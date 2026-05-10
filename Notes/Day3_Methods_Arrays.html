@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 3 — Methods & Arrays</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Sora:wght@400;600;700;800&display=swap');
+:root{--bg:#0d1117;--bg2:#161b22;--bg3:#1e2530;--border:#30363d;--accent:#f0a500;--accent2:#58a6ff;--accent3:#3fb950;--accent4:#ff7b72;--accent5:#d2a8ff;--text:#e6edf3;--muted:#8b949e;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);line-height:1.75;font-size:15px;}
+.hero{background:linear-gradient(135deg,#0d1117,#161b22,#1a1a2e);border-bottom:2px solid var(--accent5);padding:48px 40px 36px;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:0;right:0;width:400px;height:400px;background:radial-gradient(circle,rgba(210,168,255,0.06),transparent 70%);pointer-events:none;}
+.hero-tag{display:inline-block;background:rgba(210,168,255,0.12);border:1px solid rgba(210,168,255,0.3);color:var(--accent5);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;padding:4px 12px;border-radius:20px;margin-bottom:16px;}
+.hero h1{font-size:34px;font-weight:800;line-height:1.2;margin-bottom:10px;}
+.hero h1 span{color:var(--accent5);}
+.hero-sub{color:var(--muted);font-size:14px;display:flex;gap:24px;flex-wrap:wrap;margin-top:16px;}
+.hero-sub span{display:flex;align-items:center;gap:6px;}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--accent5);display:inline-block;}
+.container{max-width:980px;margin:0 auto;padding:40px 32px 80px;}
+.toc{background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--accent5);border-radius:8px;padding:24px 28px;margin-bottom:48px;}
+.toc-title{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--accent5);margin-bottom:14px;}
+.toc ol{padding-left:20px;}.toc li{margin-bottom:6px;}
+.toc a{color:var(--muted);text-decoration:none;font-size:14px;}.toc a:hover{color:var(--accent5);}
+.section{margin-bottom:56px;}
+.section-header{display:flex;align-items:center;gap:14px;margin-bottom:24px;padding-bottom:14px;border-bottom:1px solid var(--border);}
+.section-num{background:var(--accent5);color:#000;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:12px;width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.section h2{font-size:22px;font-weight:700;}
+h3{font-size:16px;font-weight:600;color:var(--accent5);margin:28px 0 12px;display:flex;align-items:center;gap:8px;}
+h3::before{content:'▸';color:var(--accent);font-size:12px;}
+p{color:var(--muted);margin-bottom:14px;line-height:1.8;}strong{color:var(--text);font-weight:600;}
+.code-block{background:#010409;border:1px solid var(--border);border-radius:10px;margin:20px 0;overflow:hidden;}
+.code-header{background:var(--bg2);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
+.code-lang{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent5);letter-spacing:1px;text-transform:uppercase;font-weight:600;}
+.code-file{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);}
+pre{font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.85;padding:20px;overflow-x:auto;color:#e6edf3;}
+.kw{color:#ff7b72;font-weight:500;}.ty{color:#ffa657;}.st{color:#a5d6ff;}.cm{color:#6e7681;font-style:italic;}
+.nm{color:#79c0ff;}.nu{color:#79c0ff;}.fn{color:#d2a8ff;}.op{color:#ff7b72;}.bool{color:#3fb950;}
+code{font-family:'JetBrains Mono',monospace;font-size:12.5px;background:rgba(210,168,255,0.1);border:1px solid rgba(210,168,255,0.2);color:var(--accent5);padding:1px 7px;border-radius:4px;}
+.callout{border-radius:8px;padding:16px 20px;margin:20px 0;display:flex;gap:14px;align-items:flex-start;}
+.callout-icon{font-size:18px;flex-shrink:0;margin-top:1px;}.callout-body{flex:1;}
+.callout-title{font-weight:700;font-size:13px;margin-bottom:4px;}.callout p{margin-bottom:0;font-size:13.5px;}
+.note{background:rgba(88,166,255,0.07);border-left:3px solid var(--accent2);}.note .callout-title{color:var(--accent2);}
+.tip{background:rgba(63,185,80,0.07);border-left:3px solid var(--accent3);}.tip .callout-title{color:var(--accent3);}
+.warn{background:rgba(240,165,0,0.07);border-left:3px solid var(--accent);}.warn .callout-title{color:var(--accent);}
+.error{background:rgba(255,123,114,0.07);border-left:3px solid var(--accent4);}.error .callout-title{color:var(--accent4);}
+.purple{background:rgba(210,168,255,0.07);border-left:3px solid var(--accent5);}.purple .callout-title{color:var(--accent5);}
+.table-wrap{overflow-x:auto;margin:20px 0;}
+table{width:100%;border-collapse:collapse;font-size:13.5px;}
+thead tr{background:var(--bg2);border-bottom:2px solid var(--accent5);}
+th{padding:12px 16px;text-align:left;font-weight:700;font-size:12px;letter-spacing:0.5px;text-transform:uppercase;color:var(--accent5);}
+td{padding:11px 16px;border-bottom:1px solid var(--border);color:var(--muted);}
+tr:hover td{background:rgba(255,255,255,0.02);}
+td:first-child{font-family:'JetBrains Mono',monospace;color:var(--accent);font-size:13px;}
+.diagram-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:28px 24px;margin:24px 0;overflow:hidden;}
+.diagram-title{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:20px;text-align:center;}
+.hour-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(210,168,255,0.1);border:1px solid rgba(210,168,255,0.25);color:var(--accent5);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:1px;padding:5px 14px;border-radius:20px;margin-bottom:18px;margin-top:30px;}
+.mistake-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:20px 0;}
+.mistake-card{background:rgba(255,123,114,0.05);border:1px solid rgba(255,123,114,0.2);border-radius:8px;padding:16px;}
+.mistake-card .mt{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent4);font-weight:700;margin-bottom:8px;}
+.mistake-card p{font-size:13px;margin:0;}
+.checklist{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:24px 28px;margin:24px 0;}
+.checklist-title{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent3);letter-spacing:1.5px;text-transform:uppercase;font-weight:700;margin-bottom:16px;}
+.check-item{display:flex;align-items:flex-start;gap:12px;padding:9px 0;border-bottom:1px solid rgba(48,54,61,0.5);font-size:14px;color:var(--muted);}
+.check-item:last-child{border-bottom:none;}
+.check-box{width:18px;height:18px;border:2px solid var(--accent3);border-radius:4px;flex-shrink:0;margin-top:2px;}
+.resource-list{list-style:none;padding:0;margin:12px 0;}
+.resource-list li{padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;margin-bottom:8px;font-size:13.5px;display:flex;gap:10px;align-items:center;}
+.resource-list li a{color:var(--accent2);text-decoration:none;}
+.footer{background:var(--bg2);border-top:1px solid var(--border);padding:24px 40px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);}
+.footer span{color:var(--accent5);}
+::-webkit-scrollbar{width:6px;height:6px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+@media(max-width:640px){.hero{padding:32px 20px 24px;}.hero h1{font-size:24px;}.container{padding:24px 16px 60px;}}
+</style>
+</head>
+<body>
+<div class="hero">
+  <div class="hero-tag">Phase 1 &middot; Day 3 of 65</div>
+  <h1>Methods <span>&amp; Arrays</span></h1>
+  <div class="hero-sub">
+    <span><span class="dot"></span>2 Hours</span>
+    <span><span class="dot"></span>Selenium + Java Track</span>
+    <span><span class="dot"></span>void &middot; return &middot; parameters &middot; arrays &middot; 2D arrays</span>
+  </div>
+</div>
+<div class="container">
+
+<div class="toc">
+  <div class="toc-title">// Table of Contents</div>
+  <ol>
+    <li><a href="#s1">Why Methods &amp; Arrays Matter in Selenium</a></li>
+    <li><a href="#s2">What is a Method? — The Big Picture</a></li>
+    <li><a href="#s3">Method Anatomy — Every Part Labelled</a></li>
+    <li><a href="#s4">void Methods — No Return Value</a></li>
+    <li><a href="#s5">Return Methods — Sending Data Back</a></li>
+    <li><a href="#s6">Parameters vs Arguments</a></li>
+    <li><a href="#s7">Multiple Parameters</a></li>
+    <li><a href="#s8">Method Overloading</a></li>
+    <li><a href="#s9">static vs Non-static Methods</a></li>
+    <li><a href="#s10">Variable Scope</a></li>
+    <li><a href="#s11">What is an Array?</a></li>
+    <li><a href="#s12">Array Declaration &amp; Initialization</a></li>
+    <li><a href="#s13">Accessing &amp; Modifying Elements</a></li>
+    <li><a href="#s14">Looping Through Arrays</a></li>
+    <li><a href="#s15">2D Arrays — Test Data Table</a></li>
+    <li><a href="#s16">Arrays Utility Methods</a></li>
+    <li><a href="#s17">Methods + Arrays Together</a></li>
+    <li><a href="#s18">Selenium Preview</a></li>
+    <li><a href="#s19">Practice Task + Expected Output</a></li>
+    <li><a href="#s20">Common Mistakes</a></li>
+    <li><a href="#s21">End of Day Checklist + Resources</a></li>
+  </ol>
+</div>
+
+<!-- S1 -->
+<div class="section" id="s1">
+  <div class="section-header"><div class="section-num">01</div><h2>Why Methods &amp; Arrays Matter in Selenium</h2></div>
+  <p>By Phase 3, <strong>every single action in Selenium will be a method</strong>. Click a button? Method. Enter text? Method. Verify a title? Method. The Page Object Model (POM) — your final framework — is literally a collection of methods inside classes. Arrays power <strong>data-driven testing</strong> — one test, 50 login combinations, zero code repetition.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Concept</th><th>Real Selenium Usage</th></tr></thead>
+      <tbody>
+        <tr><td>void method</td><td><code>clickLoginButton()</code> — performs action, returns nothing</td></tr>
+        <tr><td>return method</td><td><code>getPageTitle()</code> — returns current page title as String</td></tr>
+        <tr><td>parameters</td><td><code>enterUsername(String user)</code> — types given text into field</td></tr>
+        <tr><td>static method</td><td>Utility helpers: <code>takeScreenshot()</code>, <code>readConfig()</code></td></tr>
+        <tr><td>array / list</td><td>All <code>findElements()</code> results — returns list of web elements</td></tr>
+        <tr><td>2D array</td><td>Test data: row = test case, columns = username/password/expected</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- S2 -->
+<div class="section" id="s2">
+  <div class="section-header"><div class="section-num">02</div><h2>What is a Method? — The Big Picture</h2></div>
+  <div class="hour-badge">&#9200; Hour 1 — Methods (60 mins)</div>
+  <p>A <strong>method</strong> is a named, reusable block of code. You define it once and call it as many times as needed. Think of it as a vending machine button — press it (call it), it does its job, optionally gives you something back (return value).</p>
+  <div class="diagram-wrap">
+    <div class="diagram-title">// Define Once — Call Anywhere</div>
+    <svg viewBox="0 0 700 160" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:700px;display:block;margin:0 auto">
+      <defs><marker id="a1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0L0,6L8,3z" fill="#d2a8ff"/></marker></defs>
+      <rect x="10" y="30" width="210" height="100" rx="8" fill="#0d1117" stroke="#d2a8ff" stroke-width="2"/>
+      <rect x="10" y="30" width="210" height="28" rx="8" fill="rgba(210,168,255,0.12)"/>
+      <rect x="10" y="46" width="210" height="12" fill="rgba(210,168,255,0.12)"/>
+      <text x="115" y="50" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" font-weight="700" fill="#d2a8ff">METHOD DEFINITION</text>
+      <text x="26" y="75" font-family="JetBrains Mono,monospace" font-size="11" fill="#ff7b72">public static void</text>
+      <text x="26" y="92" font-family="JetBrains Mono,monospace" font-size="11" fill="#d2a8ff">clickLogin</text><text x="100" y="92" font-family="JetBrains Mono,monospace" font-size="11" fill="#e6edf3">() {</text>
+      <text x="38" y="109" font-family="JetBrains Mono,monospace" font-size="10" fill="#6e7681">// body here</text>
+      <text x="26" y="124" font-family="JetBrains Mono,monospace" font-size="11" fill="#e6edf3">}</text>
+      <text x="115" y="148" text-anchor="middle" font-family="Sora,sans-serif" font-size="10" fill="#6e7681">Written ONCE</text>
+      <line x1="220" y1="80" x2="265" y2="80" stroke="#d2a8ff" stroke-width="1.5" marker-end="url(#a1)"/>
+      <rect x="265" y="18" width="180" height="28" rx="6" fill="#0a1a0d" stroke="#3fb950" stroke-width="1.5"/>
+      <text x="355" y="37" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#d2a8ff">clickLogin<tspan fill="#e6edf3">();</tspan></text>
+      <text x="458" y="37" font-family="Sora,sans-serif" font-size="9" fill="#3fb950">call 1</text>
+      <rect x="265" y="58" width="180" height="28" rx="6" fill="#0a1a0d" stroke="#3fb950" stroke-width="1.5"/>
+      <text x="355" y="77" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#d2a8ff">clickLogin<tspan fill="#e6edf3">();</tspan></text>
+      <text x="458" y="77" font-family="Sora,sans-serif" font-size="9" fill="#3fb950">call 2</text>
+      <rect x="265" y="98" width="180" height="28" rx="6" fill="#0a1a0d" stroke="#3fb950" stroke-width="1.5"/>
+      <text x="355" y="117" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#d2a8ff">clickLogin<tspan fill="#e6edf3">();</tspan></text>
+      <text x="458" y="117" font-family="Sora,sans-serif" font-size="9" fill="#3fb950">call 3</text>
+      <rect x="468" y="28" width="220" height="120" rx="8" fill="#161b22" stroke="#30363d"/>
+      <text x="480" y="50" font-family="JetBrains Mono,monospace" font-size="10" fill="#f0a500" font-weight="700">Why methods?</text>
+      <text x="480" y="68" font-family="Sora,sans-serif" font-size="10" fill="#8b949e">&#10003; Write once, reuse everywhere</text>
+      <text x="480" y="86" font-family="Sora,sans-serif" font-size="10" fill="#8b949e">&#10003; Fix bugs in 1 place only</text>
+      <text x="480" y="104" font-family="Sora,sans-serif" font-size="10" fill="#8b949e">&#10003; Code is readable + clean</text>
+      <text x="480" y="122" font-family="Sora,sans-serif" font-size="10" fill="#8b949e">&#10003; POM framework is built on this</text>
+      <text x="480" y="140" font-family="Sora,sans-serif" font-size="10" fill="#8b949e">&#10003; Test each piece in isolation</text>
+    </svg>
+  </div>
+</div>
+
+<!-- S3 -->
+<div class="section" id="s3">
+  <div class="section-header"><div class="section-num">03</div><h2>Method Anatomy — Every Part Labelled</h2></div>
+  <p>Every method has up to 5 parts. Interviewers ask about every single one of these. Learn them now.</p>
+  <div class="diagram-wrap">
+    <div class="diagram-title">// Method Anatomy — Full Breakdown</div>
+    <svg viewBox="0 0 700 290" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:700px;display:block;margin:0 auto">
+      <defs><marker id="a2" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0L0,6L7,3z" fill="#8b949e"/></marker></defs>
+      <rect x="10" y="18" width="680" height="52" rx="8" fill="#010409" stroke="#30363d"/>
+      <text x="32" y="52" font-family="JetBrains Mono,monospace" font-size="15">
+        <tspan fill="#ff7b72">public static </tspan><tspan fill="#ffa657">String </tspan><tspan fill="#d2a8ff">getTitle</tspan><tspan fill="#e6edf3">(</tspan><tspan fill="#ffa657">String </tspan><tspan fill="#79c0ff">url</tspan><tspan fill="#e6edf3">) { ... }</tspan>
+      </text>
+      <!-- annotations -->
+      <line x1="75" y1="70" x2="75" y2="100" stroke="#58a6ff" stroke-width="1.5" marker-end="url(#a2)"/>
+      <rect x="10" y="100" width="135" height="48" rx="6" fill="#0d1522" stroke="#58a6ff" stroke-width="1"/>
+      <text x="77" y="118" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#58a6ff">ACCESS MODIFIER</text>
+      <text x="77" y="132" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#6e7681">public = from anywhere</text>
+      <text x="77" y="144" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#6e7681">private = same class only</text>
+
+      <line x1="158" y1="70" x2="185" y2="100" stroke="#f0a500" stroke-width="1.5" marker-end="url(#a2)"/>
+      <rect x="152" y="100" width="110" height="48" rx="6" fill="#1a1400" stroke="#f0a500" stroke-width="1"/>
+      <text x="207" y="118" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#f0a500">static</text>
+      <text x="207" y="132" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#6e7681">belongs to class,</text>
+      <text x="207" y="144" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#6e7681">not to an object</text>
+
+      <line x1="262" y1="70" x2="290" y2="100" stroke="#ffa657" stroke-width="1.5" marker-end="url(#a2)"/>
+      <rect x="265" y="100" width="120" height="48" rx="6" fill="#1a1000" stroke="#ffa657" stroke-width="1"/>
+      <text x="325" y="118" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#ffa657">RETURN TYPE</text>
+      <text x="325" y="132" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#6e7681">String = returns text</text>
+      <text x="325" y="144" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#6e7681">void = returns nothing</text>
+
+      <line x1="388" y1="70" x2="405" y2="100" stroke="#d2a8ff" stroke-width="1.5" marker-end="url(#a2)"/>
+      <rect x="390" y="100" width="120" height="48" rx="6" fill="#15091f" stroke="#d2a8ff" stroke-width="1"/>
+      <text x="450" y="118" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#d2a8ff">METHOD NAME</text>
+      <text x="450" y="132" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#6e7681">camelCase, verb-based</text>
+      <text x="450" y="144" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#6e7681">describes the action</text>
+
+      <line x1="520" y1="70" x2="545" y2="100" stroke="#3fb950" stroke-width="1.5" marker-end="url(#a2)"/>
+      <rect x="518" y="100" width="170" height="48" rx="6" fill="#0a1a0d" stroke="#3fb950" stroke-width="1"/>
+      <text x="603" y="118" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#3fb950">PARAMETER</text>
+      <text x="603" y="132" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#6e7681">input method needs:</text>
+      <text x="603" y="144" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#6e7681">type + name pair</text>
+
+      <!-- key rule box -->
+      <rect x="10" y="170" width="680" height="105" rx="8" fill="#161b22" stroke="#30363d"/>
+      <text x="28" y="194" font-family="JetBrains Mono,monospace" font-size="11" fill="#f0a500" font-weight="700">Access Modifiers Quick Reference:</text>
+      <text x="28" y="216" font-family="JetBrains Mono,monospace" font-size="11" fill="#58a6ff">public   </text><text x="105" y="216" font-family="Sora,sans-serif" font-size="11" fill="#8b949e">accessible from ANY class in the project</text>
+      <text x="28" y="234" font-family="JetBrains Mono,monospace" font-size="11" fill="#ff7b72">private  </text><text x="105" y="234" font-family="Sora,sans-serif" font-size="11" fill="#8b949e">accessible ONLY inside the same class</text>
+      <text x="28" y="252" font-family="JetBrains Mono,monospace" font-size="11" fill="#3fb950">protected</text><text x="105" y="252" font-family="Sora,sans-serif" font-size="11" fill="#8b949e">accessible in same class + all subclasses</text>
+      <text x="28" y="270" font-family="JetBrains Mono,monospace" font-size="11" fill="#6e7681">(none)   </text><text x="105" y="270" font-family="Sora,sans-serif" font-size="11" fill="#8b949e">package-private — same package only</text>
+    </svg>
+  </div>
+</div>
+
+<!-- S4 -->
+<div class="section" id="s4">
+  <div class="section-header"><div class="section-num">04</div><h2>void Methods — No Return Value</h2></div>
+  <p>A <code>void</code> method <strong>performs an action and returns nothing</strong>. In Selenium, actions like clicking, typing, scrolling are all void methods — they do the thing and that's it.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">VoidMethods.java</span></div>
+    <pre><span class="kw">public class</span> <span class="nm">VoidMethods</span> {
+
+    <span class="cm">// void — does something, returns nothing</span>
+    <span class="kw">public static void</span> <span class="fn">printWelcome</span>() {
+        <span class="fn">System.out.println</span>(<span class="st">"=============================="</span>);
+        <span class="fn">System.out.println</span>(<span class="st">"   Welcome to OrangeHRM QA   "</span>);
+        <span class="fn">System.out.println</span>(<span class="st">"=============================="</span>);
+    }
+
+    <span class="cm">// void with parameters</span>
+    <span class="kw">public static void</span> <span class="fn">printTestResult</span>(<span class="ty">String</span> <span class="nm">testName</span>, <span class="ty">boolean</span> <span class="nm">passed</span>) {
+        <span class="ty">String</span> <span class="nm">status</span> <span class="op">=</span> passed <span class="op">?</span> <span class="st">"PASS"</span> <span class="op">:</span> <span class="st">"FAIL"</span>;
+        <span class="fn">System.out.println</span>(<span class="st">"["</span> <span class="op">+</span> status <span class="op">+</span> <span class="st">"] "</span> <span class="op">+</span> testName);
+    }
+
+    <span class="kw">public static void</span> <span class="fn">main</span>(<span class="ty">String</span>[] args) {
+        <span class="fn">printWelcome</span>();
+        <span class="fn">printTestResult</span>(<span class="st">"Login with valid credentials"</span>, <span class="bool">true</span>);
+        <span class="fn">printTestResult</span>(<span class="st">"Login with wrong password"</span>,    <span class="bool">false</span>);
+        <span class="fn">printTestResult</span>(<span class="st">"Login with empty fields"</span>,       <span class="bool">false</span>);
+    }
+}
+<span class="cm">// ==============================</span>
+<span class="cm">//    Welcome to OrangeHRM QA</span>
+<span class="cm">// ==============================</span>
+<span class="cm">// [PASS] Login with valid credentials</span>
+<span class="cm">// [FAIL] Login with wrong password</span>
+<span class="cm">// [FAIL] Login with empty fields</span></pre>
+  </div>
+  <div class="callout note">
+    <span class="callout-icon">&#128204;</span>
+    <div class="callout-body">
+      <div class="callout-title">void methods CAN use return; to exit early</div>
+      <p>You can write <code>return;</code> inside a void method to bail out early based on a condition. It just can't return a value. Useful when you want to skip execution if a precondition fails.</p>
+    </div>
+  </div>
+</div>
+
+<!-- S5 -->
+<div class="section" id="s5">
+  <div class="section-header"><div class="section-num">05</div><h2>Return Methods — Sending Data Back</h2></div>
+  <p>A return method <strong>computes something and sends it back</strong> to whoever called it. The caller can store it, print it, or pass it into another method.</p>
+  <div class="diagram-wrap">
+    <div class="diagram-title">// How return works — Data flows back to caller</div>
+    <svg viewBox="0 0 700 140" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:700px;display:block;margin:0 auto">
+      <defs>
+        <marker id="a3" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0L0,6L8,3z" fill="#f0a500"/></marker>
+        <marker id="a4" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0L0,6L8,3z" fill="#3fb950"/></marker>
+      </defs>
+      <rect x="10" y="30" width="230" height="80" rx="8" fill="#0d1117" stroke="#3fb950" stroke-width="1.5"/>
+      <text x="125" y="52" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#3fb950" font-weight="700">CALLER (main method)</text>
+      <text x="26" y="72" font-family="JetBrains Mono,monospace" font-size="10"><tspan fill="#79c0ff">String</tspan><tspan fill="#e6edf3"> title = </tspan><tspan fill="#d2a8ff">getTitle</tspan><tspan fill="#e6edf3">();</tspan></text>
+      <text x="125" y="98" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#6e7681">title now holds "OrangeHRM"</text>
+      <line x1="240" y1="68" x2="286" y2="68" stroke="#f0a500" stroke-width="1.5" marker-end="url(#a3)"/>
+      <text x="263" y="61" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#f0a500">call</text>
+      <rect x="286" y="18" width="250" height="104" rx="8" fill="#0d1117" stroke="#d2a8ff" stroke-width="1.5"/>
+      <text x="411" y="40" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#d2a8ff" font-weight="700">getTitle() METHOD</text>
+      <text x="302" y="62" font-family="JetBrains Mono,monospace" font-size="10"><tspan fill="#ff7b72">public static </tspan><tspan fill="#ffa657">String </tspan><tspan fill="#d2a8ff">getTitle</tspan><tspan fill="#e6edf3">() {</tspan></text>
+      <text x="314" y="82" font-family="JetBrains Mono,monospace" font-size="10"><tspan fill="#ff7b72">  return </tspan><tspan fill="#a5d6ff">"OrangeHRM"</tspan><tspan fill="#e6edf3">;</tspan></text>
+      <text x="302" y="102" font-family="JetBrains Mono,monospace" font-size="10" fill="#e6edf3">}</text>
+      <text x="411" y="118" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#6e7681">return exits + sends value back</text>
+      <line x1="286" y1="88" x2="240" y2="88" stroke="#3fb950" stroke-width="1.5" marker-end="url(#a4)"/>
+      <text x="263" y="107" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#3fb950">returns "OrangeHRM"</text>
+      <rect x="550" y="28" width="140" height="104" rx="8" fill="#161b22" stroke="#30363d"/>
+      <text x="620" y="50" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#f0a500">Return types:</text>
+      <text x="565" y="68" font-family="Sora,sans-serif" font-size="9" fill="#8b949e">String — text</text>
+      <text x="565" y="84" font-family="Sora,sans-serif" font-size="9" fill="#8b949e">int    — number</text>
+      <text x="565" y="100" font-family="Sora,sans-serif" font-size="9" fill="#8b949e">boolean— true/false</text>
+      <text x="565" y="116" font-family="Sora,sans-serif" font-size="9" fill="#8b949e">void   — nothing</text>
+    </svg>
+  </div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">ReturnMethods.java</span></div>
+    <pre><span class="kw">public class</span> <span class="nm">ReturnMethods</span> {
+
+    <span class="cm">// Returns String</span>
+    <span class="kw">public static</span> <span class="ty">String</span> <span class="fn">getPageTitle</span>() {
+        <span class="kw">return</span> <span class="st">"OrangeHRM"</span>;
+    }
+
+    <span class="cm">// Returns int</span>
+    <span class="kw">public static</span> <span class="ty">int</span> <span class="fn">addNumbers</span>(<span class="ty">int</span> <span class="nm">a</span>, <span class="ty">int</span> <span class="nm">b</span>) {
+        <span class="kw">return</span> a <span class="op">+</span> b;
+    }
+
+    <span class="cm">// Returns boolean — perfect for test assertions</span>
+    <span class="kw">public static</span> <span class="ty">boolean</span> <span class="fn">isValidScore</span>(<span class="ty">int</span> <span class="nm">score</span>) {
+        <span class="kw">return</span> score <span class="op">&gt;=</span> <span class="nu">0</span> <span class="op">&amp;&amp;</span> score <span class="op">&lt;=</span> <span class="nu">100</span>;
+    }
+
+    <span class="cm">// Early return — exit on invalid input</span>
+    <span class="kw">public static</span> <span class="ty">String</span> <span class="fn">getGrade</span>(<span class="ty">int</span> <span class="nm">score</span>) {
+        <span class="kw">if</span> (score <span class="op">&lt;</span> <span class="nu">0</span> <span class="op">||</span> score <span class="op">&gt;</span> <span class="nu">100</span>) <span class="kw">return</span> <span class="st">"Invalid"</span>;  <span class="cm">// early exit!</span>
+        <span class="kw">if</span> (score <span class="op">&gt;=</span> <span class="nu">90</span>) <span class="kw">return</span> <span class="st">"A"</span>;
+        <span class="kw">if</span> (score <span class="op">&gt;=</span> <span class="nu">80</span>) <span class="kw">return</span> <span class="st">"B"</span>;
+        <span class="kw">if</span> (score <span class="op">&gt;=</span> <span class="nu">70</span>) <span class="kw">return</span> <span class="st">"C"</span>;
+        <span class="kw">return</span> <span class="st">"F"</span>;
+    }
+
+    <span class="kw">public static void</span> <span class="fn">main</span>(<span class="ty">String</span>[] args) {
+        <span class="ty">String</span>  <span class="nm">title</span> <span class="op">=</span> <span class="fn">getPageTitle</span>();
+        <span class="ty">int</span>     <span class="nm">sum</span>   <span class="op">=</span> <span class="fn">addNumbers</span>(<span class="nu">15</span>, <span class="nu">27</span>);
+        <span class="ty">boolean</span> <span class="nm">valid</span> <span class="op">=</span> <span class="fn">isValidScore</span>(<span class="nu">85</span>);
+        <span class="ty">String</span>  <span class="nm">grade</span> <span class="op">=</span> <span class="fn">getGrade</span>(<span class="nu">73</span>);
+
+        <span class="fn">System.out.println</span>(<span class="st">"Title : "</span> <span class="op">+</span> title);   <span class="cm">// OrangeHRM</span>
+        <span class="fn">System.out.println</span>(<span class="st">"Sum   : "</span> <span class="op">+</span> sum);     <span class="cm">// 42</span>
+        <span class="fn">System.out.println</span>(<span class="st">"Valid : "</span> <span class="op">+</span> valid);   <span class="cm">// true</span>
+        <span class="fn">System.out.println</span>(<span class="st">"Grade : "</span> <span class="op">+</span> grade);   <span class="cm">// C</span>
+
+        <span class="cm">// Use return value without storing</span>
+        <span class="fn">System.out.println</span>(<span class="fn">getGrade</span>(<span class="nu">95</span>));  <span class="cm">// A</span>
+    }
+}</pre>
+  </div>
+  <div class="callout error">
+    <span class="callout-icon">&#128680;</span>
+    <div class="callout-body">
+      <div class="callout-title">Every non-void method MUST return in EVERY possible code path</div>
+      <p>If your method says it returns <code>String</code> but one branch of an if-else has no <code>return</code>, Java gives compile error: "missing return statement." All branches must return something.</p>
+    </div>
+  </div>
+</div>
+
+<!-- S6 -->
+<div class="section" id="s6">
+  <div class="section-header"><div class="section-num">06</div><h2>Parameters vs Arguments</h2></div>
+  <p><strong>Parameter</strong> = variable in the method definition (what it expects). <strong>Argument</strong> = actual value you pass when calling (what you send). They're linked by position — first argument goes to first parameter.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">Params.java</span></div>
+    <pre><span class="cm">//           parameter1    parameter2</span>
+<span class="cm">//                ↓              ↓</span>
+<span class="kw">public static void</span> <span class="fn">loginAs</span>(<span class="ty">String</span> <span class="nm">username</span>, <span class="ty">String</span> <span class="nm">password</span>) {
+    <span class="fn">System.out.println</span>(<span class="st">"User: "</span> <span class="op">+</span> username <span class="op">+</span> <span class="st">"  Pass: "</span> <span class="op">+</span> password);
+}
+
+<span class="kw">public static void</span> <span class="fn">main</span>(<span class="ty">String</span>[] args) {
+    <span class="cm">//       argument1    argument2</span>
+    <span class="cm">//           ↓            ↓</span>
+    <span class="fn">loginAs</span>(<span class="st">"Admin"</span>, <span class="st">"admin123"</span>);   <span class="cm">// "Admin"→username, "admin123"→password</span>
+    <span class="fn">loginAs</span>(<span class="st">"sagar"</span>, <span class="st">"test@123"</span>);
+}
+
+<span class="cm">// IMPORTANT: Primitives passed BY VALUE (method gets a copy)</span>
+<span class="ty">int</span> <span class="nm">x</span> <span class="op">=</span> <span class="nu">10</span>;
+<span class="fn">modifyValue</span>(x);
+<span class="fn">System.out.println</span>(x); <span class="cm">// still 10! method only changed its own copy</span>
+
+<span class="kw">public static void</span> <span class="fn">modifyValue</span>(<span class="ty">int</span> <span class="nm">num</span>) {
+    num <span class="op">=</span> <span class="nu">99</span>;  <span class="cm">// changes local copy only, NOT original x</span>
+}</pre>
+  </div>
+</div>
+
+<!-- S7 -->
+<div class="section" id="s7">
+  <div class="section-header"><div class="section-num">07</div><h2>Multiple Parameters</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">MultiParams.java</span></div>
+    <pre><span class="kw">public static</span> <span class="ty">String</span> <span class="fn">buildReport</span>(<span class="ty">String</span> <span class="nm">testName</span>, <span class="ty">boolean</span> <span class="nm">passed</span>, <span class="ty">int</span> <span class="nm">duration</span>, <span class="ty">String</span> <span class="nm">browser</span>) {
+    <span class="ty">String</span> <span class="nm">status</span> <span class="op">=</span> passed <span class="op">?</span> <span class="st">"PASS"</span> <span class="op">:</span> <span class="st">"FAIL"</span>;
+    <span class="kw">return</span> <span class="ty">String</span>.<span class="fn">format</span>(<span class="st">"[%s] %s | %ds | %s"</span>, status, testName, duration, browser);
+}
+
+<span class="kw">public static void</span> <span class="fn">main</span>(<span class="ty">String</span>[] args) {
+    <span class="fn">System.out.println</span>(<span class="fn">buildReport</span>(<span class="st">"Login Test"</span>,  <span class="bool">true</span>,  <span class="nu">3</span>, <span class="st">"Chrome"</span>));
+    <span class="fn">System.out.println</span>(<span class="fn">buildReport</span>(<span class="st">"Logout Test"</span>, <span class="bool">false</span>, <span class="nu">1</span>, <span class="st">"Firefox"</span>));
+}
+<span class="cm">// [PASS] Login Test  | 3s | Chrome</span>
+<span class="cm">// [FAIL] Logout Test | 1s | Firefox</span></pre>
+  </div>
+</div>
+
+<!-- S8 -->
+<div class="section" id="s8">
+  <div class="section-header"><div class="section-num">08</div><h2>Method Overloading</h2></div>
+  <p>Same method name, <strong>different parameter signatures</strong>. Java picks the correct version based on what arguments you pass. Used extensively in Selenium's <code>By</code> class and <code>WebDriverWait</code>.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">Overloading.java</span></div>
+    <pre><span class="cm">// Three versions of "login" — Java picks the right one by argument types</span>
+<span class="kw">public static void</span> <span class="fn">login</span>(<span class="ty">String</span> <span class="nm">user</span>, <span class="ty">String</span> <span class="nm">pass</span>) {
+    <span class="fn">System.out.println</span>(<span class="st">"Login: "</span> <span class="op">+</span> user);
+}
+<span class="kw">public static void</span> <span class="fn">login</span>(<span class="ty">String</span> <span class="nm">user</span>, <span class="ty">String</span> <span class="nm">pass</span>, <span class="ty">boolean</span> <span class="nm">remember</span>) {
+    <span class="fn">System.out.println</span>(<span class="st">"Login: "</span> <span class="op">+</span> user <span class="op">+</span> <span class="st">" remember="</span> <span class="op">+</span> remember);
+}
+<span class="kw">public static void</span> <span class="fn">login</span>(<span class="ty">int</span> <span class="nm">userId</span>) {
+    <span class="fn">System.out.println</span>(<span class="st">"Login by ID: "</span> <span class="op">+</span> userId);
+}
+
+<span class="fn">login</span>(<span class="st">"admin"</span>, <span class="st">"pass"</span>);           <span class="cm">// version 1</span>
+<span class="fn">login</span>(<span class="st">"admin"</span>, <span class="st">"pass"</span>, <span class="bool">true</span>);    <span class="cm">// version 2</span>
+<span class="fn">login</span>(<span class="nu">1042</span>);                       <span class="cm">// version 3</span></pre>
+  </div>
+</div>
+
+<!-- S9 -->
+<div class="section" id="s9">
+  <div class="section-header"><div class="section-num">09</div><h2>static vs Non-static Methods</h2></div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Type</th><th>Keyword</th><th>How to Call</th><th>When to Use</th></tr></thead>
+      <tbody>
+        <tr><td>static</td><td><code>static</code></td><td>Directly or <code>ClassName.method()</code></td><td>Utility/helper methods. No object needed.</td></tr>
+        <tr><td>non-static</td><td>(none)</td><td>Create object first: <code>obj.method()</code></td><td>POM page classes. Each test gets its own instance.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">StaticVsInstance.java</span></div>
+    <pre><span class="kw">public class</span> <span class="nm">LoginPage</span> {
+
+    <span class="cm">// static — belongs to the CLASS, no object needed</span>
+    <span class="kw">public static</span> <span class="ty">String</span> <span class="fn">getUrl</span>() {
+        <span class="kw">return</span> <span class="st">"https://opensource-demo.orangehrmlive.com"</span>;
+    }
+
+    <span class="cm">// non-static — belongs to an OBJECT of LoginPage</span>
+    <span class="kw">public void</span> <span class="fn">enterUsername</span>(<span class="ty">String</span> <span class="nm">user</span>) {
+        <span class="fn">System.out.println</span>(<span class="st">"Typing: "</span> <span class="op">+</span> user);
+    }
+}
+
+<span class="kw">public static void</span> <span class="fn">main</span>(<span class="ty">String</span>[] args) {
+    <span class="cm">// static — no object needed</span>
+    <span class="fn">System.out.println</span>(LoginPage.<span class="fn">getUrl</span>());
+
+    <span class="cm">// non-static — must create object first</span>
+    <span class="nm">LoginPage</span> <span class="nm">page</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">LoginPage</span>();
+    page.<span class="fn">enterUsername</span>(<span class="st">"Admin"</span>);
+}</pre>
+  </div>
+  <div class="callout note">
+    <span class="callout-icon">&#128204;</span>
+    <div class="callout-body">
+      <div class="callout-title">POM Connection — Day 34</div>
+      <p>Page classes (LoginPage, DashboardPage) use <strong>non-static methods</strong> — each test gets its own page instance. Utility classes (Config, DriverFactory) use <strong>static methods</strong> — called without creating objects. Both patterns appear in your final framework.</p>
+    </div>
+  </div>
+</div>
+
+<!-- S10 -->
+<div class="section" id="s10">
+  <div class="section-header"><div class="section-num">10</div><h2>Variable Scope</h2></div>
+  <p><strong>Scope</strong> = where a variable can be accessed. A variable only exists inside the block it was declared in. Outside that block — it's gone.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">Scope.java</span></div>
+    <pre><span class="kw">public class</span> <span class="nm">Scope</span> {
+
+    <span class="cm">// CLASS-LEVEL variable — accessible by ALL methods</span>
+    <span class="kw">static</span> <span class="ty">String</span> <span class="nm">browser</span> <span class="op">=</span> <span class="st">"Chrome"</span>;
+
+    <span class="kw">public static void</span> <span class="fn">runTest</span>() {
+        <span class="cm">// LOCAL variable — only inside runTest()</span>
+        <span class="ty">String</span> <span class="nm">testName</span> <span class="op">=</span> <span class="st">"Login Test"</span>;
+
+        <span class="kw">if</span> (<span class="bool">true</span>) {
+            <span class="ty">int</span> <span class="nm">attempts</span> <span class="op">=</span> <span class="nu">3</span>;       <span class="cm">// only inside this if block</span>
+            <span class="fn">System.out.println</span>(attempts);  <span class="cm">// ✓ works here</span>
+        }
+        <span class="cm">// System.out.println(attempts); ← ERROR: out of scope</span>
+
+        <span class="fn">System.out.println</span>(testName);  <span class="cm">// ✓ same method</span>
+        <span class="fn">System.out.println</span>(browser);   <span class="cm">// ✓ class-level</span>
+    }
+
+    <span class="kw">public static void</span> <span class="fn">main</span>(<span class="ty">String</span>[] args) {
+        <span class="fn">runTest</span>();
+        <span class="fn">System.out.println</span>(browser);   <span class="cm">// ✓ class-level accessible</span>
+        <span class="cm">// System.out.println(testName); ← ERROR: testName is in runTest only</span>
+    }
+}</pre>
+  </div>
+</div>
+
+<!-- S11 -->
+<div class="section" id="s11">
+  <div class="section-header"><div class="section-num">11</div><h2>What is an Array?</h2></div>
+  <div class="hour-badge">&#9200; Hour 2 — Arrays (60 mins)</div>
+  <p>An <strong>array</strong> is a fixed-size container that holds multiple values of the <strong>same type</strong>. Each slot has an <strong>index starting from 0</strong> — never 1. Size is locked after creation — it cannot grow or shrink.</p>
+  <div class="diagram-wrap">
+    <div class="diagram-title">// Array in Memory — Index Structure</div>
+    <svg viewBox="0 0 700 170" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:700px;display:block;margin:0 auto">
+      <text x="30" y="28" font-family="JetBrains Mono,monospace" font-size="13"><tspan fill="#79c0ff">String</tspan><tspan fill="#e6edf3">[] browsers = {</tspan><tspan fill="#a5d6ff">"Chrome"</tspan><tspan fill="#e6edf3">, </tspan><tspan fill="#a5d6ff">"Firefox"</tspan><tspan fill="#e6edf3">, </tspan><tspan fill="#a5d6ff">"Edge"</tspan><tspan fill="#e6edf3">, </tspan><tspan fill="#a5d6ff">"Safari"</tspan><tspan fill="#e6edf3">};</tspan></text>
+      <rect x="30" y="42" width="140" height="55" rx="6" fill="#1e2530" stroke="#d2a8ff" stroke-width="2"/>
+      <text x="100" y="65" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="12" fill="#a5d6ff">"Chrome"</text>
+      <text x="100" y="85" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#f0a500">index [0]</text>
+      <rect x="180" y="42" width="140" height="55" rx="6" fill="#1e2530" stroke="#d2a8ff" stroke-width="2"/>
+      <text x="250" y="65" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="12" fill="#a5d6ff">"Firefox"</text>
+      <text x="250" y="85" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#f0a500">index [1]</text>
+      <rect x="330" y="42" width="140" height="55" rx="6" fill="#1e2530" stroke="#d2a8ff" stroke-width="2"/>
+      <text x="400" y="65" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="12" fill="#a5d6ff">"Edge"</text>
+      <text x="400" y="85" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#f0a500">index [2]</text>
+      <rect x="480" y="42" width="140" height="55" rx="6" fill="#1e2530" stroke="#d2a8ff" stroke-width="2"/>
+      <text x="550" y="65" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="12" fill="#a5d6ff">"Safari"</text>
+      <text x="550" y="85" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#f0a500">index [3]</text>
+      <line x1="30" y1="115" x2="620" y2="115" stroke="#3fb950" stroke-width="1.5"/>
+      <line x1="30" y1="108" x2="30" y2="122" stroke="#3fb950" stroke-width="1.5"/>
+      <line x1="620" y1="108" x2="620" y2="122" stroke="#3fb950" stroke-width="1.5"/>
+      <text x="325" y="133" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#3fb950">browsers.length = 4</text>
+      <text x="30" y="158" font-family="Sora,sans-serif" font-size="10" fill="#6e7681">First index is ALWAYS 0  ·  Last index is ALWAYS (length - 1)  ·  Size is FIXED after creation</text>
+    </svg>
+  </div>
+</div>
+
+<!-- S12 -->
+<div class="section" id="s12">
+  <div class="section-header"><div class="section-num">12</div><h2>Array Declaration &amp; Initialization</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">ArrayDeclaration.java</span></div>
+    <pre><span class="cm">// Method 1: Declare + fill at once (most common)</span>
+<span class="ty">String</span>[] <span class="nm">browsers</span>  <span class="op">=</span> {<span class="st">"Chrome"</span>, <span class="st">"Firefox"</span>, <span class="st">"Edge"</span>};
+<span class="ty">int</span>[]    <span class="nm">scores</span>    <span class="op">=</span> {<span class="nu">95</span>, <span class="nu">78</span>, <span class="nu">62</span>, <span class="nu">88</span>};
+<span class="ty">boolean</span>[] <span class="nm">results</span>  <span class="op">=</span> {<span class="bool">true</span>, <span class="bool">false</span>, <span class="bool">true</span>, <span class="bool">true</span>};
+
+<span class="cm">// Method 2: Declare size, fill later</span>
+<span class="ty">String</span>[] <span class="nm">testCases</span> <span class="op">=</span> <span class="kw">new</span> <span class="ty">String</span>[<span class="nu">3</span>];   <span class="cm">// 3 slots, all null</span>
+testCases[<span class="nu">0</span>] <span class="op">=</span> <span class="st">"Login Test"</span>;
+testCases[<span class="nu">1</span>] <span class="op">=</span> <span class="st">"Logout Test"</span>;
+testCases[<span class="nu">2</span>] <span class="op">=</span> <span class="st">"Register Test"</span>;
+
+<span class="cm">// Default values when using new Type[n]:</span>
+<span class="cm">// int[]     → 0       double[]  → 0.0</span>
+<span class="cm">// boolean[] → false   String[]  → null</span></pre>
+  </div>
+</div>
+
+<!-- S13 -->
+<div class="section" id="s13">
+  <div class="section-header"><div class="section-num">13</div><h2>Accessing &amp; Modifying Elements</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">ArrayAccess.java</span></div>
+    <pre><span class="ty">String</span>[] <span class="nm">users</span> <span class="op">=</span> {<span class="st">"admin"</span>, <span class="st">"sagar"</span>, <span class="st">"guest"</span>};
+
+<span class="cm">// Read by index</span>
+<span class="fn">System.out.println</span>(users[<span class="nu">0</span>]);                    <span class="cm">// admin (first)</span>
+<span class="fn">System.out.println</span>(users[<span class="nu">2</span>]);                    <span class="cm">// guest (last)</span>
+<span class="fn">System.out.println</span>(users[users.<span class="nm">length</span> <span class="op">-</span> <span class="nu">1</span>]);     <span class="cm">// guest (safe last)</span>
+
+<span class="cm">// Modify by index</span>
+users[<span class="nu">1</span>] <span class="op">=</span> <span class="st">"sagar_qa"</span>;
+<span class="fn">System.out.println</span>(users[<span class="nu">1</span>]);                    <span class="cm">// sagar_qa</span>
+
+<span class="cm">// Length: no parentheses for arrays!</span>
+<span class="fn">System.out.println</span>(<span class="st">"Total: "</span> <span class="op">+</span> users.<span class="nm">length</span>);   <span class="cm">// 3</span>
+
+<span class="cm">// DANGER: index out of bounds = runtime crash</span>
+<span class="cm">// System.out.println(users[5]);  ← ArrayIndexOutOfBoundsException!</span>
+<span class="cm">// Last valid index = length - 1 = 2</span></pre>
+  </div>
+</div>
+
+<!-- S14 -->
+<div class="section" id="s14">
+  <div class="section-header"><div class="section-num">14</div><h2>Looping Through Arrays</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">ArrayLoops.java</span></div>
+    <pre><span class="ty">String</span>[] <span class="nm">tests</span> <span class="op">=</span> {<span class="st">"LoginTest"</span>, <span class="st">"LogoutTest"</span>, <span class="st">"RegisterTest"</span>};
+
+<span class="cm">// Regular for — use when you need the index</span>
+<span class="kw">for</span> (<span class="ty">int</span> <span class="nm">i</span> <span class="op">=</span> <span class="nu">0</span>; <span class="nm">i</span> <span class="op">&lt;</span> tests.<span class="nm">length</span>; <span class="nm">i</span>++) {
+    <span class="fn">System.out.println</span>(<span class="st">"Test #"</span> <span class="op">+</span> (<span class="nm">i</span><span class="op">+</span><span class="nu">1</span>) <span class="op">+</span> <span class="st">": "</span> <span class="op">+</span> tests[<span class="nm">i</span>]);
+}
+
+<span class="cm">// for-each — cleanest when you just need values</span>
+<span class="kw">for</span> (<span class="ty">String</span> <span class="nm">test</span> : tests) {
+    <span class="fn">System.out.println</span>(<span class="st">"Running: "</span> <span class="op">+</span> test);
+}
+
+<span class="cm">// Find maximum score in an array</span>
+<span class="ty">int</span>[] <span class="nm">scores</span> <span class="op">=</span> {<span class="nu">78</span>, <span class="nu">95</span>, <span class="nu">62</span>, <span class="nu">88</span>, <span class="nu">91</span>};
+<span class="ty">int</span> <span class="nm">max</span> <span class="op">=</span> scores[<span class="nu">0</span>];
+<span class="kw">for</span> (<span class="ty">int</span> <span class="nm">s</span> : scores) {
+    <span class="kw">if</span> (s <span class="op">&gt;</span> max) max <span class="op">=</span> s;
+}
+<span class="fn">System.out.println</span>(<span class="st">"Highest: "</span> <span class="op">+</span> max);  <span class="cm">// 95</span></pre>
+  </div>
+</div>
+
+<!-- S15 -->
+<div class="section" id="s15">
+  <div class="section-header"><div class="section-num">15</div><h2>2D Arrays — Test Data Table</h2></div>
+  <p>An array of arrays. Think of it as a <strong>table: rows = test cases, columns = fields</strong>. This is exactly how data-driven testing works — one test method, multiple data sets.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">TwoDArray.java</span></div>
+    <pre><span class="cm">// 2D array: login test data</span>
+<span class="cm">// columns: [0]=username  [1]=password  [2]=expected result</span>
+<span class="ty">String</span>[][] <span class="nm">loginData</span> <span class="op">=</span> {
+    {<span class="st">"Admin"</span>,  <span class="st">"admin123"</span>,  <span class="st">"Dashboard"</span>},   <span class="cm">// valid login</span>
+    {<span class="st">"Admin"</span>,  <span class="st">"wrongpass"</span>, <span class="st">"Invalid"</span>},     <span class="cm">// wrong password</span>
+    {<span class="st">""</span>,       <span class="st">""</span>,           <span class="st">"Required"</span>}     <span class="cm">// empty fields</span>
+};
+
+<span class="cm">// Access: [row][column]</span>
+<span class="fn">System.out.println</span>(loginData[<span class="nu">0</span>][<span class="nu">0</span>]);  <span class="cm">// Admin</span>
+<span class="fn">System.out.println</span>(loginData[<span class="nu">1</span>][<span class="nu">2</span>]);  <span class="cm">// Invalid</span>
+
+<span class="cm">// Loop all rows</span>
+<span class="kw">for</span> (<span class="ty">int</span> <span class="nm">row</span> <span class="op">=</span> <span class="nu">0</span>; <span class="nm">row</span> <span class="op">&lt;</span> loginData.<span class="nm">length</span>; <span class="nm">row</span>++) {
+    <span class="fn">System.out.printf</span>(<span class="st">"Test %d: user=%-8s pass=%-10s expect=%s%n"</span>,
+        row<span class="op">+</span><span class="nu">1</span>, loginData[<span class="nm">row</span>][<span class="nu">0</span>], loginData[<span class="nm">row</span>][<span class="nu">1</span>], loginData[<span class="nm">row</span>][<span class="nu">2</span>]);
+}
+<span class="cm">// Test 1: user=Admin    pass=admin123   expect=Dashboard</span>
+<span class="cm">// Test 2: user=Admin    pass=wrongpass  expect=Invalid</span>
+<span class="cm">// Test 3: user=         pass=           expect=Required</span></pre>
+  </div>
+</div>
+
+<!-- S16 -->
+<div class="section" id="s16">
+  <div class="section-header"><div class="section-num">16</div><h2>Arrays Utility Methods</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">ArrayUtils.java</span></div>
+    <pre><span class="kw">import</span> java.util.Arrays;
+
+<span class="ty">int</span>[] <span class="nm">scores</span> <span class="op">=</span> {<span class="nu">78</span>, <span class="nu">95</span>, <span class="nu">62</span>, <span class="nu">88</span>, <span class="nu">71</span>};
+
+<span class="cm">// Sort ascending</span>
+Arrays.<span class="fn">sort</span>(scores);
+<span class="fn">System.out.println</span>(Arrays.<span class="fn">toString</span>(scores));  <span class="cm">// [62, 71, 78, 88, 95]</span>
+
+<span class="cm">// Print array readable — NEVER use scores.toString() directly</span>
+<span class="fn">System.out.println</span>(Arrays.<span class="fn">toString</span>(scores));
+
+<span class="cm">// Copy</span>
+<span class="ty">int</span>[] <span class="nm">copy</span> <span class="op">=</span> Arrays.<span class="fn">copyOf</span>(scores, scores.<span class="nm">length</span>);
+
+<span class="cm">// Fill all slots with same value</span>
+<span class="ty">int</span>[] <span class="nm">zeros</span> <span class="op">=</span> <span class="kw">new</span> <span class="ty">int</span>[<span class="nu">5</span>];
+Arrays.<span class="fn">fill</span>(zeros, <span class="nu">0</span>);
+
+<span class="cm">// Manual sum + average</span>
+<span class="ty">int</span> <span class="nm">total</span> <span class="op">=</span> <span class="nu">0</span>;
+<span class="kw">for</span> (<span class="ty">int</span> <span class="nm">s</span> : scores) total <span class="op">+=</span> s;
+<span class="fn">System.out.println</span>(<span class="st">"Sum: "</span>     <span class="op">+</span> total);
+<span class="fn">System.out.println</span>(<span class="st">"Average: "</span> <span class="op">+</span> (total <span class="op">/</span> scores.<span class="nm">length</span>));</pre>
+  </div>
+</div>
+
+<!-- S17 -->
+<div class="section" id="s17">
+  <div class="section-header"><div class="section-num">17</div><h2>Methods + Arrays Together</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">MethodsAndArrays.java</span></div>
+    <pre><span class="cm">// Method that takes array, returns count</span>
+<span class="kw">public static</span> <span class="ty">int</span> <span class="fn">countPassed</span>(<span class="ty">boolean</span>[] <span class="nm">results</span>) {
+    <span class="ty">int</span> <span class="nm">count</span> <span class="op">=</span> <span class="nu">0</span>;
+    <span class="kw">for</span> (<span class="ty">boolean</span> <span class="nm">r</span> : results) <span class="kw">if</span> (r) count<span class="op">++</span>;
+    <span class="kw">return</span> count;
+}
+
+<span class="cm">// Method that takes String array, returns joined string</span>
+<span class="kw">public static</span> <span class="ty">String</span> <span class="fn">join</span>(<span class="ty">String</span>[] <span class="nm">items</span>) {
+    <span class="ty">String</span> <span class="nm">result</span> <span class="op">=</span> <span class="st">""</span>;
+    <span class="kw">for</span> (<span class="ty">int</span> <span class="nm">i</span> <span class="op">=</span> <span class="nu">0</span>; <span class="nm">i</span> <span class="op">&lt;</span> items.<span class="nm">length</span>; <span class="nm">i</span>++) {
+        result <span class="op">+=</span> items[<span class="nm">i</span>];
+        <span class="kw">if</span> (<span class="nm">i</span> <span class="op">&lt;</span> items.<span class="nm">length</span> <span class="op">-</span> <span class="nu">1</span>) result <span class="op">+=</span> <span class="st">", "</span>;
+    }
+    <span class="kw">return</span> result;
+}
+
+<span class="cm">// Method that creates and returns an array</span>
+<span class="kw">public static</span> <span class="ty">int</span>[] <span class="fn">generateScores</span>(<span class="ty">int</span> <span class="nm">count</span>) {
+    <span class="ty">int</span>[] <span class="nm">arr</span> <span class="op">=</span> <span class="kw">new</span> <span class="ty">int</span>[count];
+    <span class="kw">for</span> (<span class="ty">int</span> <span class="nm">i</span> <span class="op">=</span> <span class="nu">0</span>; <span class="nm">i</span> <span class="op">&lt;</span> count; <span class="nm">i</span>++) arr[<span class="nm">i</span>] <span class="op">=</span> (<span class="nm">i</span><span class="op">+</span><span class="nu">1</span>) <span class="op">*</span> <span class="nu">10</span>;
+    <span class="kw">return</span> arr;
+}
+
+<span class="ty">boolean</span>[] <span class="nm">r</span> <span class="op">=</span> {<span class="bool">true</span>, <span class="bool">false</span>, <span class="bool">true</span>, <span class="bool">true</span>};
+<span class="fn">System.out.println</span>(<span class="st">"Passed: "</span> <span class="op">+</span> <span class="fn">countPassed</span>(r) <span class="op">+</span> <span class="st">"/"</span> <span class="op">+</span> r.<span class="nm">length</span>);  <span class="cm">// 3/4</span>
+
+<span class="ty">String</span>[] <span class="nm">b</span> <span class="op">=</span> {<span class="st">"Chrome"</span>, <span class="st">"Firefox"</span>, <span class="st">"Edge"</span>};
+<span class="fn">System.out.println</span>(<span class="fn">join</span>(b));  <span class="cm">// Chrome, Firefox, Edge</span>
+
+<span class="ty">int</span>[] <span class="nm">gen</span> <span class="op">=</span> <span class="fn">generateScores</span>(<span class="nu">5</span>);
+<span class="kw">for</span> (<span class="ty">int</span> <span class="nm">s</span> : gen) <span class="fn">System.out.print</span>(s <span class="op">+</span> <span class="st">" "</span>);  <span class="cm">// 10 20 30 40 50</span></pre>
+  </div>
+</div>
+
+<!-- S18 -->
+<div class="section" id="s18">
+  <div class="section-header"><div class="section-num">18</div><h2>Selenium Preview</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">SeleniumPreview.java — What Phase 2+ looks like</span></div>
+    <pre><span class="cm">// POM Page class — uses non-static methods (Day 34+)</span>
+<span class="kw">public class</span> <span class="nm">LoginPage</span> {
+
+    <span class="kw">public void</span> <span class="fn">enterUsername</span>(<span class="ty">String</span> <span class="nm">user</span>) {
+        <span class="cm">// usernameField.sendKeys(user);</span>
+        <span class="fn">System.out.println</span>(<span class="st">"Typing: "</span> <span class="op">+</span> user);
+    }
+
+    <span class="kw">public boolean</span> <span class="fn">isLoginEnabled</span>() {
+        <span class="cm">// return loginBtn.isEnabled();</span>
+        <span class="kw">return</span> <span class="bool">true</span>;
+    }
+
+    <span class="kw">public</span> <span class="ty">String</span> <span class="fn">getTitle</span>() {
+        <span class="cm">// return driver.getTitle();</span>
+        <span class="kw">return</span> <span class="st">"OrangeHRM"</span>;
+    }
+}
+
+<span class="cm">// Data-driven login test using 2D array (= @DataProvider in TestNG)</span>
+<span class="ty">String</span>[][] <span class="nm">creds</span> <span class="op">=</span> {
+    {<span class="st">"Admin"</span>, <span class="st">"admin123"</span>},
+    {<span class="st">"user1"</span>, <span class="st">"pass1"</span>},
+    {<span class="st">"user2"</span>, <span class="st">"pass2"</span>}
+};
+<span class="kw">for</span> (<span class="ty">String</span>[] <span class="nm">c</span> : creds) {
+    <span class="fn">System.out.println</span>(<span class="st">"Testing: "</span> <span class="op">+</span> c[<span class="nu">0</span>] <span class="op">+</span> <span class="st">" / "</span> <span class="op">+</span> c[<span class="nu">1</span>]);
+}</pre>
+  </div>
+</div>
+
+<!-- S19 -->
+<div class="section" id="s19">
+  <div class="section-header"><div class="section-num">19</div><h2>Practice Task + Expected Output</h2></div>
+  <p>Type all of this from scratch. This combines everything from Days 1–3. This is the most complete code you've written so far.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">Day3Practice.java</span></div>
+    <pre><span class="kw">import</span> java.util.Arrays;
+
+<span class="kw">public class</span> <span class="nm">Day3Practice</span> {
+
+    <span class="kw">public static void</span> <span class="fn">header</span>(<span class="ty">String</span> <span class="nm">title</span>) {
+        <span class="fn">System.out.println</span>(<span class="st">"\n====== "</span> <span class="op">+</span> title <span class="op">+</span> <span class="st">" ======"</span>);
+    }
+
+    <span class="kw">public static</span> <span class="ty">String</span> <span class="fn">getGrade</span>(<span class="ty">int</span> <span class="nm">score</span>) {
+        <span class="kw">if</span>      (score <span class="op">&gt;=</span> <span class="nu">90</span>) <span class="kw">return</span> <span class="st">"A"</span>;
+        <span class="kw">else if</span> (score <span class="op">&gt;=</span> <span class="nu">80</span>) <span class="kw">return</span> <span class="st">"B"</span>;
+        <span class="kw">else if</span> (score <span class="op">&gt;=</span> <span class="nu">70</span>) <span class="kw">return</span> <span class="st">"C"</span>;
+        <span class="kw">else if</span> (score <span class="op">&gt;=</span> <span class="nu">50</span>) <span class="kw">return</span> <span class="st">"D"</span>;
+        <span class="kw">else</span>                   <span class="kw">return</span> <span class="st">"F"</span>;
+    }
+
+    <span class="kw">public static</span> <span class="ty">int</span> <span class="fn">countPass</span>(<span class="ty">boolean</span>[] <span class="nm">res</span>) {
+        <span class="ty">int</span> <span class="nm">c</span> <span class="op">=</span> <span class="nu">0</span>;
+        <span class="kw">for</span> (<span class="ty">boolean</span> <span class="nm">r</span> : <span class="nm">res</span>) <span class="kw">if</span> (r) c<span class="op">++</span>;
+        <span class="kw">return</span> c;
+    }
+
+    <span class="kw">public static</span> <span class="ty">int</span> <span class="fn">maxScore</span>(<span class="ty">int</span>[] <span class="nm">arr</span>) {
+        <span class="ty">int</span> <span class="nm">max</span> <span class="op">=</span> arr[<span class="nu">0</span>];
+        <span class="kw">for</span> (<span class="ty">int</span> <span class="nm">s</span> : arr) <span class="kw">if</span> (s <span class="op">&gt;</span> max) max <span class="op">=</span> s;
+        <span class="kw">return</span> max;
+    }
+
+    <span class="kw">public static void</span> <span class="fn">printReport</span>(<span class="ty">String</span>[] <span class="nm">names</span>, <span class="ty">boolean</span>[] <span class="nm">passed</span>) {
+        <span class="kw">for</span> (<span class="ty">int</span> <span class="nm">i</span> <span class="op">=</span> <span class="nu">0</span>; <span class="nm">i</span> <span class="op">&lt;</span> names.<span class="nm">length</span>; <span class="nm">i</span>++) {
+            <span class="ty">String</span> <span class="nm">s</span> <span class="op">=</span> passed[<span class="nm">i</span>] <span class="op">?</span> <span class="st">"PASS"</span> <span class="op">:</span> <span class="st">"FAIL"</span>;
+            <span class="fn">System.out.printf</span>(<span class="st">"  %-28s %s%n"</span>, names[<span class="nm">i</span>], s);
+        }
+    }
+
+    <span class="kw">public static void</span> <span class="fn">main</span>(<span class="ty">String</span>[] args) {
+
+        <span class="fn">header</span>(<span class="st">"GRADE CHECKER"</span>);
+        <span class="ty">int</span>[] <span class="nm">scores</span> <span class="op">=</span> {<span class="nu">95</span>, <span class="nu">83</span>, <span class="nu">72</span>, <span class="nu">48</span>, <span class="nu">60</span>};
+        <span class="kw">for</span> (<span class="ty">int</span> <span class="nm">s</span> : scores)
+            <span class="fn">System.out.println</span>(<span class="st">"  Score "</span> <span class="op">+</span> s <span class="op">+</span> <span class="st">" → Grade: "</span> <span class="op">+</span> <span class="fn">getGrade</span>(s));
+        <span class="fn">System.out.println</span>(<span class="st">"  Highest: "</span> <span class="op">+</span> <span class="fn">maxScore</span>(scores));
+
+        <span class="fn">header</span>(<span class="st">"TEST SUITE REPORT"</span>);
+        <span class="ty">String</span>[]  <span class="nm">tests</span>   <span class="op">=</span> {<span class="st">"Login - valid creds"</span>, <span class="st">"Login - wrong pass"</span>,
+                               <span class="st">"Logout"</span>, <span class="st">"Register"</span>, <span class="st">"Reset password"</span>};
+        <span class="ty">boolean</span>[] <span class="nm">results</span> <span class="op">=</span> {<span class="bool">true</span>, <span class="bool">false</span>, <span class="bool">true</span>, <span class="bool">true</span>, <span class="bool">false</span>};
+        <span class="fn">printReport</span>(tests, results);
+        <span class="fn">System.out.println</span>(<span class="st">"\n  Summary: "</span> <span class="op">+</span> <span class="fn">countPass</span>(results)
+                           <span class="op">+</span> <span class="st">"/"</span> <span class="op">+</span> results.<span class="nm">length</span> <span class="op">+</span> <span class="st">" passed"</span>);
+
+        <span class="fn">header</span>(<span class="st">"DATA-DRIVEN LOGIN"</span>);
+        <span class="ty">String</span>[][] <span class="nm">data</span> <span class="op">=</span> {
+            {<span class="st">"Admin"</span>, <span class="st">"admin123"</span>,  <span class="st">"Dashboard"</span>},
+            {<span class="st">"Admin"</span>, <span class="st">"wrong"</span>,     <span class="st">"Invalid credentials"</span>},
+            {<span class="st">""</span>,      <span class="st">""</span>,           <span class="st">"Username required"</span>}
+        };
+        <span class="kw">for</span> (<span class="ty">int</span> <span class="nm">i</span> <span class="op">=</span> <span class="nu">0</span>; <span class="nm">i</span> <span class="op">&lt;</span> data.<span class="nm">length</span>; <span class="nm">i</span>++)
+            <span class="fn">System.out.printf</span>(<span class="st">"  Test %d | %-8s | %-10s | %s%n"</span>,
+                i<span class="op">+</span><span class="nu">1</span>, data[<span class="nm">i</span>][<span class="nu">0</span>], data[<span class="nm">i</span>][<span class="nu">1</span>], data[<span class="nm">i</span>][<span class="nu">2</span>]);
+
+        <span class="fn">header</span>(<span class="st">"ARRAY OPERATIONS"</span>);
+        <span class="ty">int</span>[] <span class="nm">raw</span> <span class="op">=</span> {<span class="nu">55</span>, <span class="nu">22</span>, <span class="nu">88</span>, <span class="nu">11</span>, <span class="nu">66</span>};
+        <span class="fn">System.out.println</span>(<span class="st">"  Before: "</span> <span class="op">+</span> Arrays.<span class="fn">toString</span>(raw));
+        Arrays.<span class="fn">sort</span>(raw);
+        <span class="fn">System.out.println</span>(<span class="st">"  After : "</span> <span class="op">+</span> Arrays.<span class="fn">toString</span>(raw));
+        <span class="fn">System.out.println</span>(<span class="st">"  Min: "</span> <span class="op">+</span> raw[<span class="nu">0</span>] <span class="op">+</span> <span class="st">"  Max: "</span> <span class="op">+</span> raw[raw.<span class="nm">length</span><span class="op">-</span><span class="nu">1</span>]);
+    }
+}</pre>
+  </div>
+  <h3>Expected Output</h3>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Output</span><span class="code-file">Console</span></div>
+    <pre>====== GRADE CHECKER ======
+  Score 95 → Grade: A
+  Score 83 → Grade: B
+  Score 72 → Grade: C
+  Score 48 → Grade: F
+  Score 60 → Grade: D
+  Highest: 95
+
+====== TEST SUITE REPORT ======
+  Login - valid creds          PASS
+  Login - wrong pass           FAIL
+  Logout                       PASS
+  Register                     PASS
+  Reset password               FAIL
+
+  Summary: 3/5 passed
+
+====== DATA-DRIVEN LOGIN ======
+  Test 1 | Admin    | admin123   | Dashboard
+  Test 2 | Admin    | wrong      | Invalid credentials
+  Test 3 |          |            | Username required
+
+====== ARRAY OPERATIONS ======
+  Before: [55, 22, 88, 11, 66]
+  After : [11, 22, 55, 66, 88]
+  Min: 11  Max: 88</pre>
+  </div>
+</div>
+
+<!-- S20 -->
+<div class="section" id="s20">
+  <div class="section-header"><div class="section-num">20</div><h2>Common Mistakes</h2></div>
+  <div class="mistake-grid">
+    <div class="mistake-card"><div class="mt">&#10060; Return type mismatch</div><p>Method says <code>int</code> but you <code>return "hello"</code>. Types must match exactly or you get a compile error.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; Missing return path</div><p>Every branch of an if-else must return something in a non-void method. One missing return = compile error.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; ArrayIndexOutOfBounds</div><p>Accessing index that doesn't exist. Array of size 3 has indices 0,1,2. Index 3 crashes at runtime.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; .length() on arrays</div><p><code>arr.length()</code> is wrong — that's for String. Arrays use <code>arr.length</code> (no parentheses).</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; Non-static from static</div><p>Calling non-static method from <code>main()</code> without an object. Create the object first: <code>new ClassName()</code>.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; Printing array directly</div><p><code>System.out.println(arr)</code> prints a memory address like <code>[I@6d06d69c</code>. Always use <code>Arrays.toString(arr)</code>.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; Arrays can't grow</div><p><code>new String[3]</code> is forever 3. You can't add a 4th element. Need dynamic size? Use ArrayList (Day 6).</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; Wrong argument order</div><p><code>login("pass", "user")</code> when method expects <code>(username, password)</code> — Java passes by position silently.</p></div>
+  </div>
+</div>
+
+<!-- S21 -->
+<div class="section" id="s21">
+  <div class="section-header"><div class="section-num">21</div><h2>End of Day Checklist + Resources</h2></div>
+  <div class="checklist">
+    <div class="checklist-title">&#10022; End of Day 3 Checklist</div>
+    <div class="check-item"><div class="check-box"></div>I can write a void method with and without parameters</div>
+    <div class="check-item"><div class="check-box"></div>I can write a return method and use the value in main()</div>
+    <div class="check-item"><div class="check-box"></div>I know the difference between parameter and argument</div>
+    <div class="check-item"><div class="check-box"></div>I understand static vs non-static and when to use each</div>
+    <div class="check-item"><div class="check-box"></div>I understand variable scope — local vs class-level</div>
+    <div class="check-item"><div class="check-box"></div>I can declare, initialize, and access array elements by index</div>
+    <div class="check-item"><div class="check-box"></div>I can loop through arrays with for, for-each, and while</div>
+    <div class="check-item"><div class="check-box"></div>I understand 2D arrays and access by [row][col]</div>
+    <div class="check-item"><div class="check-box"></div>I use arr.length (no brackets) vs str.length() (with brackets)</div>
+    <div class="check-item"><div class="check-box"></div>I use Arrays.toString() to print arrays readably</div>
+    <div class="check-item"><div class="check-box"></div>Practice task completed — all 4 sections correct</div>
+    <div class="check-item"><div class="check-box"></div>I can explain how methods and arrays connect to Selenium POM</div>
+  </div>
+  <h3>Resources for Today</h3>
+  <ul class="resource-list">
+    <li><span>&#127909;</span><strong>YouTube:&nbsp;</strong><a href="https://youtube.com/@KunalKushwaha" target="_blank">Kunal Kushwaha — Java Episodes 5, 6, 7</a> &nbsp;<span style="color:var(--muted);font-size:12px">Methods and arrays with excellent visuals.</span></li>
+    <li><span>&#128214;</span><strong>Docs:&nbsp;</strong><a href="https://docs.oracle.com/javase/tutorial/java/javaOO/methods.html" target="_blank">Oracle Java Docs — Methods</a> &nbsp;<span style="color:var(--muted);font-size:12px">Official reference for method syntax.</span></li>
+    <li><span>&#128214;</span><strong>Docs:&nbsp;</strong><a href="https://docs.oracle.com/javase/tutorial/java/nutsandbolts/arrays.html" target="_blank">Oracle Java Docs — Arrays</a> &nbsp;<span style="color:var(--muted);font-size:12px">Official arrays reference with examples.</span></li>
+    <li><span>&#127947;</span><strong>Practice:&nbsp;</strong><a href="https://exercism.org/tracks/java" target="_blank">Exercism.io Java</a> &nbsp;<span style="color:var(--muted);font-size:12px">Do "Two Fer" and "Resistor Color" exercises — both use methods and arrays.</span></li>
+  </ul>
+  <div class="callout tip">
+    <span class="callout-icon">&#128640;</span>
+    <div class="callout-body">
+      <div class="callout-title">Day 4 Preview — OOP: Classes &amp; Objects</div>
+      <p>Tomorrow is the most important Java day before Selenium. <strong>Classes and Objects</strong> are what the entire Page Object Model is built on. Every page in your framework will be a class. Every action on that page will be a method inside that class. Day 3 methods + Day 4 OOP = exact foundation for POM at Day 34.</p>
+    </div>
+  </div>
+</div>
+
+</div>
+<div class="footer">
+  <span>Day 3 of 65</span> &nbsp;&middot;&nbsp; Selenium + Java Automation Roadmap &nbsp;&middot;&nbsp; Phase 1 &mdash; Foundation &nbsp;&middot;&nbsp; <span>Next: Day 4 &mdash; OOP: Classes &amp; Objects</span>
+</div>
+</body>
+</html>

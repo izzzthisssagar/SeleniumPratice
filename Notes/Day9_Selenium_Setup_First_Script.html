@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 9 — Selenium Setup & First Script</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Sora:wght@400;600;700;800&display=swap');
+:root{--bg:#0d1117;--bg2:#161b22;--bg3:#1e2530;--border:#30363d;--accent:#f0a500;--accent2:#58a6ff;--accent3:#3fb950;--accent4:#ff7b72;--accent5:#d2a8ff;--text:#e6edf3;--muted:#8b949e;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);line-height:1.75;font-size:15px;}
+.hero{background:linear-gradient(135deg,#0d1117,#161b22,#0d1a0d);border-bottom:2px solid var(--accent3);padding:48px 40px 36px;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:0;right:0;width:400px;height:400px;background:radial-gradient(circle,rgba(63,185,80,0.08),transparent 70%);pointer-events:none;}
+.hero-tag{display:inline-block;background:rgba(63,185,80,0.12);border:1px solid rgba(63,185,80,0.3);color:var(--accent3);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;padding:4px 12px;border-radius:20px;margin-bottom:16px;}
+.hero h1{font-size:34px;font-weight:800;line-height:1.2;margin-bottom:10px;}
+.hero h1 span{color:var(--accent3);}
+.hero-sub{color:var(--muted);font-size:14px;display:flex;gap:24px;flex-wrap:wrap;margin-top:16px;}
+.hero-sub span{display:flex;align-items:center;gap:6px;}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--accent3);display:inline-block;}
+.container{max-width:980px;margin:0 auto;padding:40px 32px 80px;}
+.toc{background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--accent3);border-radius:8px;padding:24px 28px;margin-bottom:48px;}
+.toc-title{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--accent3);margin-bottom:14px;}
+.toc ol{padding-left:20px;}.toc li{margin-bottom:6px;}
+.toc a{color:var(--muted);text-decoration:none;font-size:14px;}.toc a:hover{color:var(--accent3);}
+.section{margin-bottom:56px;}
+.section-header{display:flex;align-items:center;gap:14px;margin-bottom:24px;padding-bottom:14px;border-bottom:1px solid var(--border);}
+.section-num{background:var(--accent3);color:#000;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:12px;width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.section h2{font-size:22px;font-weight:700;}
+h3{font-size:16px;font-weight:600;color:var(--accent3);margin:28px 0 12px;display:flex;align-items:center;gap:8px;}
+h3::before{content:'▸';color:var(--accent);font-size:12px;}
+p{color:var(--muted);margin-bottom:14px;line-height:1.8;}strong{color:var(--text);font-weight:600;}
+.code-block{background:#010409;border:1px solid var(--border);border-radius:10px;margin:20px 0;overflow:hidden;}
+.code-header{background:var(--bg2);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
+.code-lang{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent3);letter-spacing:1px;text-transform:uppercase;font-weight:600;}
+.code-file{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);}
+pre{font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.85;padding:20px;overflow-x:auto;color:#e6edf3;}
+.kw{color:#ff7b72;font-weight:500;}.ty{color:#ffa657;}.st{color:#a5d6ff;}.cm{color:#6e7681;font-style:italic;}
+.nm{color:#79c0ff;}.nu{color:#79c0ff;}.fn{color:#d2a8ff;}.op{color:#ff7b72;}.bool{color:#3fb950;}
+code{font-family:'JetBrains Mono',monospace;font-size:12.5px;background:rgba(63,185,80,0.1);border:1px solid rgba(63,185,80,0.2);color:var(--accent3);padding:1px 7px;border-radius:4px;}
+.callout{border-radius:8px;padding:16px 20px;margin:20px 0;display:flex;gap:14px;align-items:flex-start;}
+.callout-icon{font-size:18px;flex-shrink:0;margin-top:1px;}.callout-body{flex:1;}
+.callout-title{font-weight:700;font-size:13px;margin-bottom:4px;}.callout p{margin-bottom:0;font-size:13.5px;}
+.note{background:rgba(88,166,255,0.07);border-left:3px solid var(--accent2);}.note .callout-title{color:var(--accent2);}
+.tip{background:rgba(63,185,80,0.07);border-left:3px solid var(--accent3);}.tip .callout-title{color:var(--accent3);}
+.warn{background:rgba(240,165,0,0.07);border-left:3px solid var(--accent);}.warn .callout-title{color:var(--accent);}
+.error{background:rgba(255,123,114,0.07);border-left:3px solid var(--accent4);}.error .callout-title{color:var(--accent4);}
+.purple{background:rgba(210,168,255,0.07);border-left:3px solid var(--accent5);}.purple .callout-title{color:var(--accent5);}
+.table-wrap{overflow-x:auto;margin:20px 0;}
+table{width:100%;border-collapse:collapse;font-size:13.5px;}
+thead tr{background:var(--bg2);border-bottom:2px solid var(--accent3);}
+th{padding:12px 16px;text-align:left;font-weight:700;font-size:12px;letter-spacing:0.5px;text-transform:uppercase;color:var(--accent3);}
+td{padding:11px 16px;border-bottom:1px solid var(--border);color:var(--muted);}
+tr:hover td{background:rgba(255,255,255,0.02);}
+td:first-child{font-family:'JetBrains Mono',monospace;color:var(--accent2);font-size:13px;}
+.diagram-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:28px 24px;margin:24px 0;overflow:hidden;}
+.diagram-title{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:20px;text-align:center;}
+.hour-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(63,185,80,0.1);border:1px solid rgba(63,185,80,0.25);color:var(--accent3);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:1px;padding:5px 14px;border-radius:20px;margin-bottom:18px;margin-top:30px;}
+.step-list{list-style:none;padding:0;margin:16px 0;}
+.step-list li{display:flex;gap:14px;padding:12px 0;border-bottom:1px solid rgba(48,54,61,0.5);align-items:flex-start;}
+.step-list li:last-child{border-bottom:none;}
+.step-num{background:var(--bg3);border:1px solid var(--accent3);color:var(--accent3);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.step-content{flex:1;}
+.step-content strong{display:block;color:var(--text);font-size:14px;margin-bottom:3px;}
+.step-content span{font-size:13px;color:var(--muted);}
+.mistake-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:20px 0;}
+.mistake-card{background:rgba(255,123,114,0.05);border:1px solid rgba(255,123,114,0.2);border-radius:8px;padding:16px;}
+.mistake-card .mt{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent4);font-weight:700;margin-bottom:8px;}
+.mistake-card p{font-size:13px;margin:0;}
+.checklist{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:24px 28px;margin:24px 0;}
+.checklist-title{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent3);letter-spacing:1.5px;text-transform:uppercase;font-weight:700;margin-bottom:16px;}
+.check-item{display:flex;align-items:flex-start;gap:12px;padding:9px 0;border-bottom:1px solid rgba(48,54,61,0.5);font-size:14px;color:var(--muted);}
+.check-item:last-child{border-bottom:none;}
+.check-box{width:18px;height:18px;border:2px solid var(--accent3);border-radius:4px;flex-shrink:0;margin-top:2px;}
+.resource-list{list-style:none;padding:0;margin:12px 0;}
+.resource-list li{padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;margin-bottom:8px;font-size:13.5px;display:flex;gap:10px;align-items:center;}
+.resource-list li a{color:var(--accent2);text-decoration:none;}
+.footer{background:var(--bg2);border-top:1px solid var(--border);padding:24px 40px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);}
+.footer span{color:var(--accent3);}
+::-webkit-scrollbar{width:6px;height:6px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+@media(max-width:640px){.hero{padding:32px 20px 24px;}.hero h1{font-size:24px;}.container{padding:24px 16px 60px;}}
+</style>
+</head>
+<body>
+<div class="hero">
+  <div class="hero-tag">Phase 2 &middot; Day 9 of 65 &middot; Selenium Begins</div>
+  <h1>Selenium Setup &amp; <span>First Script</span></h1>
+  <div class="hero-sub">
+    <span><span class="dot"></span>2 Hours</span>
+    <span><span class="dot"></span>Maven &middot; pom.xml &middot; WebDriverManager &middot; ChromeDriver &middot; First browser automation</span>
+  </div>
+</div>
+<div class="container">
+
+<div class="toc">
+  <div class="toc-title">// Table of Contents</div>
+  <ol>
+    <li><a href="#s1">What is Selenium WebDriver?</a></li>
+    <li><a href="#s2">Selenium Architecture — How It Works</a></li>
+    <li><a href="#s3">What is Maven?</a></li>
+    <li><a href="#s4">Step-by-Step Setup — Maven Project in IntelliJ</a></li>
+    <li><a href="#s5">pom.xml — Adding Selenium &amp; WebDriverManager</a></li>
+    <li><a href="#s6">Project Folder Structure</a></li>
+    <li><a href="#s7">Your First Selenium Script — Line by Line</a></li>
+    <li><a href="#s8">WebDriver Core Methods</a></li>
+    <li><a href="#s9">Browser Navigation Methods</a></li>
+    <li><a href="#s10">ChromeOptions — Headless &amp; Other Settings</a></li>
+    <li><a href="#s11">Running on Firefox &amp; Edge</a></li>
+    <li><a href="#s12">Troubleshooting Setup Issues</a></li>
+    <li><a href="#s13">Practice Task + Expected Output</a></li>
+    <li><a href="#s14">Common Mistakes</a></li>
+    <li><a href="#s15">End of Day Checklist + Resources</a></li>
+  </ol>
+</div>
+
+<!-- S1 -->
+<div class="section" id="s1">
+  <div class="section-header"><div class="section-num">01</div><h2>What is Selenium WebDriver?</h2></div>
+  <div class="hour-badge">&#9200; Hour 1 — Setup (60 mins)</div>
+  <p><strong>Selenium WebDriver</strong> is a browser automation library. It lets you write Java code that directly controls a browser — clicks buttons, fills forms, reads text, takes screenshots — exactly like a real user would, but programmatically and at speed.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Component</th><th>What It Is</th><th>Your Role</th></tr></thead>
+      <tbody>
+        <tr><td>Selenium WebDriver</td><td>The Java library — API you write code against</td><td>Add as Maven dependency, write tests</td></tr>
+        <tr><td>ChromeDriver</td><td>Executable that bridges your Java code to Chrome browser</td><td>WebDriverManager handles this automatically</td></tr>
+        <tr><td>Chrome Browser</td><td>The actual browser being automated</td><td>Must be installed. Keep it updated.</td></tr>
+        <tr><td>WebDriverManager</td><td>Library that auto-downloads correct driver version</td><td>Call setup() once — done</td></tr>
+        <tr><td>Maven</td><td>Build tool that downloads all dependencies from internet</td><td>Add dependencies to pom.xml</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- S2 -->
+<div class="section" id="s2">
+  <div class="section-header"><div class="section-num">02</div><h2>Selenium Architecture — How It Works</h2></div>
+  <div class="diagram-wrap">
+    <div class="diagram-title">// Selenium WebDriver Architecture</div>
+    <svg viewBox="0 0 700 180" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:700px;display:block;margin:0 auto">
+      <defs>
+        <marker id="sa" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0L0,6L8,3z" fill="#3fb950"/></marker>
+        <marker id="sb" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0L0,6L8,3z" fill="#f0a500"/></marker>
+      </defs>
+      <!-- Your Code -->
+      <rect x="10" y="40" width="140" height="90" rx="8" fill="#0d1117" stroke="#d2a8ff" stroke-width="2"/>
+      <rect x="10" y="40" width="140" height="26" rx="8" fill="rgba(210,168,255,0.12)"/>
+      <rect x="10" y="54" width="140" height="12" fill="rgba(210,168,255,0.12)"/>
+      <text x="80" y="57" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#d2a8ff" font-weight="700">Your Java Code</text>
+      <text x="80" y="78" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#8b949e">driver.get(url)</text>
+      <text x="80" y="93" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#8b949e">driver.findElement()</text>
+      <text x="80" y="108" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#8b949e">element.click()</text>
+      <text x="80" y="123" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#8b949e">driver.quit()</text>
+      <!-- Arrow 1 -->
+      <line x1="150" y1="85" x2="185" y2="85" stroke="#3fb950" stroke-width="1.5" marker-end="url(#sa)"/>
+      <text x="167" y="78" text-anchor="middle" font-family="Sora,sans-serif" font-size="8" fill="#3fb950">HTTP</text>
+      <!-- WebDriver Protocol -->
+      <rect x="185" y="40" width="150" height="90" rx="8" fill="#0d1117" stroke="#58a6ff" stroke-width="2"/>
+      <rect x="185" y="40" width="150" height="26" rx="8" fill="rgba(88,166,255,0.12)"/>
+      <rect x="185" y="54" width="150" height="12" fill="rgba(88,166,255,0.12)"/>
+      <text x="260" y="57" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#58a6ff" font-weight="700">Selenium WebDriver</text>
+      <text x="260" y="78" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#8b949e">W3C WebDriver Protocol</text>
+      <text x="260" y="95" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#8b949e">Converts Java calls</text>
+      <text x="260" y="111" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#8b949e">to HTTP requests</text>
+      <text x="260" y="125" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#6e7681">selenium-java.jar</text>
+      <!-- Arrow 2 -->
+      <line x1="335" y1="85" x2="370" y2="85" stroke="#3fb950" stroke-width="1.5" marker-end="url(#sa)"/>
+      <!-- ChromeDriver -->
+      <rect x="370" y="40" width="150" height="90" rx="8" fill="#0d1117" stroke="#f0a500" stroke-width="2"/>
+      <rect x="370" y="40" width="150" height="26" rx="8" fill="rgba(240,165,0,0.12)"/>
+      <rect x="370" y="54" width="150" height="12" fill="rgba(240,165,0,0.12)"/>
+      <text x="445" y="57" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#f0a500" font-weight="700">ChromeDriver</text>
+      <text x="445" y="78" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#8b949e">Executable binary</text>
+      <text x="445" y="95" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#8b949e">Receives commands</text>
+      <text x="445" y="111" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#8b949e">from Selenium</text>
+      <text x="445" y="125" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#f0a500">Auto-managed by WDM</text>
+      <!-- Arrow 3 -->
+      <line x1="520" y1="85" x2="555" y2="85" stroke="#3fb950" stroke-width="1.5" marker-end="url(#sa)"/>
+      <!-- Chrome Browser -->
+      <rect x="555" y="40" width="135" height="90" rx="8" fill="#0d1117" stroke="#3fb950" stroke-width="2"/>
+      <rect x="555" y="40" width="135" height="26" rx="8" fill="rgba(63,185,80,0.12)"/>
+      <rect x="555" y="54" width="135" height="12" fill="rgba(63,185,80,0.12)"/>
+      <text x="622" y="57" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#3fb950" font-weight="700">Chrome Browser</text>
+      <text x="622" y="80" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#8b949e">Opens, navigates,</text>
+      <text x="622" y="96" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#8b949e">clicks, fills forms,</text>
+      <text x="622" y="112" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#8b949e">reads DOM</text>
+      <text x="622" y="125" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#6e7681">Real Chrome binary</text>
+      <!-- Labels below -->
+      <text x="350" y="162" text-anchor="middle" font-family="Sora,sans-serif" font-size="10" fill="#6e7681">Your code → Selenium converts → ChromeDriver executes → Chrome browser acts</text>
+    </svg>
+  </div>
+  <div class="callout note">
+    <span class="callout-icon">&#128204;</span>
+    <div class="callout-body">
+      <div class="callout-title">WebDriverManager eliminates the manual driver headache</div>
+      <p>Without WebDriverManager, you'd have to manually download chromedriver.exe, match it to your exact Chrome version, and update it every time Chrome updates. WebDriverManager does all that in ONE line: <code>WebDriverManager.chromedriver().setup()</code>. Always use it.</p>
+    </div>
+  </div>
+</div>
+
+<!-- S3 -->
+<div class="section" id="s3">
+  <div class="section-header"><div class="section-num">03</div><h2>What is Maven?</h2></div>
+  <p><strong>Maven</strong> is a build and dependency management tool. You declare what libraries you need in a file called <code>pom.xml</code>, and Maven downloads them from the internet automatically. No more manually downloading JAR files.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">XML</span><span class="code-file">How Maven works — concept</span></div>
+    <pre><span class="cm">&lt;!-- pom.xml — you declare: "I need Selenium 4.x" --&gt;</span>
+<span class="cm">&lt;!-- Maven automatically downloads: --&gt;</span>
+<span class="cm">&lt;!--   selenium-java-4.x.jar --&gt;</span>
+<span class="cm">&lt;!--   all its internal dependencies (byte-buddy, guava, etc.) --&gt;</span>
+<span class="cm">&lt;!--   puts them in your project classpath --&gt;</span>
+<span class="cm">&lt;!-- You just write code — no manual downloads ever --&gt;</span></pre>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Maven Concept</th><th>Plain English</th></tr></thead>
+      <tbody>
+        <tr><td>pom.xml</td><td>Project config file — lists all dependencies, project info, build settings</td></tr>
+        <tr><td>dependency</td><td>A library you want to use (Selenium, TestNG, etc.)</td></tr>
+        <tr><td>groupId</td><td>The organization that made the library (like a domain name)</td></tr>
+        <tr><td>artifactId</td><td>The specific library name</td></tr>
+        <tr><td>version</td><td>Which version to download</td></tr>
+        <tr><td>Maven Repository</td><td>Central online store where Maven downloads libraries from (mvnrepository.com)</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- S4 -->
+<div class="section" id="s4">
+  <div class="section-header"><div class="section-num">04</div><h2>Step-by-Step Setup — Maven Project in IntelliJ</h2></div>
+  <ul class="step-list">
+    <li>
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <strong>Open IntelliJ IDEA → File → New → Project</strong>
+        <span>In the left panel, select <strong>Maven</strong>. Make sure your JDK 17 is selected in the SDK dropdown. Click Next.</span>
+      </div>
+    </li>
+    <li>
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <strong>Set Project Name and GroupId</strong>
+        <span>Name: <code>SeleniumAutomation</code> &nbsp;|&nbsp; GroupId: <code>com.qaautomation</code> &nbsp;|&nbsp; ArtifactId: <code>SeleniumAutomation</code>. Click Finish.</span>
+      </div>
+    </li>
+    <li>
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <strong>Wait for Maven to initialize</strong>
+        <span>IntelliJ downloads the Maven wrapper. Watch the progress bar at the bottom. Takes 30–60 seconds on first run.</span>
+      </div>
+    </li>
+    <li>
+      <div class="step-num">4</div>
+      <div class="step-content">
+        <strong>Open pom.xml (it's in the project root)</strong>
+        <span>You'll see the basic pom.xml with your groupId and artifactId. This is where you add dependencies in Section 5.</span>
+      </div>
+    </li>
+    <li>
+      <div class="step-num">5</div>
+      <div class="step-content">
+        <strong>Create your first test class</strong>
+        <span>Right-click <code>src/main/java</code> → New → Java Class → name it <code>FirstSeleniumTest</code>. Or create a package first: <code>com.qaautomation.tests</code>.</span>
+      </div>
+    </li>
+  </ul>
+
+  <div class="callout tip">
+    <span class="callout-icon">&#9989;</span>
+    <div class="callout-body">
+      <div class="callout-title">Enable Auto-Import in IntelliJ</div>
+      <p>Go to <strong>File → Settings → Build, Execution, Deployment → Build Tools → Maven → Importing</strong> → check "Import Maven projects automatically". This way whenever you edit pom.xml, IntelliJ immediately downloads new dependencies without you clicking anything.</p>
+    </div>
+  </div>
+</div>
+
+<!-- S5 -->
+<div class="section" id="s5">
+  <div class="section-header"><div class="section-num">05</div><h2>pom.xml — Adding Selenium &amp; WebDriverManager</h2></div>
+  <p>Replace your entire <code>pom.xml</code> with this. Copy it exactly — every tag matters. After saving, IntelliJ will show a small Maven icon asking to reload — click it, or it auto-reloads if you enabled auto-import.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">XML</span><span class="code-file">pom.xml — Complete file</span></div>
+    <pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         http://maven.apache.org/xsd/maven-4.0.0.xsd"&gt;
+
+    &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+
+    &lt;!-- Project Identity --&gt;
+    &lt;groupId&gt;com.qaautomation&lt;/groupId&gt;
+    &lt;artifactId&gt;SeleniumAutomation&lt;/artifactId&gt;
+    &lt;version&gt;1.0-SNAPSHOT&lt;/version&gt;
+    &lt;packaging&gt;jar&lt;/packaging&gt;
+
+    &lt;properties&gt;
+        &lt;maven.compiler.source&gt;17&lt;/maven.compiler.source&gt;
+        &lt;maven.compiler.target&gt;17&lt;/maven.compiler.target&gt;
+        &lt;project.build.sourceEncoding&gt;UTF-8&lt;/project.build.sourceEncoding&gt;
+    &lt;/properties&gt;
+
+    &lt;dependencies&gt;
+
+        &lt;!-- Selenium WebDriver -- the core library --&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
+            &lt;artifactId&gt;selenium-java&lt;/artifactId&gt;
+            &lt;version&gt;4.18.1&lt;/version&gt;
+        &lt;/dependency&gt;
+
+        &lt;!-- WebDriverManager -- auto-manages browser drivers --&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;io.github.bonigarcia&lt;/groupId&gt;
+            &lt;artifactId&gt;webdrivermanager&lt;/artifactId&gt;
+            &lt;version&gt;5.7.0&lt;/version&gt;
+        &lt;/dependency&gt;
+
+        &lt;!-- TestNG -- test framework (we'll use fully on Day 27) --&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.testng&lt;/groupId&gt;
+            &lt;artifactId&gt;testng&lt;/artifactId&gt;
+            &lt;version&gt;7.9.0&lt;/version&gt;
+        &lt;/dependency&gt;
+
+    &lt;/dependencies&gt;
+
+    &lt;build&gt;
+        &lt;plugins&gt;
+            &lt;plugin&gt;
+                &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+                &lt;artifactId&gt;maven-surefire-plugin&lt;/artifactId&gt;
+                &lt;version&gt;3.2.5&lt;/version&gt;
+            &lt;/plugin&gt;
+        &lt;/plugins&gt;
+    &lt;/build&gt;
+
+&lt;/project&gt;</pre>
+  </div>
+
+  <div class="callout warn">
+    <span class="callout-icon">&#9889;</span>
+    <div class="callout-body">
+      <div class="callout-title">After saving pom.xml — wait for download</div>
+      <p>Maven will download Selenium (~40MB) and all its dependencies. Watch the progress bar at the bottom of IntelliJ. This can take 2–5 minutes on first run depending on your internet. DO NOT close IntelliJ during this. Once done, you'll see all libraries in the "External Libraries" section in the project panel.</p>
+    </div>
+  </div>
+
+  <div class="callout tip">
+    <span class="callout-icon">&#9989;</span>
+    <div class="callout-body">
+      <div class="callout-title">Always check latest version at mvnrepository.com</div>
+      <p>The versions above were current at time of writing. Always verify at <strong>mvnrepository.com</strong> by searching "selenium-java" and "webdrivermanager". Use the latest stable version for both.</p>
+    </div>
+  </div>
+</div>
+
+<!-- S6 -->
+<div class="section" id="s6">
+  <div class="section-header"><div class="section-num">06</div><h2>Project Folder Structure</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Structure</span><span class="code-file">SeleniumAutomation/ — Your project layout</span></div>
+    <pre>SeleniumAutomation/
+├── pom.xml                          ← Maven config (dependencies live here)
+├── src/
+│   ├── main/
+│   │   └── java/
+│   │       └── com/qaautomation/
+│   │           ├── pages/           ← Page Object classes (Day 34+)
+│   │           └── utils/           ← Utility/helper classes
+│   └── test/
+│       └── java/
+│           └── com/qaautomation/
+│               └── tests/           ← Your test classes live here
+│                   └── FirstSeleniumTest.java
+└── target/                          ← Compiled output (auto-generated, ignore)</pre>
+  </div>
+
+  <div class="callout note">
+    <span class="callout-icon">&#128204;</span>
+    <div class="callout-body">
+      <div class="callout-title">For now — put your test in src/main/java</div>
+      <p>We'll move tests to <code>src/test/java</code> on Day 27 when we set up TestNG properly. For Days 9–26, create all your scripts under <code>src/main/java/com/qaautomation/tests/</code>. This keeps things simple while you learn the Selenium API.</p>
+    </div>
+  </div>
+</div>
+
+<!-- S7 -->
+<div class="section" id="s7">
+  <div class="section-header"><div class="section-num">07</div><h2>Your First Selenium Script — Line by Line</h2></div>
+  <div class="hour-badge">&#9200; Hour 2 — First Script (60 mins)</div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">FirstSeleniumTest.java — Every line explained</span></div>
+    <pre><span class="kw">package</span> com.qaautomation.tests;
+
+<span class="cm">// Import Selenium's WebDriver interface</span>
+<span class="kw">import</span> org.openqa.selenium.WebDriver;
+
+<span class="cm">// Import Chrome-specific driver</span>
+<span class="kw">import</span> org.openqa.selenium.chrome.ChromeDriver;
+
+<span class="cm">// Import WebDriverManager — auto-manages driver binary</span>
+<span class="kw">import</span> io.github.bonigarcia.wdm.WebDriverManager;
+
+<span class="kw">public class</span> <span class="nm">FirstSeleniumTest</span> {
+
+    <span class="kw">public static void</span> <span class="fn">main</span>(<span class="ty">String</span>[] args) {
+
+        <span class="cm">// STEP 1: Set up ChromeDriver automatically</span>
+        <span class="cm">// Checks your Chrome version, downloads matching chromedriver.exe</span>
+        <span class="cm">// Stores in ~/.cache/selenium — only downloads once</span>
+        WebDriverManager.<span class="fn">chromedriver</span>().<span class="fn">setup</span>();
+
+        <span class="cm">// STEP 2: Create WebDriver object (opens Chrome browser)</span>
+        <span class="cm">// WebDriver = interface (left side)</span>
+        <span class="cm">// ChromeDriver = implementation (right side) — Day 5 interface pattern!</span>
+        WebDriver <span class="nm">driver</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">ChromeDriver</span>();
+
+        <span class="kw">try</span> {
+
+            <span class="cm">// STEP 3: Navigate to a URL</span>
+            driver.<span class="fn">get</span>(<span class="st">"https://opensource-demo.orangehrmlive.com"</span>);
+
+            <span class="cm">// STEP 4: Get current page title</span>
+            <span class="ty">String</span> <span class="nm">title</span> <span class="op">=</span> driver.<span class="fn">getTitle</span>();
+            <span class="fn">System.out.println</span>(<span class="st">"Page title   : "</span> <span class="op">+</span> title);
+
+            <span class="cm">// STEP 5: Get current URL</span>
+            <span class="ty">String</span> <span class="nm">currentUrl</span> <span class="op">=</span> driver.<span class="fn">getCurrentUrl</span>();
+            <span class="fn">System.out.println</span>(<span class="st">"Current URL  : "</span> <span class="op">+</span> currentUrl);
+
+            <span class="cm">// STEP 6: Get page source (full HTML)</span>
+            <span class="ty">String</span> <span class="nm">source</span> <span class="op">=</span> driver.<span class="fn">getPageSource</span>();
+            <span class="fn">System.out.println</span>(<span class="st">"Page source length: "</span> <span class="op">+</span> source.<span class="fn">length</span>() <span class="op">+</span> <span class="st">" chars"</span>);
+
+            <span class="cm">// STEP 7: Maximize browser window</span>
+            driver.<span class="fn">manage</span>().<span class="fn">window</span>().<span class="fn">maximize</span>();
+            <span class="fn">System.out.println</span>(<span class="st">"Window maximized"</span>);
+
+            <span class="cm">// STEP 8: Navigate to another page</span>
+            driver.<span class="fn">navigate</span>().<span class="fn">to</span>(<span class="st">"https://www.google.com"</span>);
+            <span class="fn">System.out.println</span>(<span class="st">"Navigated to : "</span> <span class="op">+</span> driver.<span class="fn">getTitle</span>());
+
+            <span class="cm">// STEP 9: Go back</span>
+            driver.<span class="fn">navigate</span>().<span class="fn">back</span>();
+            <span class="fn">System.out.println</span>(<span class="st">"Back to      : "</span> <span class="op">+</span> driver.<span class="fn">getTitle</span>());
+
+            <span class="cm">// STEP 10: Go forward</span>
+            driver.<span class="fn">navigate</span>().<span class="fn">forward</span>();
+            <span class="fn">System.out.println</span>(<span class="st">"Forward to   : "</span> <span class="op">+</span> driver.<span class="fn">getTitle</span>());
+
+            <span class="cm">// STEP 11: Refresh page</span>
+            driver.<span class="fn">navigate</span>().<span class="fn">refresh</span>();
+            <span class="fn">System.out.println</span>(<span class="st">"Page refreshed"</span>);
+
+        } <span class="kw">finally</span> {
+            <span class="cm">// STEP 12: ALWAYS close browser in finally</span>
+            <span class="cm">// driver.close() — closes current tab only</span>
+            <span class="cm">// driver.quit()  — closes ALL tabs + kills driver process</span>
+            driver.<span class="fn">quit</span>();
+            <span class="fn">System.out.println</span>(<span class="st">"Browser closed ✓"</span>);
+        }
+    }
+}</pre>
+  </div>
+
+  <h3>Expected Console Output</h3>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Output</span><span class="code-file">IntelliJ Console</span></div>
+    <pre>Page title   : OrangeHRM
+Current URL  : https://opensource-demo.orangehrmlive.com/web/index.php/auth/login
+Page source length: 47832 chars
+Window maximized
+Navigated to : Google
+Back to      : OrangeHRM
+Forward to   : Google
+Page refreshed
+Browser closed ✓</pre>
+  </div>
+
+  <div class="callout tip">
+    <span class="callout-icon">&#127881;</span>
+    <div class="callout-body">
+      <div class="callout-title">When Chrome Opens — That's It. You Did It.</div>
+      <p>If you see Chrome launch, navigate to OrangeHRM, then close — your Selenium setup is 100% working. From this point every day builds on top of this foundation. Welcome to automation testing.</p>
+    </div>
+  </div>
+</div>
+
+<!-- S8 -->
+<div class="section" id="s8">
+  <div class="section-header"><div class="section-num">08</div><h2>WebDriver Core Methods</h2></div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Method</th><th>What It Does</th><th>Returns</th></tr></thead>
+      <tbody>
+        <tr><td>driver.get(url)</td><td>Open URL and wait for page to load</td><td>void</td></tr>
+        <tr><td>driver.getTitle()</td><td>Get current page title (text in browser tab)</td><td>String</td></tr>
+        <tr><td>driver.getCurrentUrl()</td><td>Get full current URL</td><td>String</td></tr>
+        <tr><td>driver.getPageSource()</td><td>Get entire HTML of current page</td><td>String</td></tr>
+        <tr><td>driver.findElement(By)</td><td>Find ONE element on the page (Day 14)</td><td>WebElement</td></tr>
+        <tr><td>driver.findElements(By)</td><td>Find ALL matching elements (Day 14)</td><td>List&lt;WebElement&gt;</td></tr>
+        <tr><td>driver.close()</td><td>Close current browser tab</td><td>void</td></tr>
+        <tr><td>driver.quit()</td><td>Close ALL tabs + kill driver process</td><td>void</td></tr>
+        <tr><td>driver.manage().window().maximize()</td><td>Maximize browser window</td><td>void</td></tr>
+        <tr><td>driver.manage().window().minimize()</td><td>Minimize browser window</td><td>void</td></tr>
+        <tr><td>driver.manage().deleteAllCookies()</td><td>Clear all browser cookies</td><td>void</td></tr>
+        <tr><td>driver.switchTo().alert()</td><td>Switch focus to JavaScript alert (Day 21)</td><td>Alert</td></tr>
+        <tr><td>driver.switchTo().frame()</td><td>Switch into an iframe (Day 23)</td><td>WebDriver</td></tr>
+        <tr><td>driver.switchTo().window(handle)</td><td>Switch to different browser tab (Day 22)</td><td>WebDriver</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- S9 -->
+<div class="section" id="s9">
+  <div class="section-header"><div class="section-num">09</div><h2>Browser Navigation Methods</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">Navigation.java</span></div>
+    <pre><span class="cm">// driver.get() vs driver.navigate().to() — both load a URL</span>
+<span class="cm">// driver.get() waits for page to fully load</span>
+<span class="cm">// driver.navigate().to() same behavior, but navigate() gives more options</span>
+driver.<span class="fn">get</span>(<span class="st">"https://site.com"</span>);             <span class="cm">// preferred for direct URL load</span>
+driver.<span class="fn">navigate</span>().<span class="fn">to</span>(<span class="st">"https://site.com"</span>); <span class="cm">// same result</span>
+
+<span class="cm">// Browser history navigation</span>
+driver.<span class="fn">navigate</span>().<span class="fn">back</span>();      <span class="cm">// browser back button</span>
+driver.<span class="fn">navigate</span>().<span class="fn">forward</span>(); <span class="cm">// browser forward button</span>
+driver.<span class="fn">navigate</span>().<span class="fn">refresh</span>(); <span class="cm">// F5 / page reload</span>
+
+<span class="cm">// Window management</span>
+driver.<span class="fn">manage</span>().<span class="fn">window</span>().<span class="fn">maximize</span>();                 <span class="cm">// full screen</span>
+driver.<span class="fn">manage</span>().<span class="fn">window</span>().<span class="fn">minimize</span>();                 <span class="cm">// minimize</span>
+driver.<span class="fn">manage</span>().<span class="fn">window</span>().<span class="fn">fullscreen</span>();               <span class="cm">// true fullscreen (F11)</span>
+driver.<span class="fn">manage</span>().<span class="fn">window</span>().<span class="fn">setSize</span>(<span class="kw">new</span> <span class="fn">Dimension</span>(<span class="nu">1280</span>, <span class="nu">800</span>)); <span class="cm">// specific size</span>
+
+<span class="cm">// Get all open window handles (tabs)</span>
+<span class="nm">Set</span>&lt;<span class="ty">String</span>&gt; <span class="nm">handles</span> <span class="op">=</span> driver.<span class="fn">getWindowHandles</span>();
+<span class="fn">System.out.println</span>(<span class="st">"Open tabs: "</span> <span class="op">+</span> handles.<span class="fn">size</span>());
+
+<span class="cm">// Current tab handle</span>
+<span class="ty">String</span> <span class="nm">mainTab</span> <span class="op">=</span> driver.<span class="fn">getWindowHandle</span>();
+
+<span class="cm">// Implicit wait — wait up to X seconds for elements to appear (Day 20)</span>
+<span class="kw">import</span> java.time.Duration;
+driver.<span class="fn">manage</span>().<span class="fn">timeouts</span>().<span class="fn">implicitlyWait</span>(Duration.<span class="fn">ofSeconds</span>(<span class="nu">10</span>));</pre>
+  </div>
+</div>
+
+<!-- S10 -->
+<div class="section" id="s10">
+  <div class="section-header"><div class="section-num">10</div><h2>ChromeOptions — Headless &amp; Other Settings</h2></div>
+  <p><code>ChromeOptions</code> lets you configure Chrome behavior before launching. Headless mode is critical for CI/CD pipelines (no GUI needed on a server).</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">ChromeOptions.java</span></div>
+    <pre><span class="kw">import</span> org.openqa.selenium.chrome.ChromeOptions;
+
+<span class="nm">ChromeOptions</span> <span class="nm">options</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">ChromeOptions</span>();
+
+<span class="cm">// Headless mode — Chrome runs without opening a visible window</span>
+<span class="cm">// Required for running tests in CI/CD (GitHub Actions)</span>
+options.<span class="fn">addArguments</span>(<span class="st">"--headless=new"</span>);
+
+<span class="cm">// Disable browser automation detection banner</span>
+options.<span class="fn">addArguments</span>(<span class="st">"--disable-blink-features=AutomationControlled"</span>);
+
+<span class="cm">// Set window size for headless (important! default is tiny)</span>
+options.<span class="fn">addArguments</span>(<span class="st">"--window-size=1920,1080"</span>);
+
+<span class="cm">// Disable notifications popup</span>
+options.<span class="fn">addArguments</span>(<span class="st">"--disable-notifications"</span>);
+
+<span class="cm">// Disable infobars ("Chrome is being controlled by automated software")</span>
+options.<span class="fn">addArguments</span>(<span class="st">"--disable-infobars"</span>);
+
+<span class="cm">// Launch Chrome with these options</span>
+WebDriverManager.<span class="fn">chromedriver</span>().<span class="fn">setup</span>();
+WebDriver <span class="nm">driver</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">ChromeDriver</span>(options);
+
+<span class="cm">// Verify it worked even in headless</span>
+driver.<span class="fn">get</span>(<span class="st">"https://www.google.com"</span>);
+<span class="fn">System.out.println</span>(<span class="st">"Title: "</span> <span class="op">+</span> driver.<span class="fn">getTitle</span>()); <span class="cm">// Google — no browser opened!</span>
+driver.<span class="fn">quit</span>();</pre>
+  </div>
+</div>
+
+<!-- S11 -->
+<div class="section" id="s11">
+  <div class="section-header"><div class="section-num">11</div><h2>Running on Firefox &amp; Edge</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">CrossBrowserSetup.java</span></div>
+    <pre><span class="kw">import</span> org.openqa.selenium.firefox.FirefoxDriver;
+<span class="kw">import</span> org.openqa.selenium.edge.EdgeDriver;
+
+<span class="cm">// Firefox — must have Firefox installed</span>
+WebDriverManager.<span class="fn">firefoxdriver</span>().<span class="fn">setup</span>();
+WebDriver <span class="nm">firefox</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">FirefoxDriver</span>();
+firefox.<span class="fn">get</span>(<span class="st">"https://www.google.com"</span>);
+<span class="fn">System.out.println</span>(<span class="st">"Firefox: "</span> <span class="op">+</span> firefox.<span class="fn">getTitle</span>());
+firefox.<span class="fn">quit</span>();
+
+<span class="cm">// Edge — must have Edge installed (Windows 10/11 has it by default)</span>
+WebDriverManager.<span class="fn">edgedriver</span>().<span class="fn">setup</span>();
+WebDriver <span class="nm">edge</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">EdgeDriver</span>();
+edge.<span class="fn">get</span>(<span class="st">"https://www.google.com"</span>);
+<span class="fn">System.out.println</span>(<span class="st">"Edge: "</span> <span class="op">+</span> edge.<span class="fn">getTitle</span>());
+edge.<span class="fn">quit</span>();
+
+<span class="cm">// Cross-browser method using String parameter</span>
+<span class="kw">public static</span> WebDriver <span class="fn">getDriver</span>(<span class="ty">String</span> <span class="nm">browser</span>) {
+    <span class="kw">switch</span> (browser.<span class="fn">toLowerCase</span>()) {
+        <span class="kw">case</span> <span class="st">"chrome"</span>:
+            WebDriverManager.<span class="fn">chromedriver</span>().<span class="fn">setup</span>();
+            <span class="kw">return</span> <span class="kw">new</span> <span class="fn">ChromeDriver</span>();
+        <span class="kw">case</span> <span class="st">"firefox"</span>:
+            WebDriverManager.<span class="fn">firefoxdriver</span>().<span class="fn">setup</span>();
+            <span class="kw">return</span> <span class="kw">new</span> <span class="fn">FirefoxDriver</span>();
+        <span class="kw">case</span> <span class="st">"edge"</span>:
+            WebDriverManager.<span class="fn">edgedriver</span>().<span class="fn">setup</span>();
+            <span class="kw">return</span> <span class="kw">new</span> <span class="fn">EdgeDriver</span>();
+        <span class="kw">default</span>:
+            <span class="kw">throw</span> <span class="kw">new</span> <span class="fn">IllegalArgumentException</span>(<span class="st">"Unsupported: "</span> <span class="op">+</span> browser);
+    }
+}</pre>
+  </div>
+</div>
+
+<!-- S12 -->
+<div class="section" id="s12">
+  <div class="section-header"><div class="section-num">12</div><h2>Troubleshooting Setup Issues</h2></div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Error</th><th>Cause</th><th>Fix</th></tr></thead>
+      <tbody>
+        <tr><td>Cannot resolve symbol 'WebDriver'</td><td>Selenium not downloaded yet or pom.xml not reloaded</td><td>Right-click pom.xml → Maven → Reload Project</td></tr>
+        <tr><td>SessionNotCreatedException: Chrome version mismatch</td><td>ChromeDriver version doesn't match Chrome browser</td><td>WebDriverManager.chromedriver().setup() auto-fixes this — make sure you're calling it</td></tr>
+        <tr><td>WebDriverException: chromedriver binary not found</td><td>WebDriverManager hasn't been called or failed</td><td>Check internet connection. Add WebDriverManager to pom.xml dependencies.</td></tr>
+        <tr><td>Chrome not found at default location</td><td>Chrome not installed or in non-standard path</td><td>Install Chrome from google.com/chrome. Or set path: options.setBinary("/path/to/chrome")</td></tr>
+        <tr><td>java.lang.NoClassDefFoundError</td><td>Selenium JAR not on classpath</td><td>Maven reload. If still fails: File → Invalidate Caches → Restart</td></tr>
+        <tr><td>Browser opens but immediately closes</td><td>Exception in try block or missing driver.quit() in finally</td><td>Add a Thread.sleep(3000) temporarily to see what's happening, then find the real error</td></tr>
+        <tr><td>ERR_CONNECTION_REFUSED on OrangeHRM</td><td>Site is temporarily down or you have no internet</td><td>Try google.com first. OrangeHRM demo sometimes goes down briefly.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- S13 -->
+<div class="section" id="s13">
+  <div class="section-header"><div class="section-num">13</div><h2>Practice Task + Expected Output</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">Day9Practice.java</span></div>
+    <pre><span class="kw">package</span> com.qaautomation.tests;
+
+<span class="kw">import</span> io.github.bonigarcia.wdm.WebDriverManager;
+<span class="kw">import</span> org.openqa.selenium.WebDriver;
+<span class="kw">import</span> org.openqa.selenium.chrome.ChromeDriver;
+<span class="kw">import</span> org.openqa.selenium.chrome.ChromeOptions;
+<span class="kw">import</span> java.time.Duration;
+
+<span class="kw">public class</span> <span class="nm">Day9Practice</span> {
+
+    <span class="kw">public static void</span> <span class="fn">main</span>(<span class="ty">String</span>[] args) {
+
+        <span class="cm">// Setup</span>
+        WebDriverManager.<span class="fn">chromedriver</span>().<span class="fn">setup</span>();
+        <span class="nm">ChromeOptions</span> <span class="nm">options</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">ChromeOptions</span>();
+        options.<span class="fn">addArguments</span>(<span class="st">"--disable-notifications"</span>);
+
+        WebDriver <span class="nm">driver</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">ChromeDriver</span>(options);
+        driver.<span class="fn">manage</span>().<span class="fn">window</span>().<span class="fn">maximize</span>();
+        driver.<span class="fn">manage</span>().<span class="fn">timeouts</span>().<span class="fn">implicitlyWait</span>(Duration.<span class="fn">ofSeconds</span>(<span class="nu">5</span>));
+
+        <span class="kw">try</span> {
+            <span class="cm">// ── Task 1: Visit 3 sites, print titles ──────────────</span>
+            <span class="fn">System.out.println</span>(<span class="st">"====== TASK 1: Site Titles ======"</span>);
+            <span class="ty">String</span>[] <span class="nm">urls</span> <span class="op">=</span> {
+                <span class="st">"https://opensource-demo.orangehrmlive.com"</span>,
+                <span class="st">"https://www.selenium.dev"</span>,
+                <span class="st">"https://demoqa.com"</span>
+            };
+            <span class="kw">for</span> (<span class="ty">String</span> <span class="nm">url</span> : urls) {
+                driver.<span class="fn">get</span>(url);
+                <span class="fn">System.out.printf</span>(<span class="st">"  URL: %-45s Title: %s%n"</span>,
+                    url, driver.<span class="fn">getTitle</span>());
+            }
+
+            <span class="cm">// ── Task 2: Navigation test ───────────────────────────</span>
+            <span class="fn">System.out.println</span>(<span class="st">"\n====== TASK 2: Browser Navigation ======"</span>);
+            driver.<span class="fn">get</span>(<span class="st">"https://opensource-demo.orangehrmlive.com"</span>);
+            <span class="fn">System.out.println</span>(<span class="st">"  Start : "</span> <span class="op">+</span> driver.<span class="fn">getTitle</span>());
+
+            driver.<span class="fn">navigate</span>().<span class="fn">to</span>(<span class="st">"https://www.google.com"</span>);
+            <span class="fn">System.out.println</span>(<span class="st">"  Google: "</span> <span class="op">+</span> driver.<span class="fn">getTitle</span>());
+
+            driver.<span class="fn">navigate</span>().<span class="fn">back</span>();
+            <span class="fn">System.out.println</span>(<span class="st">"  Back  : "</span> <span class="op">+</span> driver.<span class="fn">getTitle</span>());
+
+            driver.<span class="fn">navigate</span>().<span class="fn">forward</span>();
+            <span class="fn">System.out.println</span>(<span class="st">"  Fwd   : "</span> <span class="op">+</span> driver.<span class="fn">getTitle</span>());
+
+            driver.<span class="fn">navigate</span>().<span class="fn">refresh</span>();
+            <span class="fn">System.out.println</span>(<span class="st">"  Refresh: page reloaded"</span>);
+
+            <span class="cm">// ── Task 3: URL validation ────────────────────────────</span>
+            <span class="fn">System.out.println</span>(<span class="st">"\n====== TASK 3: URL Check ======"</span>);
+            driver.<span class="fn">get</span>(<span class="st">"https://opensource-demo.orangehrmlive.com"</span>);
+            <span class="ty">String</span> <span class="nm">url</span> <span class="op">=</span> driver.<span class="fn">getCurrentUrl</span>();
+            <span class="ty">boolean</span> <span class="nm">isLogin</span> <span class="op">=</span> url.<span class="fn">contains</span>(<span class="st">"login"</span>) <span class="op">||</span> url.<span class="fn">contains</span>(<span class="st">"auth"</span>);
+            <span class="fn">System.out.println</span>(<span class="st">"  URL         : "</span> <span class="op">+</span> url);
+            <span class="fn">System.out.println</span>(<span class="st">"  Is login page: "</span> <span class="op">+</span> isLogin);
+            <span class="fn">System.out.println</span>(<span class="st">"  Title        : "</span> <span class="op">+</span> driver.<span class="fn">getTitle</span>());
+            <span class="fn">System.out.println</span>(<span class="st">"  Source len   : "</span> <span class="op">+</span> driver.<span class="fn">getPageSource</span>().<span class="fn">length</span>());
+
+        } <span class="kw">catch</span> (<span class="nm">Exception</span> <span class="nm">e</span>) {
+            <span class="fn">System.out.println</span>(<span class="st">"Test failed: "</span> <span class="op">+</span> e.<span class="fn">getMessage</span>());
+            e.<span class="fn">printStackTrace</span>();
+        } <span class="kw">finally</span> {
+            driver.<span class="fn">quit</span>();
+            <span class="fn">System.out.println</span>(<span class="st">"\nBrowser closed ✓"</span>);
+        }
+    }
+}</pre>
+  </div>
+  <h3>Expected Output (approximate — titles may vary)</h3>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Output</span><span class="code-file">Console</span></div>
+    <pre>====== TASK 1: Site Titles ======
+  URL: https://opensource-demo.orangehrmlive.com  Title: OrangeHRM
+  URL: https://www.selenium.dev                   Title: Selenium
+  URL: https://demoqa.com                         Title: DEMOQA
+
+====== TASK 2: Browser Navigation ======
+  Start : OrangeHRM
+  Google: Google
+  Back  : OrangeHRM
+  Fwd   : Google
+  Refresh: page reloaded
+
+====== TASK 3: URL Check ======
+  URL         : https://opensource-demo.orangehrmlive.com/web/index.php/auth/login
+  Is login page: true
+  Title        : OrangeHRM
+  Source len   : 47832
+
+Browser closed ✓</pre>
+  </div>
+</div>
+
+<!-- S14 -->
+<div class="section" id="s14">
+  <div class="section-header"><div class="section-num">14</div><h2>Common Mistakes</h2></div>
+  <div class="mistake-grid">
+    <div class="mistake-card"><div class="mt">&#10060; Forgetting driver.quit()</div><p>Chrome processes pile up in Task Manager if you don't quit. Always in <code>finally</code>. A lingering ChromeDriver process from 10 test runs = 10 Chrome instances eating RAM.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; driver.close() vs driver.quit()</div><p><code>close()</code> only closes the current tab — driver is still running. <code>quit()</code> kills everything. Use <code>quit()</code> in finally unless you specifically need to close just one tab.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; Not calling WebDriverManager.setup()</div><p>Creating <code>new ChromeDriver()</code> without <code>WebDriverManager.chromedriver().setup()</code> first crashes with "driver not found." Always setup before creating driver.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; Missing Maven reload after pom.xml edit</div><p>Adding a dependency to pom.xml but not reloading Maven means IntelliJ still can't find the classes. Right-click pom.xml → Maven → Reload Project.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; driver.get() without https://</div><p><code>driver.get("orangehrm.com")</code> treats it as a search query on Chrome, not a URL. Always include <code>https://</code> prefix.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; Running without maximize</div><p>Default Chrome window size may be small — some elements are hidden or overlap. Always call <code>driver.manage().window().maximize()</code> right after creating the driver.</p></div>
+  </div>
+</div>
+
+<!-- S15 -->
+<div class="section" id="s15">
+  <div class="section-header"><div class="section-num">15</div><h2>End of Day Checklist + Resources</h2></div>
+  <div class="checklist">
+    <div class="checklist-title">&#10022; End of Day 9 Checklist</div>
+    <div class="check-item"><div class="check-box"></div>Maven project created in IntelliJ with correct groupId and artifactId</div>
+    <div class="check-item"><div class="check-box"></div>pom.xml has selenium-java, webdrivermanager, and testng dependencies</div>
+    <div class="check-item"><div class="check-box"></div>Maven downloaded all dependencies (check External Libraries in project panel)</div>
+    <div class="check-item"><div class="check-box"></div>FirstSeleniumTest.java runs — Chrome opens, navigates, closes successfully</div>
+    <div class="check-item"><div class="check-box"></div>I understand what WebDriverManager does and why it's needed</div>
+    <div class="check-item"><div class="check-box"></div>I know driver.quit() vs driver.close() difference</div>
+    <div class="check-item"><div class="check-box"></div>I know driver.get(), getTitle(), getCurrentUrl(), getPageSource()</div>
+    <div class="check-item"><div class="check-box"></div>I can use navigate().back(), forward(), refresh()</div>
+    <div class="check-item"><div class="check-box"></div>Practice task runs successfully — all 3 sections print correct output</div>
+    <div class="check-item"><div class="check-box"></div>ChromeOptions added to disable notifications</div>
+  </div>
+  <h3>Resources for Today</h3>
+  <ul class="resource-list">
+    <li><span>&#127909;</span><strong>YouTube:&nbsp;</strong><a href="https://www.youtube.com/results?search_query=selenium+webdriver+java+maven+setup+2024" target="_blank">Search: "Selenium WebDriver Java Maven setup 2024"</a> &nbsp;<span style="color:var(--muted);font-size:12px">Pick any recent video (2023/2024) — the setup steps are all the same.</span></li>
+    <li><span>&#128214;</span><strong>Official:&nbsp;</strong><a href="https://www.selenium.dev/documentation/webdriver/getting_started/" target="_blank">Selenium Official Docs — Getting Started</a> &nbsp;<span style="color:var(--muted);font-size:12px">The authoritative reference for WebDriver setup and first script.</span></li>
+    <li><span>&#128214;</span><strong>WebDriverManager:&nbsp;</strong><a href="https://github.com/bonigarcia/webdrivermanager" target="_blank">WebDriverManager GitHub</a> &nbsp;<span style="color:var(--muted);font-size:12px">Official docs and latest version info.</span></li>
+    <li><span>&#9881;</span><strong>Dependencies:&nbsp;</strong><a href="https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java" target="_blank">mvnrepository.com — selenium-java</a> &nbsp;<span style="color:var(--muted);font-size:12px">Always check here for latest stable version before adding to pom.xml.</span></li>
+    <li><span>&#127947;</span><strong>Practice Site:&nbsp;</strong><a href="https://opensource-demo.orangehrmlive.com" target="_blank">OrangeHRM Demo</a> &nbsp;<span style="color:var(--muted);font-size:12px">Login: Admin / admin123. This is your primary test site for the entire roadmap.</span></li>
+  </ul>
+  <div class="callout tip">
+    <span class="callout-icon">&#128640;</span>
+    <div class="callout-body">
+      <div class="callout-title">Day 10 Preview — WebDriver Interface &amp; Browser Drivers</div>
+      <p>Tomorrow: deep dive into the <strong>WebDriver interface</strong> architecture, how ChromeDriver/FirefoxDriver/EdgeDriver relate to it, driver version management, and building a reusable <code>DriverFactory</code> class that your framework will use. Plus: implicit waits and page load timeout configuration.</p>
+    </div>
+  </div>
+</div>
+
+</div>
+<div class="footer">
+  <span>Day 9 of 65</span> &nbsp;&middot;&nbsp; Selenium + Java Automation Roadmap &nbsp;&middot;&nbsp; Phase 2 &mdash; Core Selenium &nbsp;&middot;&nbsp; <span>Next: Day 10 &mdash; WebDriver Interface &amp; Browser Drivers</span>
+</div>
+</body>
+</html>

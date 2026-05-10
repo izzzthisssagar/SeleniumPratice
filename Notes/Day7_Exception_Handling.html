@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 7 — Exception Handling</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Sora:wght@400;600;700;800&display=swap');
+:root{--bg:#0d1117;--bg2:#161b22;--bg3:#1e2530;--border:#30363d;--accent:#f0a500;--accent2:#58a6ff;--accent3:#3fb950;--accent4:#ff7b72;--accent5:#d2a8ff;--text:#e6edf3;--muted:#8b949e;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);line-height:1.75;font-size:15px;}
+.hero{background:linear-gradient(135deg,#0d1117,#161b22,#1a1200);border-bottom:2px solid var(--accent);padding:48px 40px 36px;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:0;right:0;width:400px;height:400px;background:radial-gradient(circle,rgba(240,165,0,0.07),transparent 70%);pointer-events:none;}
+.hero-tag{display:inline-block;background:rgba(240,165,0,0.12);border:1px solid rgba(240,165,0,0.3);color:var(--accent);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;padding:4px 12px;border-radius:20px;margin-bottom:16px;}
+.hero h1{font-size:34px;font-weight:800;line-height:1.2;margin-bottom:10px;}
+.hero h1 span{color:var(--accent);}
+.hero-sub{color:var(--muted);font-size:14px;display:flex;gap:24px;flex-wrap:wrap;margin-top:16px;}
+.hero-sub span{display:flex;align-items:center;gap:6px;}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--accent);display:inline-block;}
+.container{max-width:980px;margin:0 auto;padding:40px 32px 80px;}
+.toc{background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:8px;padding:24px 28px;margin-bottom:48px;}
+.toc-title{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:14px;}
+.toc ol{padding-left:20px;}.toc li{margin-bottom:6px;}
+.toc a{color:var(--muted);text-decoration:none;font-size:14px;}.toc a:hover{color:var(--accent);}
+.section{margin-bottom:56px;}
+.section-header{display:flex;align-items:center;gap:14px;margin-bottom:24px;padding-bottom:14px;border-bottom:1px solid var(--border);}
+.section-num{background:var(--accent);color:#000;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:12px;width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.section h2{font-size:22px;font-weight:700;}
+h3{font-size:16px;font-weight:600;color:var(--accent);margin:28px 0 12px;display:flex;align-items:center;gap:8px;}
+h3::before{content:'▸';color:var(--accent2);font-size:12px;}
+p{color:var(--muted);margin-bottom:14px;line-height:1.8;}strong{color:var(--text);font-weight:600;}
+.code-block{background:#010409;border:1px solid var(--border);border-radius:10px;margin:20px 0;overflow:hidden;}
+.code-header{background:var(--bg2);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
+.code-lang{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent);letter-spacing:1px;text-transform:uppercase;font-weight:600;}
+.code-file{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);}
+pre{font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.85;padding:20px;overflow-x:auto;color:#e6edf3;}
+.kw{color:#ff7b72;font-weight:500;}.ty{color:#ffa657;}.st{color:#a5d6ff;}.cm{color:#6e7681;font-style:italic;}
+.nm{color:#79c0ff;}.nu{color:#79c0ff;}.fn{color:#d2a8ff;}.op{color:#ff7b72;}.bool{color:#3fb950;}
+code{font-family:'JetBrains Mono',monospace;font-size:12.5px;background:rgba(240,165,0,0.1);border:1px solid rgba(240,165,0,0.2);color:var(--accent);padding:1px 7px;border-radius:4px;}
+.callout{border-radius:8px;padding:16px 20px;margin:20px 0;display:flex;gap:14px;align-items:flex-start;}
+.callout-icon{font-size:18px;flex-shrink:0;margin-top:1px;}.callout-body{flex:1;}
+.callout-title{font-weight:700;font-size:13px;margin-bottom:4px;}.callout p{margin-bottom:0;font-size:13.5px;}
+.note{background:rgba(88,166,255,0.07);border-left:3px solid var(--accent2);}.note .callout-title{color:var(--accent2);}
+.tip{background:rgba(63,185,80,0.07);border-left:3px solid var(--accent3);}.tip .callout-title{color:var(--accent3);}
+.warn{background:rgba(240,165,0,0.07);border-left:3px solid var(--accent);}.warn .callout-title{color:var(--accent);}
+.error{background:rgba(255,123,114,0.07);border-left:3px solid var(--accent4);}.error .callout-title{color:var(--accent4);}
+.purple{background:rgba(210,168,255,0.07);border-left:3px solid var(--accent5);}.purple .callout-title{color:var(--accent5);}
+.table-wrap{overflow-x:auto;margin:20px 0;}
+table{width:100%;border-collapse:collapse;font-size:13.5px;}
+thead tr{background:var(--bg2);border-bottom:2px solid var(--accent);}
+th{padding:12px 16px;text-align:left;font-weight:700;font-size:12px;letter-spacing:0.5px;text-transform:uppercase;color:var(--accent);}
+td{padding:11px 16px;border-bottom:1px solid var(--border);color:var(--muted);}
+tr:hover td{background:rgba(255,255,255,0.02);}
+td:first-child{font-family:'JetBrains Mono',monospace;color:var(--accent2);font-size:13px;}
+.diagram-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:28px 24px;margin:24px 0;overflow:hidden;}
+.diagram-title{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:20px;text-align:center;}
+.hour-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(240,165,0,0.1);border:1px solid rgba(240,165,0,0.25);color:var(--accent);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:1px;padding:5px 14px;border-radius:20px;margin-bottom:18px;margin-top:30px;}
+.mistake-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:20px 0;}
+.mistake-card{background:rgba(255,123,114,0.05);border:1px solid rgba(255,123,114,0.2);border-radius:8px;padding:16px;}
+.mistake-card .mt{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent4);font-weight:700;margin-bottom:8px;}
+.mistake-card p{font-size:13px;margin:0;}
+.checklist{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:24px 28px;margin:24px 0;}
+.checklist-title{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent3);letter-spacing:1.5px;text-transform:uppercase;font-weight:700;margin-bottom:16px;}
+.check-item{display:flex;align-items:flex-start;gap:12px;padding:9px 0;border-bottom:1px solid rgba(48,54,61,0.5);font-size:14px;color:var(--muted);}
+.check-item:last-child{border-bottom:none;}
+.check-box{width:18px;height:18px;border:2px solid var(--accent3);border-radius:4px;flex-shrink:0;margin-top:2px;}
+.resource-list{list-style:none;padding:0;margin:12px 0;}
+.resource-list li{padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;margin-bottom:8px;font-size:13.5px;display:flex;gap:10px;align-items:center;}
+.resource-list li a{color:var(--accent2);text-decoration:none;}
+.footer{background:var(--bg2);border-top:1px solid var(--border);padding:24px 40px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);}
+.footer span{color:var(--accent);}
+::-webkit-scrollbar{width:6px;height:6px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+@media(max-width:640px){.hero{padding:32px 20px 24px;}.hero h1{font-size:24px;}.container{padding:24px 16px 60px;}}
+</style>
+</head>
+<body>
+<div class="hero">
+  <div class="hero-tag">Phase 1 &middot; Day 7 of 65</div>
+  <h1>Exception <span>Handling</span></h1>
+  <div class="hero-sub">
+    <span><span class="dot"></span>2 Hours</span>
+    <span><span class="dot"></span>Selenium + Java Track</span>
+    <span><span class="dot"></span>try &middot; catch &middot; finally &middot; throw &middot; throws &middot; custom exceptions &middot; Selenium exceptions</span>
+  </div>
+</div>
+<div class="container">
+
+<div class="toc">
+  <div class="toc-title">// Table of Contents</div>
+  <ol>
+    <li><a href="#s1">Why Exception Handling is Critical in Selenium</a></li>
+    <li><a href="#s2">What is an Exception?</a></li>
+    <li><a href="#s3">Exception Hierarchy — Checked vs Unchecked</a></li>
+    <li><a href="#s4">try-catch Block</a></li>
+    <li><a href="#s5">Multiple catch Blocks</a></li>
+    <li><a href="#s6">finally Block</a></li>
+    <li><a href="#s7">try-with-resources</a></li>
+    <li><a href="#s8">throw — Throwing an Exception Manually</a></li>
+    <li><a href="#s9">throws — Declaring Exceptions in Method Signature</a></li>
+    <li><a href="#s10">Custom Exceptions</a></li>
+    <li><a href="#s11">Exception Message &amp; Stack Trace</a></li>
+    <li><a href="#s12">Common Java Exceptions — All You Need to Know</a></li>
+    <li><a href="#s13">Top 8 Selenium Exceptions — Causes &amp; Fixes</a></li>
+    <li><a href="#s14">Exception Handling Patterns in Selenium</a></li>
+    <li><a href="#s15">Best Practices</a></li>
+    <li><a href="#s16">Practice Task + Expected Output</a></li>
+    <li><a href="#s17">Common Mistakes</a></li>
+    <li><a href="#s18">End of Day Checklist + Resources</a></li>
+  </ol>
+</div>
+
+<!-- S1 -->
+<div class="section" id="s1">
+  <div class="section-header"><div class="section-num">01</div><h2>Why Exception Handling is Critical in Selenium</h2></div>
+  <div class="hour-badge">&#9200; Hour 1 — Exception Fundamentals (60 mins)</div>
+  <p>Selenium tests interact with live browsers, real networks, and dynamic web pages. <strong>Things go wrong constantly</strong> — elements don't load in time, pages redirect unexpectedly, networks stall. Without exception handling, one failure crashes the entire test run. With it, you control the failure, log it, take a screenshot, and continue.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Situation</th><th>Exception Thrown</th><th>Your Handler Does</th></tr></thead>
+      <tbody>
+        <tr><td>Element not found on page</td><td>NoSuchElementException</td><td>Log error + take screenshot + fail test gracefully</td></tr>
+        <tr><td>Element found but page refreshed</td><td>StaleElementReferenceException</td><td>Re-find element and retry</td></tr>
+        <tr><td>Wait ran out before element appeared</td><td>TimeoutException</td><td>Log timeout + report which element was missing</td></tr>
+        <tr><td>Element exists but not clickable yet</td><td>ElementNotInteractableException</td><td>Scroll to element or wait longer</td></tr>
+        <tr><td>Browser driver crashed</td><td>WebDriverException</td><td>Restart driver + retry test</td></tr>
+        <tr><td>driver.quit() must always run</td><td>Any exception</td><td>finally block ensures browser always closes</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- S2 -->
+<div class="section" id="s2">
+  <div class="section-header"><div class="section-num">02</div><h2>What is an Exception?</h2></div>
+  <p>An <strong>exception</strong> is an event that disrupts normal program execution. When Java encounters an error at runtime, it creates an exception object and "throws" it. If nothing catches it, the program crashes with a stack trace.</p>
+  <div class="diagram-wrap">
+    <div class="diagram-title">// Without Handler vs With Handler</div>
+    <svg viewBox="0 0 700 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:700px;display:block;margin:0 auto">
+      <defs>
+        <marker id="ea" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0L0,6L8,3z" fill="#8b949e"/></marker>
+        <marker id="eb" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0L0,6L8,3z" fill="#3fb950"/></marker>
+      </defs>
+      <!-- Without handler -->
+      <text x="10" y="20" font-family="JetBrains Mono,monospace" font-size="11" fill="#ff7b72" font-weight="700">WITHOUT handler</text>
+      <rect x="10" y="28" width="90" height="30" rx="6" fill="#1e2530" stroke="#58a6ff"/>
+      <text x="55" y="47" text-anchor="middle" font-family="Sora,sans-serif" font-size="10" fill="#e6edf3">Step 1</text>
+      <line x1="100" y1="43" x2="120" y2="43" stroke="#8b949e" stroke-width="1.5" marker-end="url(#ea)"/>
+      <rect x="120" y="28" width="90" height="30" rx="6" fill="#1e2530" stroke="#58a6ff"/>
+      <text x="165" y="47" text-anchor="middle" font-family="Sora,sans-serif" font-size="10" fill="#e6edf3">Step 2</text>
+      <line x1="210" y1="43" x2="230" y2="43" stroke="#8b949e" stroke-width="1.5" marker-end="url(#ea)"/>
+      <rect x="230" y="28" width="90" height="30" rx="6" fill="#1a0a0a" stroke="#ff7b72" stroke-width="2"/>
+      <text x="275" y="44" text-anchor="middle" font-family="Sora,sans-serif" font-size="10" fill="#ff7b72">CRASH &#128165;</text>
+      <text x="275" y="57" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#ff7b72">Exception!</text>
+      <line x1="275" y1="58" x2="275" y2="75" stroke="#ff7b72" stroke-width="1.5" marker-end="url(#ea)"/>
+      <rect x="230" y="75" width="90" height="24" rx="4" fill="#1a0a0a" stroke="#ff7b72"/>
+      <text x="275" y="91" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#ff7b72">Program stops</text>
+      <rect x="340" y="28" width="90" height="30" rx="6" fill="#1e2530" stroke="#30363d" stroke-dasharray="4,2"/>
+      <text x="385" y="47" text-anchor="middle" font-family="Sora,sans-serif" font-size="10" fill="#30363d">Step 4</text>
+      <rect x="445" y="28" width="90" height="30" rx="6" fill="#1e2530" stroke="#30363d" stroke-dasharray="4,2"/>
+      <text x="490" y="47" text-anchor="middle" font-family="Sora,sans-serif" font-size="10" fill="#30363d">Step 5</text>
+      <text x="560" y="47" font-family="Sora,sans-serif" font-size="10" fill="#6e7681">Never runs</text>
+
+      <!-- With handler -->
+      <text x="10" y="130" font-family="JetBrains Mono,monospace" font-size="11" fill="#3fb950" font-weight="700">WITH handler</text>
+      <rect x="10" y="138" width="90" height="30" rx="6" fill="#1e2530" stroke="#58a6ff"/>
+      <text x="55" y="157" text-anchor="middle" font-family="Sora,sans-serif" font-size="10" fill="#e6edf3">Step 1</text>
+      <line x1="100" y1="153" x2="120" y2="153" stroke="#8b949e" stroke-width="1.5" marker-end="url(#ea)"/>
+      <rect x="120" y="138" width="90" height="30" rx="6" fill="#1e2530" stroke="#58a6ff"/>
+      <text x="165" y="157" text-anchor="middle" font-family="Sora,sans-serif" font-size="10" fill="#e6edf3">Step 2</text>
+      <line x1="210" y1="153" x2="230" y2="153" stroke="#8b949e" stroke-width="1.5" marker-end="url(#ea)"/>
+      <rect x="230" y="138" width="90" height="30" rx="6" fill="#0a1a1a" stroke="#f0a500" stroke-width="2"/>
+      <text x="275" y="154" text-anchor="middle" font-family="Sora,sans-serif" font-size="10" fill="#f0a500">Exception</text>
+      <text x="275" y="167" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#f0a500">CAUGHT &#10003;</text>
+      <line x1="320" y1="153" x2="340" y2="153" stroke="#3fb950" stroke-width="1.5" marker-end="url(#eb)"/>
+      <rect x="340" y="138" width="90" height="30" rx="6" fill="#0a1a0d" stroke="#3fb950"/>
+      <text x="385" y="154" text-anchor="middle" font-family="Sora,sans-serif" font-size="10" fill="#3fb950">Log error</text>
+      <text x="385" y="167" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#6e7681">screenshot</text>
+      <line x1="430" y1="153" x2="450" y2="153" stroke="#3fb950" stroke-width="1.5" marker-end="url(#eb)"/>
+      <rect x="450" y="138" width="90" height="30" rx="6" fill="#1e2530" stroke="#58a6ff"/>
+      <text x="495" y="157" text-anchor="middle" font-family="Sora,sans-serif" font-size="10" fill="#e6edf3">Step 5</text>
+      <text x="560" y="157" font-family="Sora,sans-serif" font-size="10" fill="#3fb950">Continues!</text>
+    </svg>
+  </div>
+</div>
+
+<!-- S3 -->
+<div class="section" id="s3">
+  <div class="section-header"><div class="section-num">03</div><h2>Exception Hierarchy — Checked vs Unchecked</h2></div>
+  <div class="diagram-wrap">
+    <div class="diagram-title">// Java Exception Hierarchy</div>
+    <svg viewBox="0 0 700 240" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:700px;display:block;margin:0 auto">
+      <defs><marker id="ec" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0L0,6L8,3z" fill="#8b949e"/></marker></defs>
+      <!-- Throwable -->
+      <rect x="260" y="10" width="180" height="30" rx="6" fill="#0d1117" stroke="#d2a8ff" stroke-width="2"/>
+      <text x="350" y="30" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#d2a8ff" font-weight="700">Throwable</text>
+      <!-- Error branch -->
+      <line x1="300" y1="40" x2="160" y2="80" stroke="#8b949e" stroke-width="1.5" marker-end="url(#ec)"/>
+      <rect x="70" y="80" width="160" height="30" rx="6" fill="#0d1117" stroke="#ff7b72" stroke-width="1.5"/>
+      <text x="150" y="100" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#ff7b72">Error</text>
+      <text x="150" y="125" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#6e7681">JVM-level — don't catch</text>
+      <rect x="20" y="140" width="130" height="24" rx="4" fill="#1a0a0a" stroke="#ff7b72" stroke-width="1"/>
+      <text x="85" y="156" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#ff7b72">OutOfMemoryError</text>
+      <rect x="20" y="170" width="130" height="24" rx="4" fill="#1a0a0a" stroke="#ff7b72" stroke-width="1"/>
+      <text x="85" y="186" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#ff7b72">StackOverflowError</text>
+      <!-- Exception branch -->
+      <line x1="400" y1="40" x2="460" y2="80" stroke="#8b949e" stroke-width="1.5" marker-end="url(#ec)"/>
+      <rect x="380" y="80" width="180" height="30" rx="6" fill="#0d1117" stroke="#f0a500" stroke-width="2"/>
+      <text x="470" y="100" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#f0a500">Exception</text>
+      <!-- Checked -->
+      <line x1="420" y1="110" x2="340" y2="140" stroke="#8b949e" stroke-width="1.5" marker-end="url(#ec)"/>
+      <rect x="245" y="140" width="175" height="30" rx="6" fill="#0d1117" stroke="#58a6ff" stroke-width="1.5"/>
+      <text x="332" y="157" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#58a6ff">Checked Exception</text>
+      <text x="332" y="182" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#58a6ff">Must handle or declare</text>
+      <rect x="245" y="195" width="80" height="22" rx="4" fill="#0d1522" stroke="#58a6ff" stroke-width="1"/>
+      <text x="285" y="210" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8" fill="#58a6ff">IOException</text>
+      <rect x="335" y="195" width="85" height="22" rx="4" fill="#0d1522" stroke="#58a6ff" stroke-width="1"/>
+      <text x="377" y="210" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8" fill="#58a6ff">SQLException</text>
+      <!-- Unchecked (RuntimeException) -->
+      <line x1="510" y1="110" x2="570" y2="140" stroke="#8b949e" stroke-width="1.5" marker-end="url(#ec)"/>
+      <rect x="475" y="140" width="215" height="30" rx="6" fill="#0d1117" stroke="#3fb950" stroke-width="1.5"/>
+      <text x="582" y="157" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#3fb950">RuntimeException</text>
+      <text x="582" y="182" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#3fb950">Unchecked — no must-handle</text>
+      <rect x="425" y="195" width="85" height="22" rx="4" fill="#0a1a0d" stroke="#3fb950" stroke-width="1"/>
+      <text x="467" y="210" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8" fill="#3fb950">NullPointer</text>
+      <rect x="518" y="195" width="85" height="22" rx="4" fill="#0a1a0d" stroke="#3fb950" stroke-width="1"/>
+      <text x="560" y="210" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8" fill="#3fb950">ArrayIndex</text>
+      <rect x="611" y="195" width="85" height="22" rx="4" fill="#0a1a0d" stroke="#3fb950" stroke-width="1"/>
+      <text x="653" y="210" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8" fill="#3fb950">ClassCast</text>
+    </svg>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Type</th><th>Description</th><th>Must Handle?</th><th>Examples</th></tr></thead>
+      <tbody>
+        <tr><td>Error</td><td>JVM-level fatal problem. Never catch these.</td><td>No (don't touch)</td><td>OutOfMemoryError, StackOverflowError</td></tr>
+        <tr><td>Checked Exception</td><td>Compiler forces you to handle or declare. Represents recoverable situations.</td><td>YES — compile error if not handled</td><td>IOException, SQLException, FileNotFoundException</td></tr>
+        <tr><td>Unchecked Exception (RuntimeException)</td><td>Programmer errors. Compiler doesn't force handling.</td><td>No (but you should)</td><td>NullPointerException, ArrayIndexOutOfBoundsException, all Selenium exceptions</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout note">
+    <span class="callout-icon">&#128204;</span>
+    <div class="callout-body">
+      <div class="callout-title">All Selenium exceptions are RuntimeExceptions (Unchecked)</div>
+      <p>This means the compiler won't force you to catch them — but you should handle the important ones. <code>NoSuchElementException</code>, <code>TimeoutException</code>, <code>StaleElementReferenceException</code> are all unchecked. They extend <code>WebDriverException</code> which extends <code>RuntimeException</code>.</p>
+    </div>
+  </div>
+</div>
+
+<!-- S4 -->
+<div class="section" id="s4">
+  <div class="section-header"><div class="section-num">04</div><h2>try-catch Block</h2></div>
+  <p>The <code>try</code> block contains code that might throw an exception. The <code>catch</code> block handles it if it does. If no exception occurs, the catch block is completely skipped.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">TryCatch.java</span></div>
+    <pre><span class="cm">// Without try-catch — program crashes if 0 is passed</span>
+<span class="kw">public static</span> <span class="ty">int</span> <span class="fn">divide_BAD</span>(<span class="ty">int</span> <span class="nm">a</span>, <span class="ty">int</span> <span class="nm">b</span>) {
+    <span class="kw">return</span> a / b;  <span class="cm">// ArithmeticException if b == 0</span>
+}
+
+<span class="cm">// With try-catch — handles the error gracefully</span>
+<span class="kw">public static</span> <span class="ty">int</span> <span class="fn">divide</span>(<span class="ty">int</span> <span class="nm">a</span>, <span class="ty">int</span> <span class="nm">b</span>) {
+    <span class="kw">try</span> {
+        <span class="kw">return</span> a / b;                    <span class="cm">// line that might throw</span>
+    } <span class="kw">catch</span> (<span class="nm">ArithmeticException</span> <span class="nm">e</span>) {   <span class="cm">// catch specific exception type</span>
+        <span class="fn">System.out.println</span>(<span class="st">"Error: Cannot divide by zero"</span>);
+        <span class="fn">System.out.println</span>(<span class="st">"Message: "</span> <span class="op">+</span> e.<span class="fn">getMessage</span>()); <span class="cm">// "/ by zero"</span>
+        <span class="kw">return</span> <span class="op">-</span><span class="nu">1</span>;                         <span class="cm">// return safe default</span>
+    }
+}
+
+<span class="cm">// Usage</span>
+<span class="fn">System.out.println</span>(<span class="fn">divide</span>(<span class="nu">10</span>, <span class="nu">2</span>));   <span class="cm">// 5  — no exception</span>
+<span class="fn">System.out.println</span>(<span class="fn">divide</span>(<span class="nu">10</span>, <span class="nu">0</span>));   <span class="cm">// Error printed, returns -1</span>
+
+<span class="cm">// catch gives you access to the exception object 'e'</span>
+<span class="cm">// e.getMessage()    → short description</span>
+<span class="cm">// e.toString()      → class name + message</span>
+<span class="cm">// e.printStackTrace() → full stack trace (for debugging)</span></pre>
+  </div>
+</div>
+
+<!-- S5 -->
+<div class="section" id="s5">
+  <div class="section-header"><div class="section-num">05</div><h2>Multiple catch Blocks</h2></div>
+  <p>One try block can have multiple catch blocks — each handling a different exception type. Java checks them top to bottom and runs the first matching one. Always catch specific exceptions before general ones.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">MultipleCatch.java</span></div>
+    <pre><span class="kw">public static void</span> <span class="fn">processData</span>(<span class="ty">String</span>[] <span class="nm">data</span>, <span class="ty">int</span> <span class="nm">index</span>) {
+    <span class="kw">try</span> {
+        <span class="ty">String</span> <span class="nm">value</span>   <span class="op">=</span> data[index];          <span class="cm">// may throw ArrayIndexOutOfBoundsException</span>
+        <span class="ty">int</span>    <span class="nm">number</span>  <span class="op">=</span> <span class="ty">Integer</span>.<span class="fn">parseInt</span>(value); <span class="cm">// may throw NumberFormatException</span>
+        <span class="ty">int</span>    <span class="nm">result</span>  <span class="op">=</span> <span class="nu">100</span> <span class="op">/</span> number;          <span class="cm">// may throw ArithmeticException</span>
+        <span class="fn">System.out.println</span>(<span class="st">"Result: "</span> <span class="op">+</span> result);
+    }
+    <span class="kw">catch</span> (<span class="nm">ArrayIndexOutOfBoundsException</span> <span class="nm">e</span>) {
+        <span class="fn">System.out.println</span>(<span class="st">"Index "</span> <span class="op">+</span> index <span class="op">+</span> <span class="st">" out of bounds. Array size: "</span> <span class="op">+</span> data.<span class="nm">length</span>);
+    }
+    <span class="kw">catch</span> (<span class="nm">NumberFormatException</span> <span class="nm">e</span>) {
+        <span class="fn">System.out.println</span>(<span class="st">"Not a valid number: "</span> <span class="op">+</span> e.<span class="fn">getMessage</span>());
+    }
+    <span class="kw">catch</span> (<span class="nm">ArithmeticException</span> <span class="nm">e</span>) {
+        <span class="fn">System.out.println</span>(<span class="st">"Division by zero"</span>);
+    }
+    <span class="kw">catch</span> (<span class="nm">Exception</span> <span class="nm">e</span>) {        <span class="cm">// general catch — ALWAYS last!</span>
+        <span class="fn">System.out.println</span>(<span class="st">"Unexpected: "</span> <span class="op">+</span> e.<span class="fn">getMessage</span>());
+    }
+}
+
+<span class="cm">// Multi-catch: handle two exceptions the same way (Java 7+)</span>
+<span class="kw">try</span> {
+    <span class="cm">// some code</span>
+} <span class="kw">catch</span> (<span class="nm">NumberFormatException</span> <span class="op">|</span> <span class="nm">ArithmeticException</span> <span class="nm">e</span>) {
+    <span class="fn">System.out.println</span>(<span class="st">"Number error: "</span> <span class="op">+</span> e.<span class="fn">getMessage</span>());
+}</pre>
+  </div>
+  <div class="callout error">
+    <span class="callout-icon">&#128680;</span>
+    <div class="callout-body">
+      <div class="callout-title">Most specific exception FIRST — always</div>
+      <p>If you put <code>catch (Exception e)</code> first, it catches EVERYTHING — your specific handlers below it never run. Java forces you to put child classes before parent classes in catch chains. <code>Exception</code> is always last. <code>RuntimeException</code> before <code>Exception</code>.</p>
+    </div>
+  </div>
+</div>
+
+<!-- S6 -->
+<div class="section" id="s6">
+  <div class="section-header"><div class="section-num">06</div><h2>finally Block</h2></div>
+  <p>The <code>finally</code> block <strong>ALWAYS runs</strong> — whether an exception occurred or not, whether it was caught or not. This is where <code>driver.quit()</code> lives in your Selenium tests — the browser MUST close no matter what happens.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">Finally.java</span></div>
+    <pre><span class="cm">// Structure</span>
+<span class="kw">try</span> {
+    <span class="cm">// risky code</span>
+} <span class="kw">catch</span> (<span class="nm">Exception</span> <span class="nm">e</span>) {
+    <span class="cm">// handle error</span>
+} <span class="kw">finally</span> {
+    <span class="cm">// ALWAYS runs — cleanup goes here</span>
+}
+
+<span class="cm">// Selenium pattern — driver.quit() in finally</span>
+<span class="kw">public static void</span> <span class="fn">runLoginTest</span>() {
+    <span class="ty">String</span> <span class="nm">driver</span> <span class="op">=</span> <span class="st">"ChromeDriver"</span>;   <span class="cm">// simulating WebDriver</span>
+
+    <span class="kw">try</span> {
+        <span class="fn">System.out.println</span>(<span class="st">"[SETUP] Browser started: "</span> <span class="op">+</span> driver);
+        <span class="fn">System.out.println</span>(<span class="st">"[TEST]  Navigating to login page"</span>);
+        <span class="fn">System.out.println</span>(<span class="st">"[TEST]  Entering credentials"</span>);
+
+        <span class="cm">// Simulate a test failure</span>
+        <span class="kw">if</span> (<span class="bool">true</span>) <span class="kw">throw</span> <span class="kw">new</span> <span class="fn">RuntimeException</span>(<span class="st">"Login button not found!"</span>);
+
+        <span class="fn">System.out.println</span>(<span class="st">"[TEST]  Login successful"</span>);  <span class="cm">// never reached</span>
+
+    } <span class="kw">catch</span> (<span class="nm">RuntimeException</span> <span class="nm">e</span>) {
+        <span class="fn">System.out.println</span>(<span class="st">"[FAIL]  Test failed: "</span> <span class="op">+</span> e.<span class="fn">getMessage</span>());
+        <span class="fn">System.out.println</span>(<span class="st">"[SCRN]  Screenshot saved: login_fail.png"</span>);
+
+    } <span class="kw">finally</span> {
+        <span class="cm">// This ALWAYS runs — even if catch block throws another exception</span>
+        <span class="fn">System.out.println</span>(<span class="st">"[QUIT]  driver.quit() — browser closed"</span>);
+    }
+}
+
+<span class="cm">// Output (even though test failed):</span>
+<span class="cm">// [SETUP] Browser started: ChromeDriver</span>
+<span class="cm">// [TEST]  Navigating to login page</span>
+<span class="cm">// [TEST]  Entering credentials</span>
+<span class="cm">// [FAIL]  Test failed: Login button not found!</span>
+<span class="cm">// [SCRN]  Screenshot saved: login_fail.png</span>
+<span class="cm">// [QUIT]  driver.quit() — browser closed   ← always!</span></pre>
+  </div>
+</div>
+
+<!-- S7 -->
+<div class="section" id="s7">
+  <div class="section-header"><div class="section-num">07</div><h2>try-with-resources</h2></div>
+  <p>Automatically closes resources (files, connections) after the try block — even if an exception occurs. The resource must implement <code>AutoCloseable</code>. Cleaner than writing <code>finally { resource.close(); }</code>.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">TryWithResources.java</span></div>
+    <pre><span class="kw">import</span> java.io.*;
+
+<span class="cm">// OLD WAY — manual close in finally</span>
+<span class="nm">BufferedReader</span> <span class="nm">reader</span> <span class="op">=</span> <span class="kw">null</span>;
+<span class="kw">try</span> {
+    reader <span class="op">=</span> <span class="kw">new</span> <span class="fn">BufferedReader</span>(<span class="kw">new</span> <span class="fn">FileReader</span>(<span class="st">"data.txt"</span>));
+    <span class="ty">String</span> <span class="nm">line</span> <span class="op">=</span> reader.<span class="fn">readLine</span>();
+} <span class="kw">catch</span> (<span class="nm">IOException</span> <span class="nm">e</span>) {
+    e.<span class="fn">printStackTrace</span>();
+} <span class="kw">finally</span> {
+    <span class="kw">if</span> (reader <span class="op">!=</span> <span class="kw">null</span>) {
+        <span class="kw">try</span> { reader.<span class="fn">close</span>(); } <span class="kw">catch</span> (<span class="nm">IOException</span> <span class="nm">e</span>) { }
+    }
+}
+
+<span class="cm">// NEW WAY — try-with-resources (Java 7+)</span>
+<span class="cm">// Resource declared in try() — auto-closed when block ends</span>
+<span class="kw">try</span> (<span class="nm">BufferedReader</span> <span class="nm">br</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">BufferedReader</span>(<span class="kw">new</span> <span class="fn">FileReader</span>(<span class="st">"data.txt"</span>))) {
+    <span class="ty">String</span> <span class="nm">line</span> <span class="op">=</span> br.<span class="fn">readLine</span>();
+    <span class="fn">System.out.println</span>(line);
+} <span class="kw">catch</span> (<span class="nm">IOException</span> <span class="nm">e</span>) {
+    <span class="fn">System.out.println</span>(<span class="st">"File error: "</span> <span class="op">+</span> e.<span class="fn">getMessage</span>());
+}
+<span class="cm">// br is automatically closed — no finally needed!</span></pre>
+  </div>
+</div>
+
+<!-- S8 -->
+<div class="section" id="s8">
+  <div class="section-header"><div class="section-num">08</div><h2>throw — Throwing an Exception Manually</h2></div>
+  <p>You can intentionally throw an exception using <code>throw</code>. Use it to signal that a method received invalid input or that a test precondition failed.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">ThrowKeyword.java</span></div>
+    <pre><span class="kw">public static void</span> <span class="fn">login</span>(<span class="ty">String</span> <span class="nm">username</span>, <span class="ty">String</span> <span class="nm">password</span>) {
+
+    <span class="cm">// Validate inputs before doing anything</span>
+    <span class="kw">if</span> (username <span class="op">==</span> <span class="kw">null</span> <span class="op">||</span> username.<span class="fn">isEmpty</span>()) {
+        <span class="kw">throw</span> <span class="kw">new</span> <span class="fn">IllegalArgumentException</span>(<span class="st">"Username cannot be null or empty"</span>);
+    }
+    <span class="kw">if</span> (password <span class="op">==</span> <span class="kw">null</span> <span class="op">||</span> password.<span class="fn">length</span>() <span class="op">&lt;</span> <span class="nu">6</span>) {
+        <span class="kw">throw</span> <span class="kw">new</span> <span class="fn">IllegalArgumentException</span>(<span class="st">"Password must be at least 6 characters"</span>);
+    }
+
+    <span class="fn">System.out.println</span>(<span class="st">"Logged in as: "</span> <span class="op">+</span> username);
+}
+
+<span class="cm">// Catching manually thrown exceptions</span>
+<span class="kw">try</span> {
+    <span class="fn">login</span>(<span class="st">""</span>, <span class="st">"pass123"</span>);
+} <span class="kw">catch</span> (<span class="nm">IllegalArgumentException</span> <span class="nm">e</span>) {
+    <span class="fn">System.out.println</span>(<span class="st">"Validation failed: "</span> <span class="op">+</span> e.<span class="fn">getMessage</span>());
+}
+<span class="cm">// Validation failed: Username cannot be null or empty</span>
+
+<span class="kw">try</span> {
+    <span class="fn">login</span>(<span class="st">"Admin"</span>, <span class="st">"123"</span>);
+} <span class="kw">catch</span> (<span class="nm">IllegalArgumentException</span> <span class="nm">e</span>) {
+    <span class="fn">System.out.println</span>(<span class="st">"Validation failed: "</span> <span class="op">+</span> e.<span class="fn">getMessage</span>());
+}
+<span class="cm">// Validation failed: Password must be at least 6 characters</span></pre>
+  </div>
+</div>
+
+<!-- S9 -->
+<div class="section" id="s9">
+  <div class="section-header"><div class="section-num">09</div><h2>throws — Declaring Exceptions in Method Signature</h2></div>
+  <p><code>throws</code> in a method signature tells callers "this method might throw this exception — you handle it." Required for checked exceptions. Optional for unchecked (but good documentation).</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">ThrowsDeclaration.java</span></div>
+    <pre><span class="kw">import</span> java.io.*;
+
+<span class="cm">// throws in signature = "caller must handle IOException"</span>
+<span class="kw">public static</span> <span class="ty">String</span> <span class="fn">readConfig</span>(<span class="ty">String</span> <span class="nm">path</span>) <span class="kw">throws</span> <span class="nm">IOException</span> {
+    <span class="nm">BufferedReader</span> <span class="nm">br</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">BufferedReader</span>(<span class="kw">new</span> <span class="fn">FileReader</span>(path));
+    <span class="kw">return</span> br.<span class="fn">readLine</span>();
+    <span class="cm">// IOException NOT handled here — passed to caller</span>
+}
+
+<span class="cm">// Caller MUST handle it</span>
+<span class="kw">public static void</span> <span class="fn">main</span>(<span class="ty">String</span>[] args) {
+    <span class="kw">try</span> {
+        <span class="ty">String</span> <span class="nm">url</span> <span class="op">=</span> <span class="fn">readConfig</span>(<span class="st">"config.properties"</span>);
+        <span class="fn">System.out.println</span>(<span class="st">"URL: "</span> <span class="op">+</span> url);
+    } <span class="kw">catch</span> (<span class="nm">IOException</span> <span class="nm">e</span>) {
+        <span class="fn">System.out.println</span>(<span class="st">"Config file not found: "</span> <span class="op">+</span> e.<span class="fn">getMessage</span>());
+    }
+}
+
+<span class="cm">// throw vs throws — remember the difference:</span>
+<span class="cm">// throw  → action: actually throws the exception object</span>
+<span class="cm">// throws → declaration: warns callers this method may throw</span></pre>
+  </div>
+</div>
+
+<!-- S10 -->
+<div class="section" id="s10">
+  <div class="section-header"><div class="section-num">10</div><h2>Custom Exceptions</h2></div>
+  <p>Create your own exception classes for domain-specific errors. In Selenium frameworks, custom exceptions make test failure reasons crystal clear — much better than a generic RuntimeException.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">CustomException.java</span></div>
+    <pre><span class="cm">// Custom checked exception</span>
+<span class="kw">public class</span> <span class="nm">TestSetupException</span> <span class="kw">extends</span> <span class="nm">Exception</span> {
+    <span class="kw">public</span> <span class="fn">TestSetupException</span>(<span class="ty">String</span> <span class="nm">message</span>) {
+        <span class="kw">super</span>(message);
+    }
+    <span class="kw">public</span> <span class="fn">TestSetupException</span>(<span class="ty">String</span> <span class="nm">message</span>, <span class="nm">Throwable</span> <span class="nm">cause</span>) {
+        <span class="kw">super</span>(message, cause);
+    }
+}
+
+<span class="cm">// Custom unchecked exception</span>
+<span class="kw">public class</span> <span class="nm">ElementNotFoundException</span> <span class="kw">extends</span> <span class="nm">RuntimeException</span> {
+    <span class="kw">private</span> <span class="ty">String</span> <span class="nm">locator</span>;
+
+    <span class="kw">public</span> <span class="fn">ElementNotFoundException</span>(<span class="ty">String</span> <span class="nm">locator</span>) {
+        <span class="kw">super</span>(<span class="st">"Element not found using locator: "</span> <span class="op">+</span> locator);
+        <span class="kw">this</span>.locator <span class="op">=</span> locator;
+    }
+
+    <span class="kw">public</span> <span class="ty">String</span> <span class="fn">getLocator</span>() { <span class="kw">return</span> locator; }
+}
+
+<span class="cm">// Using custom exceptions</span>
+<span class="kw">public static void</span> <span class="fn">clickElement</span>(<span class="ty">String</span> <span class="nm">locatorId</span>) {
+    <span class="ty">boolean</span> <span class="nm">found</span> <span class="op">=</span> <span class="bool">false</span>;  <span class="cm">// simulate element not found</span>
+    <span class="kw">if</span> (!found) {
+        <span class="kw">throw</span> <span class="kw">new</span> <span class="fn">ElementNotFoundException</span>(locatorId);
+    }
+}
+
+<span class="kw">try</span> {
+    <span class="fn">clickElement</span>(<span class="st">"#loginButton"</span>);
+} <span class="kw">catch</span> (<span class="nm">ElementNotFoundException</span> <span class="nm">e</span>) {
+    <span class="fn">System.out.println</span>(<span class="st">"FAILED: "</span> <span class="op">+</span> e.<span class="fn">getMessage</span>());
+    <span class="fn">System.out.println</span>(<span class="st">"Locator: "</span> <span class="op">+</span> e.<span class="fn">getLocator</span>());
+}
+<span class="cm">// FAILED: Element not found using locator: #loginButton</span>
+<span class="cm">// Locator: #loginButton</span></pre>
+  </div>
+</div>
+
+<!-- S11 -->
+<div class="section" id="s11">
+  <div class="section-header"><div class="section-num">11</div><h2>Exception Message &amp; Stack Trace</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">ExceptionInfo.java</span></div>
+    <pre><span class="kw">try</span> {
+    <span class="ty">int</span>[] <span class="nm">arr</span> <span class="op">=</span> {<span class="nu">1</span>, <span class="nu">2</span>, <span class="nu">3</span>};
+    <span class="fn">System.out.println</span>(arr[<span class="nu">10</span>]);   <span class="cm">// throws ArrayIndexOutOfBoundsException</span>
+
+} <span class="kw">catch</span> (<span class="nm">ArrayIndexOutOfBoundsException</span> <span class="nm">e</span>) {
+
+    <span class="cm">// getMessage() — just the error description</span>
+    <span class="fn">System.out.println</span>(<span class="st">"Message: "</span> <span class="op">+</span> e.<span class="fn">getMessage</span>());
+    <span class="cm">// Message: Index 10 out of bounds for length 3</span>
+
+    <span class="cm">// getClass().getSimpleName() — exception class name</span>
+    <span class="fn">System.out.println</span>(<span class="st">"Type: "</span> <span class="op">+</span> e.<span class="fn">getClass</span>().<span class="fn">getSimpleName</span>());
+    <span class="cm">// Type: ArrayIndexOutOfBoundsException</span>
+
+    <span class="cm">// toString() — class name + message</span>
+    <span class="fn">System.out.println</span>(<span class="st">"Full: "</span> <span class="op">+</span> e.<span class="fn">toString</span>());
+    <span class="cm">// Full: java.lang.ArrayIndexOutOfBoundsException: Index 10 ...</span>
+
+    <span class="cm">// printStackTrace() — full trace showing which line caused it</span>
+    <span class="cm">// Use during DEBUG, remove from production code</span>
+    e.<span class="fn">printStackTrace</span>();
+}</pre>
+  </div>
+</div>
+
+<!-- S12 -->
+<div class="section" id="s12">
+  <div class="section-header"><div class="section-num">12</div><h2>Common Java Exceptions — All You Need to Know</h2></div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Exception</th><th>Cause</th><th>Fix</th></tr></thead>
+      <tbody>
+        <tr><td>NullPointerException</td><td>Calling method on null reference: <code>str.length()</code> when str is null</td><td>Check for null before use: <code>if (str != null)</code></td></tr>
+        <tr><td>ArrayIndexOutOfBoundsException</td><td>Accessing index beyond array size: <code>arr[10]</code> on arr of size 3</td><td>Check: <code>if (i &lt; arr.length)</code></td></tr>
+        <tr><td>NumberFormatException</td><td>Parsing non-numeric string: <code>Integer.parseInt("abc")</code></td><td>Validate input or catch and provide default</td></tr>
+        <tr><td>ClassCastException</td><td>Invalid type cast: <code>(String) integerObject</code></td><td>Use <code>instanceof</code> check before casting</td></tr>
+        <tr><td>IllegalArgumentException</td><td>Method received invalid argument</td><td>Validate parameters at start of method</td></tr>
+        <tr><td>IllegalStateException</td><td>Method called at wrong time (object in wrong state)</td><td>Check preconditions before calling method</td></tr>
+        <tr><td>StackOverflowError</td><td>Infinite recursion — method calls itself endlessly</td><td>Add base case to recursive method</td></tr>
+        <tr><td>ConcurrentModificationException</td><td>Modifying collection while iterating with for-each</td><td>Use Iterator.remove() or loop backwards</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- S13 -->
+<div class="section" id="s13">
+  <div class="section-header"><div class="section-num">13</div><h2>Top 8 Selenium Exceptions — Causes &amp; Fixes</h2></div>
+  <p>Memorize these. You will encounter every single one during Phase 2 and beyond. Knowing them now means you fix them instantly instead of Googling for 30 minutes.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Exception</th><th>When it happens</th><th>Fix</th></tr></thead>
+      <tbody>
+        <tr><td>NoSuchElementException</td><td>Element not found with given locator at the moment of call</td><td>Fix locator, add explicit wait, check page loads first</td></tr>
+        <tr><td>StaleElementReferenceException</td><td>Element was found but page changed (refresh/navigate) making reference stale</td><td>Re-find the element after the page change</td></tr>
+        <tr><td>TimeoutException</td><td>WebDriverWait ran out of time before condition was met</td><td>Increase timeout, check if element actually exists</td></tr>
+        <tr><td>ElementNotInteractableException</td><td>Element exists in DOM but cannot be interacted with (hidden, covered, disabled)</td><td>Wait for visibility, scroll into view, check element state</td></tr>
+        <tr><td>ElementClickInterceptedException</td><td>Click intercepted by another element (popup, overlay, cookie banner)</td><td>Close/dismiss overlapping element first</td></tr>
+        <tr><td>InvalidSelectorException</td><td>XPath or CSS selector syntax is invalid</td><td>Validate your locator in browser DevTools first</td></tr>
+        <tr><td>WebDriverException</td><td>General driver error — browser crashed, driver version mismatch</td><td>Check ChromeDriver matches Chrome version</td></tr>
+        <tr><td>SessionNotCreatedException</td><td>Driver couldn't start — wrong driver binary, browser not installed</td><td>Use WebDriverManager to auto-manage driver versions</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">SeleniumExceptions_Preview.java — Day 14+ patterns</span></div>
+    <pre><span class="cm">// ── NoSuchElementException ───────────────────────────────────</span>
+<span class="kw">try</span> {
+    <span class="cm">// WebElement btn = driver.findElement(By.id("submitBtn"));</span>
+    <span class="cm">// btn.click();</span>
+    <span class="fn">System.out.println</span>(<span class="st">"Clicking submit..."</span>);
+    <span class="kw">throw</span> <span class="kw">new</span> <span class="fn">RuntimeException</span>(<span class="st">"NoSuchElementException: id=submitBtn"</span>);
+} <span class="kw">catch</span> (<span class="nm">RuntimeException</span> <span class="nm">e</span>) {
+    <span class="fn">System.out.println</span>(<span class="st">"Element not found: "</span> <span class="op">+</span> e.<span class="fn">getMessage</span>());
+}
+
+<span class="cm">// ── StaleElementReferenceException — retry pattern ───────────</span>
+<span class="ty">int</span> <span class="nm">retries</span> <span class="op">=</span> <span class="nu">0</span>;
+<span class="ty">boolean</span> <span class="nm">success</span> <span class="op">=</span> <span class="bool">false</span>;
+<span class="kw">while</span> (retries <span class="op">&lt;</span> <span class="nu">3</span> <span class="op">&amp;&amp;</span> !success) {
+    <span class="kw">try</span> {
+        <span class="cm">// WebElement el = driver.findElement(By.id("item"));</span>
+        <span class="cm">// el.click();</span>
+        <span class="fn">System.out.println</span>(<span class="st">"Attempt "</span> <span class="op">+</span> (retries<span class="op">+</span><span class="nu">1</span>) <span class="op">+</span> <span class="st">": clicked element"</span>);
+        success <span class="op">=</span> <span class="bool">true</span>;
+    } <span class="kw">catch</span> (<span class="nm">RuntimeException</span> <span class="nm">e</span>) {
+        retries<span class="op">++</span>;
+        <span class="fn">System.out.println</span>(<span class="st">"Stale — retrying ("</span> <span class="op">+</span> retries <span class="op">+</span> <span class="st">")"</span>);
+    }
+}
+
+<span class="cm">// ── driver.quit() ALWAYS in finally ──────────────────────────</span>
+<span class="ty">String</span> <span class="nm">driver</span> <span class="op">=</span> <span class="st">"ChromeDriver"</span>;
+<span class="kw">try</span> {
+    <span class="fn">System.out.println</span>(<span class="st">"Running test on "</span> <span class="op">+</span> driver);
+    <span class="kw">throw</span> <span class="kw">new</span> <span class="fn">RuntimeException</span>(<span class="st">"Test crashed mid-way"</span>);
+} <span class="kw">catch</span> (<span class="nm">RuntimeException</span> <span class="nm">e</span>) {
+    <span class="fn">System.out.println</span>(<span class="st">"Caught: "</span> <span class="op">+</span> e.<span class="fn">getMessage</span>());
+} <span class="kw">finally</span> {
+    <span class="fn">System.out.println</span>(<span class="st">"driver.quit() called — browser closed ✓"</span>);
+}</pre>
+  </div>
+</div>
+
+<!-- S14 -->
+<div class="section" id="s14">
+  <div class="section-header"><div class="section-num">14</div><h2>Exception Handling Patterns in Selenium</h2></div>
+  <div class="hour-badge">&#9200; Hour 2 — Advanced Patterns (60 mins)</div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">SeleniumPatterns.java — Patterns you will copy into your framework</span></div>
+    <pre><span class="cm">// PATTERN 1: Safe click — handle non-interactable elements</span>
+<span class="kw">public static</span> <span class="ty">boolean</span> <span class="fn">safeClick</span>(<span class="ty">String</span> <span class="nm">elementId</span>) {
+    <span class="kw">try</span> {
+        <span class="fn">System.out.println</span>(<span class="st">"Clicking: "</span> <span class="op">+</span> elementId);
+        <span class="cm">// element.click();</span>
+        <span class="kw">return</span> <span class="bool">true</span>;
+    } <span class="kw">catch</span> (<span class="nm">Exception</span> <span class="nm">e</span>) {
+        <span class="fn">System.out.println</span>(<span class="st">"Click failed on ["</span> <span class="op">+</span> elementId <span class="op">+</span> <span class="st">"]: "</span> <span class="op">+</span> e.<span class="fn">getMessage</span>());
+        <span class="kw">return</span> <span class="bool">false</span>;
+    }
+}
+
+<span class="cm">// PATTERN 2: Safe getText — return empty string if element gone</span>
+<span class="kw">public static</span> <span class="ty">String</span> <span class="fn">safeGetText</span>(<span class="ty">String</span> <span class="nm">elementId</span>) {
+    <span class="kw">try</span> {
+        <span class="cm">// return element.getText();</span>
+        <span class="kw">return</span> <span class="st">"Welcome, Admin"</span>;
+    } <span class="kw">catch</span> (<span class="nm">Exception</span> <span class="nm">e</span>) {
+        <span class="fn">System.out.println</span>(<span class="st">"getText failed: "</span> <span class="op">+</span> e.<span class="fn">getMessage</span>());
+        <span class="kw">return</span> <span class="st">""</span>;   <span class="cm">// safe empty string instead of crash</span>
+    }
+}
+
+<span class="cm">// PATTERN 3: isElementPresent — no crash if not found</span>
+<span class="kw">public static</span> <span class="ty">boolean</span> <span class="fn">isPresent</span>(<span class="ty">String</span> <span class="nm">elementId</span>) {
+    <span class="kw">try</span> {
+        <span class="cm">// driver.findElement(By.id(elementId));</span>
+        <span class="kw">return</span> <span class="bool">true</span>;
+    } <span class="kw">catch</span> (<span class="nm">Exception</span> <span class="nm">e</span>) {
+        <span class="kw">return</span> <span class="bool">false</span>;   <span class="cm">// element not found = not present</span>
+    }
+}
+
+<span class="cm">// PATTERN 4: BaseTest with guaranteed cleanup</span>
+<span class="kw">public static void</span> <span class="fn">runTest</span>(<span class="ty">String</span> <span class="nm">testName</span>) {
+    <span class="ty">String</span> <span class="nm">driver</span> <span class="op">=</span> <span class="st">"ChromeDriver"</span>;
+    <span class="kw">try</span> {
+        <span class="fn">System.out.println</span>(<span class="st">"[START] "</span> <span class="op">+</span> testName);
+        <span class="cm">// ... test steps ...</span>
+        <span class="fn">System.out.println</span>(<span class="st">"[PASS]  "</span> <span class="op">+</span> testName);
+    } <span class="kw">catch</span> (<span class="nm">AssertionError</span> <span class="nm">e</span>) {
+        <span class="fn">System.out.println</span>(<span class="st">"[FAIL]  "</span> <span class="op">+</span> testName <span class="op">+</span> <span class="st">": "</span> <span class="op">+</span> e.<span class="fn">getMessage</span>());
+        <span class="cm">// takeScreenshot(testName + "_fail");</span>
+    } <span class="kw">catch</span> (<span class="nm">Exception</span> <span class="nm">e</span>) {
+        <span class="fn">System.out.println</span>(<span class="st">"[ERROR] "</span> <span class="op">+</span> testName <span class="op">+</span> <span class="st">": "</span> <span class="op">+</span> e.<span class="fn">getMessage</span>());
+    } <span class="kw">finally</span> {
+        <span class="fn">System.out.println</span>(<span class="st">"[QUIT]  driver.quit()"</span>);
+        <span class="cm">// driver.quit();</span>
+    }
+}</pre>
+  </div>
+</div>
+
+<!-- S15 -->
+<div class="section" id="s15">
+  <div class="section-header"><div class="section-num">15</div><h2>Best Practices</h2></div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Practice</th><th>Do This</th><th>Not This</th></tr></thead>
+      <tbody>
+        <tr><td>Catch specific</td><td><code>catch (NoSuchElementException e)</code></td><td><code>catch (Exception e)</code> for everything</td></tr>
+        <tr><td>Never empty catch</td><td><code>catch (Exception e) { log(e); }</code></td><td><code>catch (Exception e) { }</code> — silently swallows errors</td></tr>
+        <tr><td>Use finally</td><td><code>finally { driver.quit(); }</code></td><td>Relying on test passing to close browser</td></tr>
+        <tr><td>Meaningful messages</td><td><code>throw new IllegalArgumentException("Username cannot be empty")</code></td><td><code>throw new Exception("error")</code></td></tr>
+        <tr><td>Don't catch Error</td><td>Let OutOfMemoryError propagate</td><td>Catching Error and trying to recover</td></tr>
+        <tr><td>Log before rethrowing</td><td><code>log(e); throw e;</code></td><td>Rethrowing silently — makes debugging impossible</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- S16 -->
+<div class="section" id="s16">
+  <div class="section-header"><div class="section-num">16</div><h2>Practice Task + Expected Output</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">Day7Practice.java</span></div>
+    <pre><span class="kw">public class</span> <span class="nm">Day7Practice</span> {
+
+    <span class="cm">// ── Custom exception ─────────────────────────────────────</span>
+    <span class="kw">static class</span> <span class="nm">BrowserNotSupportedException</span> <span class="kw">extends</span> <span class="nm">RuntimeException</span> {
+        <span class="kw">public</span> <span class="fn">BrowserNotSupportedException</span>(<span class="ty">String</span> <span class="nm">browser</span>) {
+            <span class="kw">super</span>(<span class="st">"Browser not supported: "</span> <span class="op">+</span> browser);
+        }
+    }
+
+    <span class="cm">// ── Method 1: safe divide ─────────────────────────────────</span>
+    <span class="kw">public static</span> <span class="ty">double</span> <span class="fn">safeDivide</span>(<span class="ty">int</span> <span class="nm">a</span>, <span class="ty">int</span> <span class="nm">b</span>) {
+        <span class="kw">try</span> {
+            <span class="kw">return</span> (<span class="ty">double</span>) a / b;
+        } <span class="kw">catch</span> (<span class="nm">ArithmeticException</span> <span class="nm">e</span>) {
+            <span class="fn">System.out.println</span>(<span class="st">"  [ERROR] Division by zero — returning 0"</span>);
+            <span class="kw">return</span> <span class="nu">0</span>;
+        }
+    }
+
+    <span class="cm">// ── Method 2: login validator ─────────────────────────────</span>
+    <span class="kw">public static void</span> <span class="fn">validateLogin</span>(<span class="ty">String</span> <span class="nm">user</span>, <span class="ty">String</span> <span class="nm">pass</span>) {
+        <span class="kw">if</span> (user <span class="op">==</span> <span class="kw">null</span> <span class="op">||</span> user.<span class="fn">isEmpty</span>())
+            <span class="kw">throw</span> <span class="kw">new</span> <span class="fn">IllegalArgumentException</span>(<span class="st">"Username is required"</span>);
+        <span class="kw">if</span> (pass <span class="op">==</span> <span class="kw">null</span> <span class="op">||</span> pass.<span class="fn">length</span>() <span class="op">&lt;</span> <span class="nu">6</span>)
+            <span class="kw">throw</span> <span class="kw">new</span> <span class="fn">IllegalArgumentException</span>(<span class="st">"Password min 6 chars"</span>);
+        <span class="fn">System.out.println</span>(<span class="st">"  Credentials valid for: "</span> <span class="op">+</span> user);
+    }
+
+    <span class="cm">// ── Method 3: browser init ────────────────────────────────</span>
+    <span class="kw">public static void</span> <span class="fn">initBrowser</span>(<span class="ty">String</span> <span class="nm">browser</span>) {
+        <span class="kw">switch</span> (browser.<span class="fn">toLowerCase</span>()) {
+            <span class="kw">case</span> <span class="st">"chrome"</span>:
+            <span class="kw">case</span> <span class="st">"firefox"</span>:
+            <span class="kw">case</span> <span class="st">"edge"</span>:
+                <span class="fn">System.out.println</span>(<span class="st">"  "</span> <span class="op">+</span> browser <span class="op">+</span> <span class="st">" initialized ✓"</span>);
+                <span class="kw">break</span>;
+            <span class="kw">default</span>:
+                <span class="kw">throw</span> <span class="kw">new</span> <span class="fn">BrowserNotSupportedException</span>(browser);
+        }
+    }
+
+    <span class="cm">// ── Method 4: full test run simulation ───────────────────</span>
+    <span class="kw">public static void</span> <span class="fn">runTest</span>(<span class="ty">String</span> <span class="nm">name</span>, <span class="ty">boolean</span> <span class="nm">shouldFail</span>) {
+        <span class="fn">System.out.println</span>(<span class="st">"\n  [START] "</span> <span class="op">+</span> name);
+        <span class="kw">try</span> {
+            <span class="kw">if</span> (shouldFail)
+                <span class="kw">throw</span> <span class="kw">new</span> <span class="fn">RuntimeException</span>(<span class="st">"Element 'submitBtn' not found"</span>);
+            <span class="fn">System.out.println</span>(<span class="st">"  [PASS]  "</span> <span class="op">+</span> name);
+        } <span class="kw">catch</span> (<span class="nm">RuntimeException</span> <span class="nm">e</span>) {
+            <span class="fn">System.out.println</span>(<span class="st">"  [FAIL]  "</span> <span class="op">+</span> name <span class="op">+</span> <span class="st">": "</span> <span class="op">+</span> e.<span class="fn">getMessage</span>());
+        } <span class="kw">finally</span> {
+            <span class="fn">System.out.println</span>(<span class="st">"  [QUIT]  Browser closed"</span>);
+        }
+    }
+
+    <span class="kw">public static void</span> <span class="fn">main</span>(<span class="ty">String</span>[] args) {
+
+        <span class="fn">System.out.println</span>(<span class="st">"====== TASK 1: Safe Division ======"</span>);
+        <span class="fn">System.out.println</span>(<span class="st">"10 / 2 = "</span> <span class="op">+</span> <span class="fn">safeDivide</span>(<span class="nu">10</span>, <span class="nu">2</span>));
+        <span class="fn">System.out.println</span>(<span class="st">"10 / 0 = "</span> <span class="op">+</span> <span class="fn">safeDivide</span>(<span class="nu">10</span>, <span class="nu">0</span>));
+        <span class="fn">System.out.println</span>(<span class="st">"25 / 4 = "</span> <span class="op">+</span> <span class="fn">safeDivide</span>(<span class="nu">25</span>, <span class="nu">4</span>));
+
+        <span class="fn">System.out.println</span>(<span class="st">"\n====== TASK 2: Login Validation ======"</span>);
+        <span class="ty">String</span>[][] <span class="nm">logins</span> <span class="op">=</span> {
+            {<span class="st">"Admin"</span>, <span class="st">"admin123"</span>},
+            {<span class="st">""</span>,      <span class="st">"admin123"</span>},
+            {<span class="st">"user1"</span>, <span class="st">"123"</span>}
+        };
+        <span class="kw">for</span> (<span class="ty">String</span>[] <span class="nm">l</span> : logins) {
+            <span class="kw">try</span> {
+                <span class="fn">validateLogin</span>(l[<span class="nu">0</span>], l[<span class="nu">1</span>]);
+            } <span class="kw">catch</span> (<span class="nm">IllegalArgumentException</span> <span class="nm">e</span>) {
+                <span class="fn">System.out.println</span>(<span class="st">"  [INVALID] "</span> <span class="op">+</span> e.<span class="fn">getMessage</span>());
+            }
+        }
+
+        <span class="fn">System.out.println</span>(<span class="st">"\n====== TASK 3: Browser Init ======"</span>);
+        <span class="ty">String</span>[] <span class="nm">browsers</span> <span class="op">=</span> {<span class="st">"Chrome"</span>, <span class="st">"Firefox"</span>, <span class="st">"Safari"</span>, <span class="st">"Edge"</span>};
+        <span class="kw">for</span> (<span class="ty">String</span> <span class="nm">b</span> : browsers) {
+            <span class="kw">try</span> {
+                <span class="fn">initBrowser</span>(b);
+            } <span class="kw">catch</span> (<span class="nm">BrowserNotSupportedException</span> <span class="nm">e</span>) {
+                <span class="fn">System.out.println</span>(<span class="st">"  [ERROR] "</span> <span class="op">+</span> e.<span class="fn">getMessage</span>());
+            }
+        }
+
+        <span class="fn">System.out.println</span>(<span class="st">"\n====== TASK 4: Test Run Simulation ======"</span>);
+        <span class="fn">runTest</span>(<span class="st">"Login Test"</span>,  <span class="bool">false</span>);
+        <span class="fn">runTest</span>(<span class="st">"Logout Test"</span>, <span class="bool">true</span>);
+        <span class="fn">runTest</span>(<span class="st">"Search Test"</span>, <span class="bool">false</span>);
+    }
+}</pre>
+  </div>
+  <h3>Expected Output</h3>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Output</span><span class="code-file">Console</span></div>
+    <pre>====== TASK 1: Safe Division ======
+10 / 2 = 5.0
+  [ERROR] Division by zero — returning 0
+10 / 0 = 0.0
+25 / 4 = 6.25
+
+====== TASK 2: Login Validation ======
+  Credentials valid for: Admin
+  [INVALID] Username is required
+  [INVALID] Password min 6 chars
+
+====== TASK 3: Browser Init ======
+  Chrome initialized ✓
+  Firefox initialized ✓
+  [ERROR] Browser not supported: Safari
+  Edge initialized ✓
+
+====== TASK 4: Test Run Simulation ======
+
+  [START] Login Test
+  [PASS]  Login Test
+  [QUIT]  Browser closed
+
+  [START] Logout Test
+  [FAIL]  Logout Test: Element 'submitBtn' not found
+  [QUIT]  Browser closed
+
+  [START] Search Test
+  [PASS]  Search Test
+  [QUIT]  Browser closed</pre>
+  </div>
+  <div class="callout purple">
+    <span class="callout-icon">&#127919;</span>
+    <div class="callout-body">
+      <div class="callout-title">Extension Challenge</div>
+      <p>Add a <code>TestReport</code> class that tracks total tests run, passed, and failed across all runTest() calls. Print the final summary after all tests. Hint: use static fields in the class to maintain counts across method calls.</p>
+    </div>
+  </div>
+</div>
+
+<!-- S17 -->
+<div class="section" id="s17">
+  <div class="section-header"><div class="section-num">17</div><h2>Common Mistakes</h2></div>
+  <div class="mistake-grid">
+    <div class="mistake-card"><div class="mt">&#10060; Empty catch block</div><p><code>catch (Exception e) { }</code> — silently swallows errors. You'll never know why your test failed. Always at minimum: <code>System.out.println(e.getMessage())</code> or <code>e.printStackTrace()</code>.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; Catching Exception too broadly</div><p>Catching <code>Exception</code> for everything means you accidentally catch NPE, ArrayIndex, and other programmer errors. Catch specific exceptions. Only use general catch as a last resort safety net.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; Not using finally for cleanup</div><p>If <code>driver.quit()</code> is only in the try block, a test failure means browser stays open forever. Always put cleanup in <code>finally</code>.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; Catching Error</div><p>Never catch <code>OutOfMemoryError</code> or <code>StackOverflowError</code>. These are JVM-level failures — you can't recover. Let them propagate.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; throw vs throws confusion</div><p><code>throw new Exception()</code> — actually throws it. <code>throws Exception</code> in method signature — warns callers. Different keywords, different purposes.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; Exception order in multi-catch</div><p>Putting parent class (Exception) before child class (NullPointerException) — child case never reached. Always most specific first, most general last.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; Ignoring checked exceptions</div><p>Using <code>throws Exception</code> on every method to avoid handling — bad practice. Handle at the right level. Don't bubble everything to main().</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; Re-throwing without cause</div><p><code>throw new RuntimeException(e.getMessage())</code> loses the original stack trace. Use <code>throw new RuntimeException("msg", e)</code> to preserve the cause chain.</p></div>
+  </div>
+</div>
+
+<!-- S18 -->
+<div class="section" id="s18">
+  <div class="section-header"><div class="section-num">18</div><h2>End of Day Checklist + Resources</h2></div>
+  <div class="checklist">
+    <div class="checklist-title">&#10022; End of Day 7 Checklist</div>
+    <div class="check-item"><div class="check-box"></div>I understand the difference between Error, Checked Exception, and RuntimeException</div>
+    <div class="check-item"><div class="check-box"></div>I can write a try-catch-finally block correctly</div>
+    <div class="check-item"><div class="check-box"></div>I can use multiple catch blocks with most-specific first</div>
+    <div class="check-item"><div class="check-box"></div>I know why finally is essential for driver.quit() in Selenium</div>
+    <div class="check-item"><div class="check-box"></div>I can manually throw exceptions using throw with a meaningful message</div>
+    <div class="check-item"><div class="check-box"></div>I understand throws in method signature vs throw keyword</div>
+    <div class="check-item"><div class="check-box"></div>I can create a custom exception class by extending RuntimeException</div>
+    <div class="check-item"><div class="check-box"></div>I know all 8 common Selenium exceptions and what causes each one</div>
+    <div class="check-item"><div class="check-box"></div>I never write an empty catch block</div>
+    <div class="check-item"><div class="check-box"></div>Practice task completed — all 4 tasks match expected output exactly</div>
+  </div>
+  <h3>Resources for Today</h3>
+  <ul class="resource-list">
+    <li><span>&#127909;</span><strong>YouTube:&nbsp;</strong><a href="https://youtube.com/@KunalKushwaha" target="_blank">Kunal Kushwaha — Java Exception Handling episode</a> &nbsp;<span style="color:var(--muted);font-size:12px">Covers checked vs unchecked with clear real-world examples.</span></li>
+    <li><span>&#128214;</span><strong>Docs:&nbsp;</strong><a href="https://docs.oracle.com/javase/tutorial/essential/exceptions/index.html" target="_blank">Oracle Java — Exceptions Tutorial</a> &nbsp;<span style="color:var(--muted);font-size:12px">Complete official guide — read the try-catch-finally section.</span></li>
+    <li><span>&#128214;</span><strong>Selenium:&nbsp;</strong><a href="https://www.selenium.dev/exceptions/" target="_blank">Selenium WebDriver Exceptions Reference</a> &nbsp;<span style="color:var(--muted);font-size:12px">Official list of all Selenium exceptions — bookmark this.</span></li>
+  </ul>
+  <div class="callout tip">
+    <span class="callout-icon">&#128640;</span>
+    <div class="callout-body">
+      <div class="callout-title">Day 8 — Mini Project: Calculator in Java</div>
+      <p>Tomorrow is Day 8 — a mini project that uses ALL of Days 1-7 together: classes, methods, arrays, collections, OOP, and exception handling. Then <strong>Day 9: Selenium setup begins.</strong> You are one day away from touching real browser automation. Get Day 7 solid and show up tomorrow.</p>
+    </div>
+  </div>
+</div>
+
+</div>
+<div class="footer">
+  <span>Day 7 of 65</span> &nbsp;&middot;&nbsp; Selenium + Java Automation Roadmap &nbsp;&middot;&nbsp; Phase 1 &mdash; Foundation &nbsp;&middot;&nbsp; <span>Next: Day 8 &mdash; Mini Project + Day 9 Selenium Begins</span>
+</div>
+</body>
+</html>

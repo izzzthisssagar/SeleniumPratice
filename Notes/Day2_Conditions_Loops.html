@@ -1,0 +1,1520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 2 — Conditions & Loops</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Sora:wght@300;400;500;600;700;800&display=swap');
+
+  :root {
+    --bg:        #0d1117;
+    --bg2:       #161b22;
+    --bg3:       #1e2530;
+    --border:    #30363d;
+    --accent:    #f0a500;
+    --accent2:   #58a6ff;
+    --accent3:   #3fb950;
+    --accent4:   #ff7b72;
+    --accent5:   #d2a8ff;
+    --text:      #e6edf3;
+    --textmuted: #8b949e;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Sora', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.75;
+    font-size: 15px;
+  }
+
+  /* HERO */
+  .hero {
+    background: linear-gradient(135deg, #0d1117 0%, #161b22 60%, #1a2332 100%);
+    border-bottom: 2px solid var(--accent2);
+    padding: 48px 40px 36px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; top: 0; right: 0;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(88,166,255,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-tag {
+    display: inline-block;
+    background: rgba(88,166,255,0.12);
+    border: 1px solid rgba(88,166,255,0.3);
+    color: var(--accent2);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 16px;
+  }
+  .hero h1 { font-size: 34px; font-weight: 800; line-height: 1.2; margin-bottom: 10px; }
+  .hero h1 span { color: var(--accent2); }
+  .hero-sub {
+    color: var(--textmuted);
+    font-size: 14px;
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-top: 16px;
+  }
+  .hero-sub span { display: flex; align-items: center; gap: 6px; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent2); display: inline-block; }
+
+  /* LAYOUT */
+  .container { max-width: 980px; margin: 0 auto; padding: 40px 32px 80px; }
+
+  /* TOC */
+  .toc {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 8px;
+    padding: 24px 28px;
+    margin-bottom: 48px;
+  }
+  .toc-title { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); margin-bottom: 14px; }
+  .toc ol { padding-left: 20px; }
+  .toc li { margin-bottom: 6px; }
+  .toc a { color: var(--textmuted); text-decoration: none; font-size: 14px; transition: color 0.2s; }
+  .toc a:hover { color: var(--accent2); }
+
+  /* SECTION */
+  .section { margin-bottom: 56px; }
+  .section-header { display: flex; align-items: center; gap: 14px; margin-bottom: 24px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
+  .section-num {
+    background: var(--accent2);
+    color: #000;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 12px;
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .section h2 { font-size: 22px; font-weight: 700; }
+
+  h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--accent2);
+    margin: 28px 0 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  h3::before { content: '▸'; color: var(--accent); font-size: 12px; }
+
+  p { color: var(--textmuted); margin-bottom: 14px; line-height: 1.8; }
+  strong { color: var(--text); font-weight: 600; }
+
+  /* CODE */
+  .code-block { background: #010409; border: 1px solid var(--border); border-radius: 10px; margin: 20px 0; overflow: hidden; }
+  .code-header { background: var(--bg2); padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
+  .code-lang { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent2); letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
+  .code-file { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--textmuted); }
+  pre { font-family: 'JetBrains Mono', monospace; font-size: 13px; line-height: 1.85; padding: 20px; overflow-x: auto; color: #e6edf3; }
+
+  .kw { color: #ff7b72; font-weight: 500; }
+  .ty { color: #ffa657; }
+  .st { color: #a5d6ff; }
+  .cm { color: #6e7681; font-style: italic; }
+  .nm { color: #79c0ff; }
+  .nu { color: #79c0ff; }
+  .fn { color: #d2a8ff; }
+  .op { color: #ff7b72; }
+  .bool { color: #3fb950; }
+
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    background: rgba(88,166,255,0.1);
+    border: 1px solid rgba(88,166,255,0.2);
+    color: var(--accent2);
+    padding: 1px 7px;
+    border-radius: 4px;
+  }
+
+  /* CALLOUTS */
+  .callout { border-radius: 8px; padding: 16px 20px; margin: 20px 0; display: flex; gap: 14px; align-items: flex-start; }
+  .callout-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+  .callout-body { flex: 1; }
+  .callout-title { font-weight: 700; font-size: 13px; margin-bottom: 4px; }
+  .callout p { margin-bottom: 0; font-size: 13.5px; }
+
+  .callout.note    { background: rgba(88,166,255,0.07); border-left: 3px solid var(--accent2); }
+  .callout.note .callout-title { color: var(--accent2); }
+  .callout.tip     { background: rgba(63,185,80,0.07);  border-left: 3px solid var(--accent3); }
+  .callout.tip .callout-title { color: var(--accent3); }
+  .callout.warn    { background: rgba(240,165,0,0.07);  border-left: 3px solid var(--accent); }
+  .callout.warn .callout-title { color: var(--accent); }
+  .callout.error   { background: rgba(255,123,114,0.07); border-left: 3px solid var(--accent4); }
+  .callout.error .callout-title { color: var(--accent4); }
+  .callout.purple  { background: rgba(210,168,255,0.07); border-left: 3px solid var(--accent5); }
+  .callout.purple .callout-title { color: var(--accent5); }
+
+  /* TABLES */
+  .table-wrap { overflow-x: auto; margin: 20px 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  thead tr { background: var(--bg2); border-bottom: 2px solid var(--accent2); }
+  th { padding: 12px 16px; text-align: left; font-weight: 700; font-size: 12px; letter-spacing: 0.5px; text-transform: uppercase; color: var(--accent2); }
+  td { padding: 11px 16px; border-bottom: 1px solid var(--border); color: var(--textmuted); }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+  td:first-child { font-family: 'JetBrains Mono', monospace; color: var(--accent); font-size: 13px; }
+
+  /* DIAGRAM */
+  .diagram-wrap { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 28px 24px; margin: 24px 0; overflow: hidden; }
+  .diagram-title { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--textmuted); margin-bottom: 20px; text-align: center; }
+
+  /* HOUR BADGE */
+  .hour-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(88,166,255,0.1);
+    border: 1px solid rgba(88,166,255,0.25);
+    color: var(--accent2);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 5px 14px;
+    border-radius: 20px;
+    margin-bottom: 18px;
+    margin-top: 30px;
+  }
+
+  /* MISTAKE CARDS */
+  .mistake-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin: 20px 0; }
+  .mistake-card { background: rgba(255,123,114,0.05); border: 1px solid rgba(255,123,114,0.2); border-radius: 8px; padding: 16px; }
+  .mistake-card .mistake-title { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent4); font-weight: 700; margin-bottom: 8px; }
+  .mistake-card p { font-size: 13px; margin: 0; }
+
+  /* CHECKLIST */
+  .checklist { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 24px 28px; margin: 24px 0; }
+  .checklist-title { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent3); letter-spacing: 1.5px; text-transform: uppercase; font-weight: 700; margin-bottom: 16px; }
+  .check-item { display: flex; align-items: flex-start; gap: 12px; padding: 9px 0; border-bottom: 1px solid rgba(48,54,61,0.5); font-size: 14px; color: var(--textmuted); }
+  .check-item:last-child { border-bottom: none; }
+  .check-box { width: 18px; height: 18px; border: 2px solid var(--accent3); border-radius: 4px; flex-shrink: 0; margin-top: 2px; }
+
+  /* RESOURCE LIST */
+  .resource-list { list-style: none; padding: 0; margin: 12px 0; }
+  .resource-list li { padding: 10px 14px; background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; margin-bottom: 8px; font-size: 13.5px; display: flex; gap: 10px; align-items: center; }
+  .resource-list li a { color: var(--accent2); text-decoration: none; }
+  .resource-list li a:hover { text-decoration: underline; }
+  .res-icon { font-size: 16px; }
+
+  /* COMPARISON CARD */
+  .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+  .compare-card { border-radius: 8px; padding: 20px; }
+  .compare-card.good { background: rgba(63,185,80,0.07); border: 1px solid rgba(63,185,80,0.25); }
+  .compare-card.bad  { background: rgba(255,123,114,0.07); border: 1px solid rgba(255,123,114,0.25); }
+  .compare-card-title { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; margin-bottom: 12px; }
+  .compare-card.good .compare-card-title { color: var(--accent3); }
+  .compare-card.bad  .compare-card-title { color: var(--accent4); }
+
+  /* FOOTER */
+  .footer { background: var(--bg2); border-top: 1px solid var(--border); padding: 24px 40px; text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--textmuted); }
+  .footer span { color: var(--accent2); }
+
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  @media (max-width: 640px) {
+    .hero { padding: 32px 20px 24px; }
+    .hero h1 { font-size: 24px; }
+    .container { padding: 24px 16px 60px; }
+    .compare-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-tag">Phase 1 · Day 2 of 65</div>
+  <h1>Conditions &amp; <span>Loops</span></h1>
+  <div class="hero-sub">
+    <span><span class="dot"></span> 2 Hours</span>
+    <span><span class="dot"></span> Selenium + Java Track</span>
+    <span><span class="dot"></span> if / else / switch / for / while / do-while</span>
+    <span><span class="dot"></span> Foundation Phase</span>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- TOC -->
+  <div class="toc">
+    <div class="toc-title">// Table of Contents</div>
+    <ol>
+      <li><a href="#s1">Why Conditions &amp; Loops Matter in Selenium</a></li>
+      <li><a href="#s2">Comparison Operators</a></li>
+      <li><a href="#s3">Logical Operators</a></li>
+      <li><a href="#s4">if Statement</a></li>
+      <li><a href="#s5">if-else Statement</a></li>
+      <li><a href="#s6">if-else if-else Chain</a></li>
+      <li><a href="#s7">Nested if</a></li>
+      <li><a href="#s8">Ternary Operator</a></li>
+      <li><a href="#s9">switch Statement</a></li>
+      <li><a href="#s10">for Loop</a></li>
+      <li><a href="#s11">while Loop</a></li>
+      <li><a href="#s12">do-while Loop</a></li>
+      <li><a href="#s13">Enhanced for Loop (for-each)</a></li>
+      <li><a href="#s14">break &amp; continue</a></li>
+      <li><a href="#s15">Nested Loops</a></li>
+      <li><a href="#s16">Selenium Real-World Usage</a></li>
+      <li><a href="#s17">Practice Task + Expected Output</a></li>
+      <li><a href="#s18">Common Mistakes</a></li>
+      <li><a href="#s19">End of Day Checklist + Resources</a></li>
+    </ol>
+  </div>
+
+  <!-- ─── SECTION 1 ─────────────────────────────────────────── -->
+  <div class="section" id="s1">
+    <div class="section-header">
+      <div class="section-num">01</div>
+      <h2>Why Conditions &amp; Loops Matter in Selenium</h2>
+    </div>
+
+    <p>Every meaningful Selenium script uses conditions and loops. Without them, your test code is just a linear list of steps — it can't make decisions, handle failures, or repeat actions. Here's exactly how you'll use them once you reach Selenium:</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Concept</th><th>Real Selenium Usage</th></tr></thead>
+        <tbody>
+          <tr><td>if / else</td><td>Check if a button is enabled before clicking. If login failed, skip rest of test.</td></tr>
+          <tr><td>if-else if</td><td>Different actions based on browser type: Chrome vs Firefox vs Edge.</td></tr>
+          <tr><td>for loop</td><td>Loop through all rows in a table to verify each value.</td></tr>
+          <tr><td>while loop</td><td>Keep retrying an action until element appears (custom wait logic).</td></tr>
+          <tr><td>for-each</td><td>Iterate through all <code>WebElement</code> objects returned by <code>findElements()</code>.</td></tr>
+          <tr><td>break</td><td>Stop searching through a list once the target element is found.</td></tr>
+          <tr><td>continue</td><td>Skip disabled or hidden elements in a list while processing others.</td></tr>
+          <tr><td>switch</td><td>Pick which browser driver to initialize based on a config value.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout note">
+      <span class="callout-icon">💡</span>
+      <div class="callout-body">
+        <div class="callout-title">Today's Goal</div>
+        <p>Master all control flow tools in Java. When you hit Day 14 (Locators) and Day 20 (Waits), every single concept you learn today will appear in real test code. Build it solid now.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── SECTION 2 ─────────────────────────────────────────── -->
+  <div class="section" id="s2">
+    <div class="section-header">
+      <div class="section-num">02</div>
+      <h2>Comparison Operators</h2>
+    </div>
+
+    <div class="hour-badge">⏱ Hour 1 — Conditions (60 mins)</div>
+
+    <p>Comparison operators compare two values and return a <code>boolean</code> — either <code>true</code> or <code>false</code>. These go inside <code>if</code> conditions.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Operator</th><th>Meaning</th><th>Example</th><th>Result</th></tr></thead>
+        <tbody>
+          <tr><td>==</td><td>Equal to</td><td><code>5 == 5</code></td><td>true</td></tr>
+          <tr><td>!=</td><td>Not equal to</td><td><code>5 != 3</code></td><td>true</td></tr>
+          <tr><td>&gt;</td><td>Greater than</td><td><code>10 &gt; 5</code></td><td>true</td></tr>
+          <tr><td>&lt;</td><td>Less than</td><td><code>3 &lt; 8</code></td><td>true</td></tr>
+          <tr><td>&gt;=</td><td>Greater than or equal</td><td><code>5 &gt;= 5</code></td><td>true</td></tr>
+          <tr><td>&lt;=</td><td>Less than or equal</td><td><code>4 &lt;= 3</code></td><td>false</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout error">
+      <span class="callout-icon">🚨</span>
+      <div class="callout-body">
+        <div class="callout-title">= vs == — The #1 Beginner Bug</div>
+        <p><code>=</code> is assignment: puts a value INTO a variable. <code>==</code> is comparison: checks if two values are EQUAL. Writing <code>if (x = 5)</code> instead of <code>if (x == 5)</code> is a logic bug that's hard to spot. Never mix them up.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── SECTION 3 ─────────────────────────────────────────── -->
+  <div class="section" id="s3">
+    <div class="section-header">
+      <div class="section-num">03</div>
+      <h2>Logical Operators</h2>
+    </div>
+
+    <p>Logical operators combine multiple conditions together. You'll use these constantly in Selenium when you need to check more than one thing at once.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Operator</th><th>Name</th><th>Meaning</th><th>Example</th><th>Result</th></tr></thead>
+        <tbody>
+          <tr><td>&amp;&amp;</td><td>AND</td><td>Both conditions must be true</td><td><code>age &gt; 18 &amp;&amp; isActive</code></td><td>true only if BOTH true</td></tr>
+          <tr><td>||</td><td>OR</td><td>At least one must be true</td><td><code>isAdmin || isUser</code></td><td>true if EITHER true</td></tr>
+          <tr><td>!</td><td>NOT</td><td>Reverses the boolean</td><td><code>!isLoggedIn</code></td><td>true if isLoggedIn is false</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Truth Table Diagram -->
+    <div class="diagram-wrap">
+      <div class="diagram-title">// Truth Tables — AND · OR · NOT</div>
+      <svg viewBox="0 0 720 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:720px;display:block;margin:0 auto">
+        <defs>
+          <marker id="none" markerWidth="0" markerHeight="0"/>
+        </defs>
+
+        <!-- AND Table -->
+        <text x="20" y="24" font-family="JetBrains Mono,monospace" font-size="12" font-weight="700" fill="#58a6ff">&amp;&amp;  AND</text>
+        <rect x="20" y="32" width="180" height="155" rx="6" fill="#0d1117" stroke="#30363d"/>
+        <!-- header -->
+        <rect x="20" y="32" width="180" height="28" rx="6" fill="#1e2530"/>
+        <rect x="20" y="48" width="180" height="12" fill="#1e2530"/>
+        <text x="50" y="52" font-family="JetBrains Mono,monospace" font-size="11" fill="#8b949e">A</text>
+        <text x="100" y="52" font-family="JetBrains Mono,monospace" font-size="11" fill="#8b949e">B</text>
+        <text x="155" y="52" font-family="JetBrains Mono,monospace" font-size="11" fill="#58a6ff">A &amp;&amp; B</text>
+        <!-- rows -->
+        <text x="40" y="82" font-family="JetBrains Mono,monospace" font-size="11" fill="#3fb950">true</text>
+        <text x="94" y="82" font-family="JetBrains Mono,monospace" font-size="11" fill="#3fb950">true</text>
+        <text x="152" y="82" font-family="JetBrains Mono,monospace" font-size="11" fill="#3fb950">true</text>
+
+        <text x="40" y="112" font-family="JetBrains Mono,monospace" font-size="11" fill="#3fb950">true</text>
+        <text x="88" y="112" font-family="JetBrains Mono,monospace" font-size="11" fill="#ff7b72">false</text>
+        <text x="146" y="112" font-family="JetBrains Mono,monospace" font-size="11" fill="#ff7b72">false</text>
+
+        <text x="34" y="142" font-family="JetBrains Mono,monospace" font-size="11" fill="#ff7b72">false</text>
+        <text x="94" y="142" font-family="JetBrains Mono,monospace" font-size="11" fill="#3fb950">true</text>
+        <text x="146" y="142" font-family="JetBrains Mono,monospace" font-size="11" fill="#ff7b72">false</text>
+
+        <text x="34" y="172" font-family="JetBrains Mono,monospace" font-size="11" fill="#ff7b72">false</text>
+        <text x="88" y="172" font-family="JetBrains Mono,monospace" font-size="11" fill="#ff7b72">false</text>
+        <text x="146" y="172" font-family="JetBrains Mono,monospace" font-size="11" fill="#ff7b72">false</text>
+
+        <!-- OR Table -->
+        <text x="230" y="24" font-family="JetBrains Mono,monospace" font-size="12" font-weight="700" fill="#f0a500">||  OR</text>
+        <rect x="230" y="32" width="180" height="155" rx="6" fill="#0d1117" stroke="#30363d"/>
+        <rect x="230" y="32" width="180" height="28" rx="6" fill="#1e2530"/>
+        <rect x="230" y="48" width="180" height="12" fill="#1e2530"/>
+        <text x="260" y="52" font-family="JetBrains Mono,monospace" font-size="11" fill="#8b949e">A</text>
+        <text x="310" y="52" font-family="JetBrains Mono,monospace" font-size="11" fill="#8b949e">B</text>
+        <text x="362" y="52" font-family="JetBrains Mono,monospace" font-size="11" fill="#f0a500">A || B</text>
+
+        <text x="250" y="82" font-family="JetBrains Mono,monospace" font-size="11" fill="#3fb950">true</text>
+        <text x="304" y="82" font-family="JetBrains Mono,monospace" font-size="11" fill="#3fb950">true</text>
+        <text x="360" y="82" font-family="JetBrains Mono,monospace" font-size="11" fill="#3fb950">true</text>
+
+        <text x="250" y="112" font-family="JetBrains Mono,monospace" font-size="11" fill="#3fb950">true</text>
+        <text x="298" y="112" font-family="JetBrains Mono,monospace" font-size="11" fill="#ff7b72">false</text>
+        <text x="360" y="112" font-family="JetBrains Mono,monospace" font-size="11" fill="#3fb950">true</text>
+
+        <text x="244" y="142" font-family="JetBrains Mono,monospace" font-size="11" fill="#ff7b72">false</text>
+        <text x="304" y="142" font-family="JetBrains Mono,monospace" font-size="11" fill="#3fb950">true</text>
+        <text x="360" y="142" font-family="JetBrains Mono,monospace" font-size="11" fill="#3fb950">true</text>
+
+        <text x="244" y="172" font-family="JetBrains Mono,monospace" font-size="11" fill="#ff7b72">false</text>
+        <text x="298" y="172" font-family="JetBrains Mono,monospace" font-size="11" fill="#ff7b72">false</text>
+        <text x="354" y="172" font-family="JetBrains Mono,monospace" font-size="11" fill="#ff7b72">false</text>
+
+        <!-- NOT Table -->
+        <text x="440" y="24" font-family="JetBrains Mono,monospace" font-size="12" font-weight="700" fill="#d2a8ff">!  NOT</text>
+        <rect x="440" y="32" width="160" height="100" rx="6" fill="#0d1117" stroke="#30363d"/>
+        <rect x="440" y="32" width="160" height="28" rx="6" fill="#1e2530"/>
+        <rect x="440" y="48" width="160" height="12" fill="#1e2530"/>
+        <text x="468" y="52" font-family="JetBrains Mono,monospace" font-size="11" fill="#8b949e">A</text>
+        <text x="540" y="52" font-family="JetBrains Mono,monospace" font-size="11" fill="#d2a8ff">!A</text>
+
+        <text x="458" y="82" font-family="JetBrains Mono,monospace" font-size="11" fill="#3fb950">true</text>
+        <text x="528" y="82" font-family="JetBrains Mono,monospace" font-size="11" fill="#ff7b72">false</text>
+
+        <text x="452" y="112" font-family="JetBrains Mono,monospace" font-size="11" fill="#ff7b72">false</text>
+        <text x="528" y="112" font-family="JetBrains Mono,monospace" font-size="11" fill="#3fb950">true</text>
+
+        <!-- short circuit note -->
+        <rect x="440" y="148" width="265" height="42" rx="6" fill="#1a1f2e" stroke="#30363d"/>
+        <text x="455" y="164" font-family="JetBrains Mono,monospace" font-size="10" fill="#f0a500">Short-Circuit Evaluation:</text>
+        <text x="455" y="180" font-family="Sora,sans-serif" font-size="10" fill="#8b949e">&amp;&amp; stops if first is false. || stops if first is true.</text>
+      </svg>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Java</span><span class="code-file">LogicalOperators.java</span></div>
+      <pre><span class="ty">boolean</span> <span class="nm">isLoggedIn</span>  <span class="op">=</span> <span class="bool">true</span>;
+<span class="ty">boolean</span> <span class="nm">isAdmin</span>     <span class="op">=</span> <span class="bool">false</span>;
+<span class="ty">int</span>     <span class="nm">age</span>         <span class="op">=</span> <span class="nu">22</span>;
+
+<span class="cm">// AND — both must be true</span>
+<span class="kw">if</span> (isLoggedIn <span class="op">&amp;&amp;</span> isAdmin) {
+    <span class="fn">System.out.println</span>(<span class="st">"Show admin dashboard"</span>);
+} <span class="kw">else</span> {
+    <span class="fn">System.out.println</span>(<span class="st">"Access denied"</span>);   <span class="cm">// prints this</span>
+}
+
+<span class="cm">// OR — at least one must be true</span>
+<span class="kw">if</span> (isLoggedIn <span class="op">||</span> isAdmin) {
+    <span class="fn">System.out.println</span>(<span class="st">"Allow access"</span>);      <span class="cm">// prints this</span>
+}
+
+<span class="cm">// NOT — reverses the boolean</span>
+<span class="kw">if</span> (<span class="op">!</span>isAdmin) {
+    <span class="fn">System.out.println</span>(<span class="st">"User is NOT an admin"</span>); <span class="cm">// prints this</span>
+}
+
+<span class="cm">// Combining operators</span>
+<span class="kw">if</span> (age <span class="op">&gt;=</span> <span class="nu">18</span> <span class="op">&amp;&amp;</span> isLoggedIn <span class="op">&amp;&amp;</span> <span class="op">!</span>isAdmin) {
+    <span class="fn">System.out.println</span>(<span class="st">"Standard user — age verified"</span>); <span class="cm">// prints</span>
+}</pre>
+    </div>
+  </div>
+
+  <!-- ─── SECTION 4 ─────────────────────────────────────────── -->
+  <div class="section" id="s4">
+    <div class="section-header">
+      <div class="section-num">04</div>
+      <h2>if Statement</h2>
+    </div>
+
+    <p>The simplest form. Code inside the block runs <strong>only if the condition is true</strong>. If false, the block is skipped entirely.</p>
+
+    <!-- Flowchart SVG -->
+    <div class="diagram-wrap">
+      <div class="diagram-title">// if Statement — Flow Diagram</div>
+      <svg viewBox="0 0 400 240" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:400px;display:block;margin:0 auto">
+        <defs>
+          <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#8b949e"/>
+          </marker>
+          <marker id="arrt" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#3fb950"/>
+          </marker>
+          <marker id="arrf" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="#ff7b72"/>
+          </marker>
+        </defs>
+
+        <!-- Start -->
+        <ellipse cx="200" cy="25" rx="55" ry="18" fill="#1e2530" stroke="#58a6ff" stroke-width="1.5"/>
+        <text x="200" y="30" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#58a6ff">START</text>
+
+        <!-- Arrow down -->
+        <line x1="200" y1="43" x2="200" y2="68" stroke="#8b949e" stroke-width="1.5" marker-end="url(#arr)"/>
+
+        <!-- Diamond condition -->
+        <polygon points="200,70 270,105 200,140 130,105" fill="#1e2530" stroke="#f0a500" stroke-width="1.5"/>
+        <text x="200" y="100" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#f0a500">condition</text>
+        <text x="200" y="115" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#f0a500">true?</text>
+
+        <!-- TRUE path -->
+        <line x1="270" y1="105" x2="330" y2="105" stroke="#3fb950" stroke-width="1.5" marker-end="url(#arrt)"/>
+        <text x="295" y="98" text-anchor="middle" font-family="Sora,sans-serif" font-size="10" fill="#3fb950">YES</text>
+        <rect x="330" y="88" width="55" height="34" rx="6" fill="#0a1a0d" stroke="#3fb950" stroke-width="1.5"/>
+        <text x="357" y="107" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#3fb950">Execute</text>
+        <text x="357" y="118" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#3fb950">block</text>
+
+        <!-- TRUE path continues down -->
+        <line x1="357" y1="122" x2="357" y2="185" stroke="#3fb950" stroke-width="1.5"/>
+        <line x1="357" y1="185" x2="200" y2="185" stroke="#3fb950" stroke-width="1.5" marker-end="url(#arr)"/>
+
+        <!-- FALSE path -->
+        <line x1="200" y1="140" x2="200" y2="185" stroke="#ff7b72" stroke-width="1.5" marker-end="url(#arr)"/>
+        <text x="175" y="165" font-family="Sora,sans-serif" font-size="10" fill="#ff7b72">NO</text>
+
+        <!-- End -->
+        <ellipse cx="200" cy="210" rx="55" ry="18" fill="#1e2530" stroke="#58a6ff" stroke-width="1.5"/>
+        <text x="200" y="215" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#58a6ff">CONTINUE</text>
+      </svg>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Java</span><span class="code-file">IfStatement.java</span></div>
+      <pre><span class="ty">int</span> <span class="nm">score</span> <span class="op">=</span> <span class="nu">85</span>;
+
+<span class="cm">// Basic if — only runs if score &gt; 80</span>
+<span class="kw">if</span> (score <span class="op">&gt;</span> <span class="nu">80</span>) {
+    <span class="fn">System.out.println</span>(<span class="st">"Test passed with high score!"</span>);
+}
+<span class="cm">// Output: Test passed with high score!</span>
+
+<span class="cm">// If only one line — braces optional (but ALWAYS use them)</span>
+<span class="kw">if</span> (score <span class="op">&gt;</span> <span class="nu">80</span>)
+    <span class="fn">System.out.println</span>(<span class="st">"Passed"</span>);  <span class="cm">// works but risky</span>
+
+<span class="cm">// Selenium example: only click if button is enabled</span>
+<span class="ty">boolean</span> <span class="nm">isButtonEnabled</span> <span class="op">=</span> <span class="bool">true</span>;
+<span class="kw">if</span> (isButtonEnabled) {
+    <span class="fn">System.out.println</span>(<span class="st">"Clicking submit button"</span>);
+    <span class="cm">// submitButton.click(); ← actual Selenium code (Day 9+)</span>
+}</pre>
+    </div>
+
+    <div class="callout warn">
+      <span class="callout-icon">⚡</span>
+      <div class="callout-body">
+        <div class="callout-title">Always Use Braces { } — Even for One Line</div>
+        <p>Skipping braces for single-line if is valid Java but a bad habit. When you add a second line later, forgetting to add braces causes a silent logic bug that's painful to debug. Always use <code>{ }</code>.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── SECTION 5 ─────────────────────────────────────────── -->
+  <div class="section" id="s5">
+    <div class="section-header">
+      <div class="section-num">05</div>
+      <h2>if-else Statement</h2>
+    </div>
+
+    <p>When you need to do one thing if true, and a <strong>different thing if false</strong>. One of the two blocks always executes — never both, never neither.</p>
+
+    <!-- if-else flowchart -->
+    <div class="diagram-wrap">
+      <div class="diagram-title">// if-else — Flow Diagram</div>
+      <svg viewBox="0 0 500 250" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:500px;display:block;margin:0 auto">
+        <ellipse cx="250" cy="25" rx="55" ry="18" fill="#1e2530" stroke="#58a6ff" stroke-width="1.5"/>
+        <text x="250" y="30" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#58a6ff">START</text>
+
+        <line x1="250" y1="43" x2="250" y2="68" stroke="#8b949e" stroke-width="1.5" marker-end="url(#arr)"/>
+
+        <polygon points="250,70 330,110 250,150 170,110" fill="#1e2530" stroke="#f0a500" stroke-width="1.5"/>
+        <text x="250" y="105" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#f0a500">condition</text>
+        <text x="250" y="120" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#f0a500">true?</text>
+
+        <!-- YES path right -->
+        <line x1="330" y1="110" x2="400" y2="110" stroke="#3fb950" stroke-width="1.5" marker-end="url(#arrt)"/>
+        <text x="360" y="103" text-anchor="middle" font-family="Sora,sans-serif" font-size="10" fill="#3fb950">YES</text>
+        <rect x="398" y="93" width="80" height="34" rx="6" fill="#0a1a0d" stroke="#3fb950" stroke-width="1.5"/>
+        <text x="438" y="113" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#3fb950">if block</text>
+        <line x1="438" y1="127" x2="438" y2="205" stroke="#3fb950" stroke-width="1.5"/>
+        <line x1="438" y1="205" x2="250" y2="205" stroke="#3fb950" stroke-width="1.5" marker-end="url(#arr)"/>
+
+        <!-- NO path left -->
+        <line x1="170" y1="110" x2="80" y2="110" stroke="#ff7b72" stroke-width="1.5" marker-end="url(#arrf)"/>
+        <text x="130" y="103" text-anchor="middle" font-family="Sora,sans-serif" font-size="10" fill="#ff7b72">NO</text>
+        <rect x="20" y="93" width="60" height="34" rx="6" fill="#1a0a0a" stroke="#ff7b72" stroke-width="1.5"/>
+        <text x="50" y="113" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#ff7b72">else block</text>
+        <line x1="50" y1="127" x2="50" y2="205" stroke="#ff7b72" stroke-width="1.5"/>
+        <line x1="50" y1="205" x2="250" y2="205" stroke="#ff7b72" stroke-width="1.5" marker-end="url(#arr)"/>
+
+        <ellipse cx="250" cy="225" rx="55" ry="18" fill="#1e2530" stroke="#58a6ff" stroke-width="1.5"/>
+        <text x="250" y="230" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#58a6ff">CONTINUE</text>
+      </svg>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Java</span><span class="code-file">IfElse.java</span></div>
+      <pre><span class="ty">int</span> <span class="nm">score</span> <span class="op">=</span> <span class="nu">45</span>;
+
+<span class="kw">if</span> (score <span class="op">&gt;=</span> <span class="nu">50</span>) {
+    <span class="fn">System.out.println</span>(<span class="st">"PASS"</span>);
+} <span class="kw">else</span> {
+    <span class="fn">System.out.println</span>(<span class="st">"FAIL"</span>);   <span class="cm">// prints this (45 &lt; 50)</span>
+}
+
+<span class="cm">// Selenium example: login result check</span>
+<span class="ty">String</span> <span class="nm">pageTitle</span> <span class="op">=</span> <span class="st">"Dashboard"</span>;
+<span class="ty">String</span> <span class="nm">expected</span>  <span class="op">=</span> <span class="st">"Dashboard"</span>;
+
+<span class="kw">if</span> (pageTitle.<span class="fn">equals</span>(expected)) {
+    <span class="fn">System.out.println</span>(<span class="st">"Login test PASSED ✓"</span>);
+} <span class="kw">else</span> {
+    <span class="fn">System.out.println</span>(<span class="st">"Login test FAILED ✗ — Expected: "</span>
+                       <span class="op">+</span> expected <span class="op">+</span> <span class="st">" Got: "</span> <span class="op">+</span> pageTitle);
+}</pre>
+    </div>
+  </div>
+
+  <!-- ─── SECTION 6 ─────────────────────────────────────────── -->
+  <div class="section" id="s6">
+    <div class="section-header">
+      <div class="section-num">06</div>
+      <h2>if-else if-else Chain</h2>
+    </div>
+
+    <p>When you have <strong>more than two possible outcomes</strong>. Java checks each condition top to bottom and runs the first one that is true. Once a match is found, the rest are skipped.</p>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Java</span><span class="code-file">ElseIfChain.java</span></div>
+      <pre><span class="ty">int</span> <span class="nm">score</span> <span class="op">=</span> <span class="nu">72</span>;
+
+<span class="kw">if</span> (score <span class="op">&gt;=</span> <span class="nu">90</span>) {
+    <span class="fn">System.out.println</span>(<span class="st">"Grade: A"</span>);
+} <span class="kw">else if</span> (score <span class="op">&gt;=</span> <span class="nu">80</span>) {
+    <span class="fn">System.out.println</span>(<span class="st">"Grade: B"</span>);
+} <span class="kw">else if</span> (score <span class="op">&gt;=</span> <span class="nu">70</span>) {
+    <span class="fn">System.out.println</span>(<span class="st">"Grade: C"</span>);   <span class="cm">// prints this (72 &gt;= 70)</span>
+} <span class="kw">else if</span> (score <span class="op">&gt;=</span> <span class="nu">60</span>) {
+    <span class="fn">System.out.println</span>(<span class="st">"Grade: D"</span>);
+} <span class="kw">else</span> {
+    <span class="fn">System.out.println</span>(<span class="st">"Grade: F"</span>);
+}
+
+<span class="cm">// Selenium use case: Browser selection in framework</span>
+<span class="ty">String</span> <span class="nm">browser</span> <span class="op">=</span> <span class="st">"firefox"</span>;
+
+<span class="kw">if</span> (browser.<span class="fn">equals</span>(<span class="st">"chrome"</span>)) {
+    <span class="fn">System.out.println</span>(<span class="st">"Starting ChromeDriver"</span>);
+} <span class="kw">else if</span> (browser.<span class="fn">equals</span>(<span class="st">"firefox"</span>)) {
+    <span class="fn">System.out.println</span>(<span class="st">"Starting FirefoxDriver"</span>);  <span class="cm">// prints</span>
+} <span class="kw">else if</span> (browser.<span class="fn">equals</span>(<span class="st">"edge"</span>)) {
+    <span class="fn">System.out.println</span>(<span class="st">"Starting EdgeDriver"</span>);
+} <span class="kw">else</span> {
+    <span class="fn">System.out.println</span>(<span class="st">"Browser not supported: "</span> <span class="op">+</span> browser);
+}</pre>
+    </div>
+
+    <div class="callout tip">
+      <span class="callout-icon">✅</span>
+      <div class="callout-body">
+        <div class="callout-title">Always Put the Most Specific Condition First</div>
+        <p>In a chain, order matters. If you put <code>score &gt;= 50</code> first, it catches 72 and never reaches <code>score &gt;= 70</code>. Always go from most specific (highest value) to least specific (lowest value).</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── SECTION 7 ─────────────────────────────────────────── -->
+  <div class="section" id="s7">
+    <div class="section-header">
+      <div class="section-num">07</div>
+      <h2>Nested if</h2>
+    </div>
+
+    <p>An <code>if</code> inside another <code>if</code>. Use when you need to check a secondary condition only after the primary one passes. Common in Selenium for element state validation.</p>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Java</span><span class="code-file">NestedIf.java</span></div>
+      <pre><span class="ty">boolean</span> <span class="nm">isPageLoaded</span>   <span class="op">=</span> <span class="bool">true</span>;
+<span class="ty">boolean</span> <span class="nm">isUserLoggedIn</span> <span class="op">=</span> <span class="bool">true</span>;
+<span class="ty">boolean</span> <span class="nm">hasPermission</span>  <span class="op">=</span> <span class="bool">false</span>;
+
+<span class="kw">if</span> (isPageLoaded) {
+    <span class="fn">System.out.println</span>(<span class="st">"Page loaded successfully"</span>);
+
+    <span class="kw">if</span> (isUserLoggedIn) {
+        <span class="fn">System.out.println</span>(<span class="st">"User is logged in"</span>);
+
+        <span class="kw">if</span> (hasPermission) {
+            <span class="fn">System.out.println</span>(<span class="st">"Access granted to admin panel"</span>);
+        } <span class="kw">else</span> {
+            <span class="fn">System.out.println</span>(<span class="st">"No permission — redirect to home"</span>); <span class="cm">// prints</span>
+        }
+    } <span class="kw">else</span> {
+        <span class="fn">System.out.println</span>(<span class="st">"Redirect to login page"</span>);
+    }
+} <span class="kw">else</span> {
+    <span class="fn">System.out.println</span>(<span class="st">"Page not loaded — test cannot proceed"</span>);
+}</pre>
+    </div>
+
+    <div class="callout warn">
+      <span class="callout-icon">⚠️</span>
+      <div class="callout-body">
+        <div class="callout-title">Don't Nest More Than 3 Levels Deep</div>
+        <p>Deeply nested ifs become impossible to read and debug. If you find yourself at 4+ levels, refactor into methods. Clean code is a habit that matters in real QA jobs.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── SECTION 8 ─────────────────────────────────────────── -->
+  <div class="section" id="s8">
+    <div class="section-header">
+      <div class="section-num">08</div>
+      <h2>Ternary Operator</h2>
+    </div>
+
+    <p>A shortcut for simple if-else on one line. Syntax: <code>condition ? valueIfTrue : valueIfFalse</code></p>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Java</span><span class="code-file">Ternary.java</span></div>
+      <pre><span class="ty">int</span> <span class="nm">score</span> <span class="op">=</span> <span class="nu">75</span>;
+
+<span class="cm">// Normal if-else</span>
+<span class="ty">String</span> <span class="nm">result1</span>;
+<span class="kw">if</span> (score <span class="op">&gt;=</span> <span class="nu">50</span>) {
+    result1 <span class="op">=</span> <span class="st">"PASS"</span>;
+} <span class="kw">else</span> {
+    result1 <span class="op">=</span> <span class="st">"FAIL"</span>;
+}
+
+<span class="cm">// Same thing with ternary — one line</span>
+<span class="ty">String</span> <span class="nm">result2</span> <span class="op">=</span> (score <span class="op">&gt;=</span> <span class="nu">50</span>) <span class="op">?</span> <span class="st">"PASS"</span> <span class="op">:</span> <span class="st">"FAIL"</span>;
+
+<span class="fn">System.out.println</span>(result2);  <span class="cm">// PASS</span>
+
+<span class="cm">// Selenium use: determine expected status in one line</span>
+<span class="ty">boolean</span> <span class="nm">isDisplayed</span> <span class="op">=</span> <span class="bool">true</span>;
+<span class="ty">String</span> <span class="nm">status</span> <span class="op">=</span> isDisplayed <span class="op">?</span> <span class="st">"VISIBLE"</span> <span class="op">:</span> <span class="st">"HIDDEN"</span>;
+<span class="fn">System.out.println</span>(<span class="st">"Element is: "</span> <span class="op">+</span> status);  <span class="cm">// Element is: VISIBLE</span></pre>
+    </div>
+  </div>
+
+  <!-- ─── SECTION 9 ─────────────────────────────────────────── -->
+  <div class="section" id="s9">
+    <div class="section-header">
+      <div class="section-num">09</div>
+      <h2>switch Statement</h2>
+    </div>
+
+    <p>When you have one variable that could match several exact values, <code>switch</code> is cleaner than a long if-else if chain. It matches an exact value — no ranges, no complex conditions.</p>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Java</span><span class="code-file">SwitchDemo.java</span></div>
+      <pre><span class="ty">String</span> <span class="nm">browser</span> <span class="op">=</span> <span class="st">"chrome"</span>;
+
+<span class="kw">switch</span> (browser) {
+    <span class="kw">case</span> <span class="st">"chrome"</span>:
+        <span class="fn">System.out.println</span>(<span class="st">"Launching Chrome browser"</span>);
+        <span class="kw">break</span>;                    <span class="cm">// MUST have break or it falls through!</span>
+    <span class="kw">case</span> <span class="st">"firefox"</span>:
+        <span class="fn">System.out.println</span>(<span class="st">"Launching Firefox browser"</span>);
+        <span class="kw">break</span>;
+    <span class="kw">case</span> <span class="st">"edge"</span>:
+        <span class="fn">System.out.println</span>(<span class="st">"Launching Edge browser"</span>);
+        <span class="kw">break</span>;
+    <span class="kw">default</span>:                      <span class="cm">// runs if nothing matches</span>
+        <span class="fn">System.out.println</span>(<span class="st">"Unknown browser: "</span> <span class="op">+</span> browser);
+}
+<span class="cm">// Output: Launching Chrome browser</span>
+
+<span class="cm">// What happens WITHOUT break? (fall-through bug)</span>
+<span class="ty">int</span> <span class="nm">day</span> <span class="op">=</span> <span class="nu">2</span>;
+<span class="kw">switch</span> (day) {
+    <span class="kw">case</span> <span class="nu">1</span>: <span class="fn">System.out.println</span>(<span class="st">"Monday"</span>);
+    <span class="kw">case</span> <span class="nu">2</span>: <span class="fn">System.out.println</span>(<span class="st">"Tuesday"</span>);  <span class="cm">// matches here...</span>
+    <span class="kw">case</span> <span class="nu">3</span>: <span class="fn">System.out.println</span>(<span class="st">"Wednesday"</span>); <span class="cm">// ...FALLS THROUGH here too!</span>
+    <span class="kw">default</span>: <span class="fn">System.out.println</span>(<span class="st">"Other"</span>);    <span class="cm">// ...and here!</span>
+}
+<span class="cm">// Bug output: Tuesday  Wednesday  Other  ← not what you wanted!</span></pre>
+    </div>
+
+    <div class="callout error">
+      <span class="callout-icon">🚨</span>
+      <div class="callout-body">
+        <div class="callout-title">Never Forget break in switch</div>
+        <p>Without <code>break</code>, Java "falls through" — it keeps executing ALL cases below the match until it hits a <code>break</code> or the end. This is one of Java's most notorious beginner bugs.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── SECTION 10 ─────────────────────────────────────────── -->
+  <div class="section" id="s10">
+    <div class="section-header">
+      <div class="section-num">10</div>
+      <h2>for Loop</h2>
+    </div>
+
+    <div class="hour-badge">⏱ Hour 2 — Loops (60 mins)</div>
+
+    <p>Use <code>for</code> loop when you know <strong>exactly how many times</strong> to repeat something. The loop has 3 parts: initialization, condition, and update.</p>
+
+    <!-- for loop anatomy SVG -->
+    <div class="diagram-wrap">
+      <div class="diagram-title">// for Loop — Anatomy &amp; Flow</div>
+      <svg viewBox="0 0 720 280" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:720px;display:block;margin:0 auto">
+
+        <!-- Anatomy box -->
+        <rect x="20" y="20" width="680" height="60" rx="8" fill="#010409" stroke="#30363d"/>
+        <text x="40" y="58" font-family="JetBrains Mono,monospace" font-size="16" fill="#e6edf3">
+          <tspan fill="#ff7b72">for </tspan>
+          <tspan fill="#e6edf3">(</tspan>
+          <tspan fill="#3fb950">int i = 0</tspan>
+          <tspan fill="#e6edf3"> ; </tspan>
+          <tspan fill="#f0a500">i &lt; 5</tspan>
+          <tspan fill="#e6edf3"> ; </tspan>
+          <tspan fill="#58a6ff">i++</tspan>
+          <tspan fill="#e6edf3">) { ... }</tspan>
+        </text>
+
+        <!-- Labels -->
+        <line x1="100" y1="80" x2="100" y2="105" stroke="#3fb950" stroke-width="1.5"/>
+        <rect x="40" y="105" width="130" height="40" rx="6" fill="#0a1a0d" stroke="#3fb950" stroke-width="1"/>
+        <text x="105" y="122" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#3fb950">INITIALIZATION</text>
+        <text x="105" y="136" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#6e7681">Runs once at start</text>
+
+        <line x1="270" y1="80" x2="270" y2="105" stroke="#f0a500" stroke-width="1.5"/>
+        <rect x="200" y="105" width="130" height="40" rx="6" fill="#1a1400" stroke="#f0a500" stroke-width="1"/>
+        <text x="265" y="122" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#f0a500">CONDITION</text>
+        <text x="265" y="136" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#6e7681">Checked before each loop</text>
+
+        <line x1="430" y1="80" x2="430" y2="105" stroke="#58a6ff" stroke-width="1.5"/>
+        <rect x="360" y="105" width="130" height="40" rx="6" fill="#0d1522" stroke="#58a6ff" stroke-width="1"/>
+        <text x="425" y="122" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#58a6ff">UPDATE</text>
+        <text x="425" y="136" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#6e7681">Runs after each loop</text>
+
+        <!-- Execution order -->
+        <rect x="20" y="165" width="680" height="95" rx="8" fill="#161b22" stroke="#30363d"/>
+        <text x="36" y="185" font-family="JetBrains Mono,monospace" font-size="10" fill="#8b949e">Execution order:</text>
+
+        <rect x="36" y="193" width="90" height="24" rx="4" fill="#0a1a0d" stroke="#3fb950"/>
+        <text x="81" y="209" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#3fb950">1. Init: i=0</text>
+
+        <line x1="126" y1="205" x2="146" y2="205" stroke="#8b949e" stroke-width="1.5" marker-end="url(#arr)"/>
+
+        <rect x="146" y="193" width="104" height="24" rx="4" fill="#1a1400" stroke="#f0a500"/>
+        <text x="198" y="209" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#f0a500">2. Check: i &lt; 5?</text>
+
+        <line x1="250" y1="205" x2="270" y2="205" stroke="#8b949e" stroke-width="1.5" marker-end="url(#arr)"/>
+
+        <rect x="270" y="193" width="104" height="24" rx="4" fill="#1a0a0a" stroke="#ff7b72"/>
+        <text x="322" y="209" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#ff7b72">3. Run body</text>
+
+        <line x1="374" y1="205" x2="394" y2="205" stroke="#8b949e" stroke-width="1.5" marker-end="url(#arr)"/>
+
+        <rect x="394" y="193" width="90" height="24" rx="4" fill="#0d1522" stroke="#58a6ff"/>
+        <text x="439" y="209" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#58a6ff">4. Update: i++</text>
+
+        <line x1="484" y1="205" x2="510" y2="205" stroke="#8b949e" stroke-width="1.5" marker-end="url(#arr)"/>
+
+        <rect x="510" y="193" width="110" height="24" rx="4" fill="#1a1400" stroke="#f0a500"/>
+        <text x="565" y="209" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#f0a500">5. Check again...</text>
+
+        <text x="36" y="247" font-family="Sora,sans-serif" font-size="10" fill="#6e7681">Repeats steps 2-4-3-4-2-4... until condition is false → loop ends</text>
+      </svg>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Java</span><span class="code-file">ForLoop.java</span></div>
+      <pre><span class="cm">// Basic for loop — print 0 to 4</span>
+<span class="kw">for</span> (<span class="ty">int</span> <span class="nm">i</span> <span class="op">=</span> <span class="nu">0</span>; <span class="nm">i</span> <span class="op">&lt;</span> <span class="nu">5</span>; <span class="nm">i</span>++) {
+    <span class="fn">System.out.println</span>(<span class="st">"Iteration: "</span> <span class="op">+</span> <span class="nm">i</span>);
+}
+<span class="cm">// Output: 0, 1, 2, 3, 4</span>
+
+<span class="cm">// Count from 1 to 10</span>
+<span class="kw">for</span> (<span class="ty">int</span> <span class="nm">i</span> <span class="op">=</span> <span class="nu">1</span>; <span class="nm">i</span> <span class="op">&lt;=</span> <span class="nu">10</span>; <span class="nm">i</span>++) {
+    <span class="fn">System.out.println</span>(<span class="nm">i</span>);
+}
+
+<span class="cm">// Count DOWN</span>
+<span class="kw">for</span> (<span class="ty">int</span> <span class="nm">i</span> <span class="op">=</span> <span class="nu">5</span>; <span class="nm">i</span> <span class="op">&gt;</span> <span class="nu">0</span>; <span class="nm">i</span>--) {
+    <span class="fn">System.out.println</span>(<span class="st">"Countdown: "</span> <span class="op">+</span> <span class="nm">i</span>);
+}
+
+<span class="cm">// Step by 2</span>
+<span class="kw">for</span> (<span class="ty">int</span> <span class="nm">i</span> <span class="op">=</span> <span class="nu">0</span>; <span class="nm">i</span> <span class="op">&lt;=</span> <span class="nu">10</span>; <span class="nm">i</span> <span class="op">+=</span> <span class="nu">2</span>) {
+    <span class="fn">System.out.print</span>(<span class="nm">i</span> <span class="op">+</span> <span class="st">" "</span>);    <span class="cm">// 0 2 4 6 8 10</span>
+}
+
+<span class="cm">// Selenium: loop through test data</span>
+<span class="ty">String</span>[] <span class="nm">testUsers</span> <span class="op">=</span> {<span class="st">"admin"</span>, <span class="st">"user1"</span>, <span class="st">"user2"</span>};
+<span class="kw">for</span> (<span class="ty">int</span> <span class="nm">i</span> <span class="op">=</span> <span class="nu">0</span>; <span class="nm">i</span> <span class="op">&lt;</span> testUsers.<span class="nm">length</span>; <span class="nm">i</span>++) {
+    <span class="fn">System.out.println</span>(<span class="st">"Testing login for: "</span> <span class="op">+</span> testUsers[<span class="nm">i</span>]);
+}
+<span class="cm">// Output:</span>
+<span class="cm">// Testing login for: admin</span>
+<span class="cm">// Testing login for: user1</span>
+<span class="cm">// Testing login for: user2</span></pre>
+    </div>
+  </div>
+
+  <!-- ─── SECTION 11 ─────────────────────────────────────────── -->
+  <div class="section" id="s11">
+    <div class="section-header">
+      <div class="section-num">11</div>
+      <h2>while Loop</h2>
+    </div>
+
+    <p>Use <code>while</code> when you <strong>don't know in advance</strong> how many times to repeat. It checks the condition first — if false from the start, the body never runs.</p>
+
+    <!-- while flowchart -->
+    <div class="diagram-wrap">
+      <div class="diagram-title">// while vs do-while — Key Difference</div>
+      <svg viewBox="0 0 720 220" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:720px;display:block;margin:0 auto">
+
+        <!-- while -->
+        <text x="130" y="22" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="12" font-weight="700" fill="#58a6ff">while loop</text>
+        <text x="130" y="38" text-anchor="middle" font-family="Sora,sans-serif" font-size="10" fill="#8b949e">Check FIRST, then run</text>
+
+        <ellipse cx="130" cy="60" rx="45" ry="16" fill="#1e2530" stroke="#58a6ff" stroke-width="1.5"/>
+        <text x="130" y="65" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#58a6ff">START</text>
+
+        <line x1="130" y1="76" x2="130" y2="92" stroke="#8b949e" stroke-width="1.5" marker-end="url(#arr)"/>
+
+        <polygon points="130,94 185,120 130,146 75,120" fill="#1e2530" stroke="#f0a500" stroke-width="1.5"/>
+        <text x="130" y="117" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#f0a500">condition?</text>
+
+        <!-- true path -->
+        <line x1="185" y1="120" x2="240" y2="120" stroke="#3fb950" stroke-width="1.5" marker-end="url(#arrt)"/>
+        <text x="208" y="113" font-family="Sora,sans-serif" font-size="9" fill="#3fb950">true</text>
+        <rect x="240" y="108" width="60" height="24" rx="5" fill="#0a1a0d" stroke="#3fb950"/>
+        <text x="270" y="124" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#3fb950">body</text>
+        <line x1="300" y1="120" x2="340" y2="120" stroke="#3fb950" stroke-width="1.5"/>
+        <line x1="340" y1="120" x2="340" y2="60" stroke="#3fb950" stroke-width="1.5"/>
+        <line x1="340" y1="60" x2="185" y2="60" stroke="#3fb950" stroke-width="1.5"/>
+        <line x1="185" y1="60" x2="185" y2="94" stroke="#3fb950" stroke-width="1.5" marker-end="url(#arrt)"/>
+
+        <!-- false path -->
+        <line x1="130" y1="146" x2="130" y2="175" stroke="#ff7b72" stroke-width="1.5" marker-end="url(#arrf)"/>
+        <text x="142" y="165" font-family="Sora,sans-serif" font-size="9" fill="#ff7b72">false</text>
+        <ellipse cx="130" cy="192" rx="45" ry="16" fill="#1e2530" stroke="#58a6ff" stroke-width="1.5"/>
+        <text x="130" y="197" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#58a6ff">END</text>
+
+        <!-- do-while -->
+        <text x="560" y="22" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="12" font-weight="700" fill="#d2a8ff">do-while loop</text>
+        <text x="560" y="38" text-anchor="middle" font-family="Sora,sans-serif" font-size="10" fill="#8b949e">Run FIRST, then check</text>
+
+        <ellipse cx="560" cy="60" rx="45" ry="16" fill="#1e2530" stroke="#d2a8ff" stroke-width="1.5"/>
+        <text x="560" y="65" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#d2a8ff">START</text>
+
+        <line x1="560" y1="76" x2="560" y2="90" stroke="#8b949e" stroke-width="1.5" marker-end="url(#arr)"/>
+
+        <rect x="525" y="90" width="70" height="30" rx="5" fill="#15091f" stroke="#d2a8ff" stroke-width="1.5"/>
+        <text x="560" y="109" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#d2a8ff">body</text>
+
+        <line x1="560" y1="120" x2="560" y2="136" stroke="#8b949e" stroke-width="1.5" marker-end="url(#arr)"/>
+
+        <polygon points="560,138 620,164 560,190 500,164" fill="#1e2530" stroke="#f0a500" stroke-width="1.5"/>
+        <text x="560" y="161" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#f0a500">condition?</text>
+
+        <!-- true loops back -->
+        <line x1="620" y1="164" x2="660" y2="164" stroke="#3fb950" stroke-width="1.5"/>
+        <text x="638" y="157" font-family="Sora,sans-serif" font-size="9" fill="#3fb950">true</text>
+        <line x1="660" y1="164" x2="660" y2="105" stroke="#3fb950" stroke-width="1.5"/>
+        <line x1="660" y1="105" x2="595" y2="105" stroke="#3fb950" stroke-width="1.5" marker-end="url(#arrt)"/>
+
+        <!-- false exits -->
+        <line x1="560" y1="190" x2="560" y2="208" stroke="#ff7b72" stroke-width="1.5" marker-end="url(#arrf)"/>
+        <text x="572" y="205" font-family="Sora,sans-serif" font-size="9" fill="#ff7b72">false</text>
+        <text x="560" y="220" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#8b949e">END</text>
+      </svg>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Java</span><span class="code-file">WhileLoop.java</span></div>
+      <pre><span class="cm">// Basic while loop</span>
+<span class="ty">int</span> <span class="nm">attempt</span> <span class="op">=</span> <span class="nu">1</span>;
+<span class="kw">while</span> (attempt <span class="op">&lt;=</span> <span class="nu">3</span>) {
+    <span class="fn">System.out.println</span>(<span class="st">"Login attempt: "</span> <span class="op">+</span> attempt);
+    attempt<span class="op">++</span>;   <span class="cm">// CRITICAL: always update variable or infinite loop!</span>
+}
+<span class="cm">// Output: Login attempt: 1  2  3</span>
+
+<span class="cm">// Selenium: retry logic — keep retrying until element loads</span>
+<span class="ty">int</span>     <span class="nm">retries</span>    <span class="op">=</span> <span class="nu">0</span>;
+<span class="ty">int</span>     <span class="nm">maxRetries</span> <span class="op">=</span> <span class="nu">5</span>;
+<span class="ty">boolean</span> <span class="nm">found</span>      <span class="op">=</span> <span class="bool">false</span>;
+
+<span class="kw">while</span> (retries <span class="op">&lt;</span> maxRetries <span class="op">&amp;&amp;</span> <span class="op">!</span>found) {
+    <span class="fn">System.out.println</span>(<span class="st">"Attempting to find element... try "</span> <span class="op">+</span> (retries <span class="op">+</span> <span class="nu">1</span>));
+    <span class="cm">// In real Selenium: try to find element here</span>
+    <span class="cm">// Simulate: found on 3rd attempt</span>
+    <span class="kw">if</span> (retries <span class="op">==</span> <span class="nu">2</span>) {
+        found <span class="op">=</span> <span class="bool">true</span>;
+    }
+    retries<span class="op">++</span>;
+}
+
+<span class="kw">if</span> (found) {
+    <span class="fn">System.out.println</span>(<span class="st">"Element found!"</span>);
+} <span class="kw">else</span> {
+    <span class="fn">System.out.println</span>(<span class="st">"Element not found after "</span> <span class="op">+</span> maxRetries <span class="op">+</span> <span class="st">" tries"</span>);
+}</pre>
+    </div>
+
+    <div class="callout error">
+      <span class="callout-icon">⚠️</span>
+      <div class="callout-body">
+        <div class="callout-title">Infinite Loop — The Most Common while Bug</div>
+        <p>If you forget to update the variable inside the loop (e.g., forget <code>attempt++</code>), the condition never becomes false, and your program freezes forever. IntelliJ will hang. Force-stop with the red stop button. Always double-check your update step.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── SECTION 12 ─────────────────────────────────────────── -->
+  <div class="section" id="s12">
+    <div class="section-header">
+      <div class="section-num">12</div>
+      <h2>do-while Loop</h2>
+    </div>
+
+    <p>Like <code>while</code> but the body <strong>always runs at least once</strong> regardless of the condition. The check happens at the <em>bottom</em>, not the top.</p>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Java</span><span class="code-file">DoWhile.java</span></div>
+      <pre><span class="cm">// do-while — runs at least once</span>
+<span class="ty">int</span> <span class="nm">count</span> <span class="op">=</span> <span class="nu">0</span>;
+<span class="kw">do</span> {
+    <span class="fn">System.out.println</span>(<span class="st">"Executed: "</span> <span class="op">+</span> count);
+    count<span class="op">++</span>;
+} <span class="kw">while</span> (count <span class="op">&lt;</span> <span class="nu">3</span>);
+<span class="cm">// Output: 0, 1, 2</span>
+
+<span class="cm">// Compare: even if condition is false from start, do-while runs once</span>
+<span class="ty">int</span> <span class="nm">x</span> <span class="op">=</span> <span class="nu">10</span>;
+
+<span class="cm">// while — does NOT run (10 &lt; 5 is false)</span>
+<span class="kw">while</span> (x <span class="op">&lt;</span> <span class="nu">5</span>) {
+    <span class="fn">System.out.println</span>(<span class="st">"while: never prints"</span>);
+}
+
+<span class="cm">// do-while — runs ONCE even though 10 &lt; 5 is false</span>
+<span class="kw">do</span> {
+    <span class="fn">System.out.println</span>(<span class="st">"do-while: prints once!"</span>); <span class="cm">// prints!</span>
+} <span class="kw">while</span> (x <span class="op">&lt;</span> <span class="nu">5</span>);
+
+<span class="cm">// Selenium use: menu validation — open menu then check items</span>
+<span class="ty">int</span> <span class="nm">menuItems</span> <span class="op">=</span> <span class="nu">0</span>;
+<span class="kw">do</span> {
+    <span class="fn">System.out.println</span>(<span class="st">"Checking menu item: "</span> <span class="op">+</span> menuItems);
+    menuItems<span class="op">++</span>;
+} <span class="kw">while</span> (menuItems <span class="op">&lt;</span> <span class="nu">4</span>);</pre>
+    </div>
+  </div>
+
+  <!-- ─── SECTION 13 ─────────────────────────────────────────── -->
+  <div class="section" id="s13">
+    <div class="section-header">
+      <div class="section-num">13</div>
+      <h2>Enhanced for Loop (for-each)</h2>
+    </div>
+
+    <p>A cleaner way to loop through arrays or collections when you <strong>don't need the index</strong>. This is the most common loop you'll use with Selenium's <code>findElements()</code> which returns a list.</p>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Java</span><span class="code-file">ForEach.java</span></div>
+      <pre><span class="cm">// Syntax: for (type variable : array/list) { }</span>
+
+<span class="ty">String</span>[] <span class="nm">browsers</span> <span class="op">=</span> {<span class="st">"Chrome"</span>, <span class="st">"Firefox"</span>, <span class="st">"Edge"</span>};
+
+<span class="cm">// Regular for (needs index)</span>
+<span class="kw">for</span> (<span class="ty">int</span> <span class="nm">i</span> <span class="op">=</span> <span class="nu">0</span>; <span class="nm">i</span> <span class="op">&lt;</span> browsers.<span class="nm">length</span>; <span class="nm">i</span>++) {
+    <span class="fn">System.out.println</span>(browsers[<span class="nm">i</span>]);
+}
+
+<span class="cm">// for-each (cleaner, no index needed)</span>
+<span class="kw">for</span> (<span class="ty">String</span> <span class="nm">browser</span> : browsers) {
+    <span class="fn">System.out.println</span>(<span class="st">"Testing on: "</span> <span class="op">+</span> browser);
+}
+<span class="cm">// Output: Chrome, Firefox, Edge</span>
+
+<span class="cm">// Selenium real-world example:</span>
+<span class="cm">// List&lt;WebElement&gt; links = driver.findElements(By.tagName("a"));</span>
+<span class="cm">// for (WebElement link : links) {</span>
+<span class="cm">//     System.out.println(link.getText());  ← prints text of each link</span>
+<span class="cm">// }</span>
+
+<span class="cm">// Another example: verify all nav menu items</span>
+<span class="ty">String</span>[] <span class="nm">menuItems</span> <span class="op">=</span> {<span class="st">"Home"</span>, <span class="st">"Dashboard"</span>, <span class="st">"Reports"</span>, <span class="st">"Logout"</span>};
+<span class="ty">String</span>[] <span class="nm">expected</span>  <span class="op">=</span> {<span class="st">"Home"</span>, <span class="st">"Dashboard"</span>, <span class="st">"Reports"</span>, <span class="st">"Logout"</span>};
+
+<span class="ty">int</span> <span class="nm">idx</span> <span class="op">=</span> <span class="nu">0</span>;
+<span class="kw">for</span> (<span class="ty">String</span> <span class="nm">item</span> : menuItems) {
+    <span class="kw">if</span> (item.<span class="fn">equals</span>(expected[idx])) {
+        <span class="fn">System.out.println</span>(<span class="st">"✓ "</span> <span class="op">+</span> item);
+    } <span class="kw">else</span> {
+        <span class="fn">System.out.println</span>(<span class="st">"✗ Expected: "</span> <span class="op">+</span> expected[idx] <span class="op">+</span> <span class="st">" Got: "</span> <span class="op">+</span> item);
+    }
+    idx<span class="op">++</span>;
+}</pre>
+    </div>
+
+    <div class="callout note">
+      <span class="callout-icon">📌</span>
+      <div class="callout-body">
+        <div class="callout-title">Use for-each when you don't need the index. Use regular for when you do.</div>
+        <p>If you need to know the position (index 0, 1, 2...), use regular <code>for</code>. If you just need each element, use <code>for-each</code>. It's cleaner and less error-prone.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── SECTION 14 ─────────────────────────────────────────── -->
+  <div class="section" id="s14">
+    <div class="section-header">
+      <div class="section-num">14</div>
+      <h2>break &amp; continue</h2>
+    </div>
+
+    <div class="compare-grid">
+      <div class="compare-card good">
+        <div class="compare-card-title">break — Exit the loop entirely</div>
+        <p style="font-size:13px;color:var(--textmuted)">Stops the loop immediately. Code after the loop continues. Use when you found what you need and don't need to keep looping.</p>
+      </div>
+      <div class="compare-card bad" style="background:rgba(88,166,255,0.07);border-color:rgba(88,166,255,0.25)">
+        <div class="compare-card-title" style="color:var(--accent2)">continue — Skip current iteration</div>
+        <p style="font-size:13px;color:var(--textmuted)">Skips the rest of the current loop body and goes to the next iteration. Use to skip certain elements without stopping the loop.</p>
+      </div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Java</span><span class="code-file">BreakContinue.java</span></div>
+      <pre><span class="cm">// BREAK: stop looping when target found</span>
+<span class="ty">String</span>[] <span class="nm">users</span> <span class="op">=</span> {<span class="st">"alice"</span>, <span class="st">"bob"</span>, <span class="st">"sagar"</span>, <span class="st">"david"</span>};
+<span class="ty">String</span> <span class="nm">target</span> <span class="op">=</span> <span class="st">"sagar"</span>;
+
+<span class="kw">for</span> (<span class="ty">String</span> <span class="nm">user</span> : users) {
+    <span class="fn">System.out.println</span>(<span class="st">"Checking: "</span> <span class="op">+</span> user);
+    <span class="kw">if</span> (user.<span class="fn">equals</span>(target)) {
+        <span class="fn">System.out.println</span>(<span class="st">"Found! Stopping search."</span>);
+        <span class="kw">break</span>;   <span class="cm">// stop — no need to check david</span>
+    }
+}
+<span class="cm">// Output: Checking: alice → bob → sagar → Found! Stopping search.</span>
+
+<span class="cm">// CONTINUE: skip disabled users, process active ones</span>
+<span class="ty">int</span>[] <span class="nm">userIds</span> <span class="op">=</span> {<span class="nu">1</span>, <span class="nu">2</span>, <span class="nu">3</span>, <span class="nu">4</span>, <span class="nu">5</span>};
+<span class="ty">int</span>[] <span class="nm">disabled</span> <span class="op">=</span> {<span class="nu">2</span>, <span class="nu">4</span>};   <span class="cm">// IDs 2 and 4 are disabled</span>
+
+<span class="kw">for</span> (<span class="ty">int</span> <span class="nm">id</span> : userIds) {
+    <span class="kw">if</span> (id <span class="op">==</span> <span class="nu">2</span> <span class="op">||</span> id <span class="op">==</span> <span class="nu">4</span>) {
+        <span class="fn">System.out.println</span>(<span class="st">"Skipping disabled user: "</span> <span class="op">+</span> id);
+        <span class="kw">continue</span>;  <span class="cm">// skip this iteration, go to next id</span>
+    }
+    <span class="fn">System.out.println</span>(<span class="st">"Processing user: "</span> <span class="op">+</span> id);
+}
+<span class="cm">// Output: 1(process) → 2(skip) → 3(process) → 4(skip) → 5(process)</span></pre>
+    </div>
+  </div>
+
+  <!-- ─── SECTION 15 ─────────────────────────────────────────── -->
+  <div class="section" id="s15">
+    <div class="section-header">
+      <div class="section-num">15</div>
+      <h2>Nested Loops</h2>
+    </div>
+
+    <p>A loop inside another loop. The <strong>inner loop completes fully</strong> for each single iteration of the outer loop. Used in Selenium for table testing (rows × columns).</p>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Java</span><span class="code-file">NestedLoops.java</span></div>
+      <pre><span class="cm">// Basic nested loop: multiplication table</span>
+<span class="kw">for</span> (<span class="ty">int</span> <span class="nm">i</span> <span class="op">=</span> <span class="nu">1</span>; <span class="nm">i</span> <span class="op">&lt;=</span> <span class="nu">3</span>; <span class="nm">i</span>++) {          <span class="cm">// outer: rows</span>
+    <span class="kw">for</span> (<span class="ty">int</span> <span class="nm">j</span> <span class="op">=</span> <span class="nu">1</span>; <span class="nm">j</span> <span class="op">&lt;=</span> <span class="nu">3</span>; <span class="nm">j</span>++) {      <span class="cm">// inner: columns</span>
+        <span class="fn">System.out.print</span>((<span class="nm">i</span> <span class="op">*</span> <span class="nm">j</span>) <span class="op">+</span> <span class="st">"\t"</span>);
+    }
+    <span class="fn">System.out.println</span>();               <span class="cm">// new line after each row</span>
+}
+<span class="cm">// Output:</span>
+<span class="cm">// 1   2   3</span>
+<span class="cm">// 2   4   6</span>
+<span class="cm">// 3   6   9</span>
+
+<span class="cm">// Selenium use: verify data in an HTML table</span>
+<span class="ty">String</span>[][] <span class="nm">tableData</span> <span class="op">=</span> {
+    {<span class="st">"John"</span>, <span class="st">"Admin"</span>, <span class="st">"Active"</span>},
+    {<span class="st">"Jane"</span>, <span class="st">"User"</span>,  <span class="st">"Active"</span>},
+    {<span class="st">"Bob"</span>,  <span class="st">"User"</span>,  <span class="st">"Inactive"</span>}
+};
+
+<span class="kw">for</span> (<span class="ty">int</span> <span class="nm">row</span> <span class="op">=</span> <span class="nu">0</span>; <span class="nm">row</span> <span class="op">&lt;</span> tableData.<span class="nm">length</span>; <span class="nm">row</span>++) {
+    <span class="fn">System.out.print</span>(<span class="st">"Row "</span> <span class="op">+</span> (<span class="nm">row</span> <span class="op">+</span> <span class="nu">1</span>) <span class="op">+</span> <span class="st">": "</span>);
+    <span class="kw">for</span> (<span class="ty">int</span> <span class="nm">col</span> <span class="op">=</span> <span class="nu">0</span>; <span class="nm">col</span> <span class="op">&lt;</span> tableData[<span class="nm">row</span>].<span class="nm">length</span>; <span class="nm">col</span>++) {
+        <span class="fn">System.out.print</span>(tableData[<span class="nm">row</span>][<span class="nm">col</span>] <span class="op">+</span> <span class="st">"  "</span>);
+    }
+    <span class="fn">System.out.println</span>();
+}
+<span class="cm">// Row 1: John  Admin  Active</span>
+<span class="cm">// Row 2: Jane  User   Active</span>
+<span class="cm">// Row 3: Bob   User   Inactive</span></pre>
+    </div>
+  </div>
+
+  <!-- ─── SECTION 16 ─────────────────────────────────────────── -->
+  <div class="section" id="s16">
+    <div class="section-header">
+      <div class="section-num">16</div>
+      <h2>Selenium Real-World Usage</h2>
+    </div>
+
+    <p>Everything you learned today appears directly in Selenium automation. Here's a preview of actual test code you'll write in Phase 2.</p>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Java</span><span class="code-file">SeleniumPreview.java — What Day 9+ looks like</span></div>
+      <pre><span class="cm">// ── 1. if/else: Verify login result ────────────────────────</span>
+<span class="ty">String</span> <span class="nm">currentUrl</span> <span class="op">=</span> <span class="st">"https://site.com/dashboard"</span>;
+<span class="kw">if</span> (currentUrl.<span class="fn">contains</span>(<span class="st">"dashboard"</span>)) {
+    <span class="fn">System.out.println</span>(<span class="st">"PASS: Redirected to dashboard"</span>);
+} <span class="kw">else</span> {
+    <span class="fn">System.out.println</span>(<span class="st">"FAIL: Wrong URL — "</span> <span class="op">+</span> currentUrl);
+}
+
+<span class="cm">// ── 2. for-each: Check all links on a page ─────────────────</span>
+<span class="cm">// List&lt;WebElement&gt; allLinks = driver.findElements(By.tagName("a"));</span>
+<span class="cm">// for (WebElement link : allLinks) {</span>
+<span class="cm">//     if (!link.getText().isEmpty()) {</span>
+<span class="cm">//         System.out.println("Link: " + link.getText());</span>
+<span class="cm">//     }</span>
+<span class="cm">// }</span>
+
+<span class="cm">// ── 3. while: Wait for element to appear ───────────────────</span>
+<span class="ty">int</span>     <span class="nm">attempts</span>   <span class="op">=</span> <span class="nu">0</span>;
+<span class="ty">boolean</span> <span class="nm">isVisible</span>  <span class="op">=</span> <span class="bool">false</span>;
+<span class="kw">while</span> (attempts <span class="op">&lt;</span> <span class="nu">10</span> <span class="op">&amp;&amp;</span> <span class="op">!</span>isVisible) {
+    <span class="cm">// isVisible = driver.findElement(By.id("btn")).isDisplayed();</span>
+    attempts<span class="op">++</span>;
+}
+
+<span class="cm">// ── 4. for + continue: Skip hidden dropdowns ───────────────</span>
+<span class="cm">// List&lt;WebElement&gt; dropdowns = driver.findElements(By.tagName("select"));</span>
+<span class="cm">// for (WebElement dd : dropdowns) {</span>
+<span class="cm">//     if (!dd.isDisplayed()) { continue; } // skip hidden</span>
+<span class="cm">//     new Select(dd).selectByIndex(1);     // interact with visible</span>
+<span class="cm">// }</span>
+
+<span class="cm">// ── 5. switch: Browser driver selection ────────────────────</span>
+<span class="ty">String</span> <span class="nm">browser</span> <span class="op">=</span> <span class="st">"chrome"</span>;
+<span class="kw">switch</span> (browser) {
+    <span class="kw">case</span> <span class="st">"chrome"</span>:
+        <span class="fn">System.out.println</span>(<span class="st">"WebDriverManager.chromedriver().setup()"</span>);
+        <span class="kw">break</span>;
+    <span class="kw">case</span> <span class="st">"firefox"</span>:
+        <span class="fn">System.out.println</span>(<span class="st">"WebDriverManager.firefoxdriver().setup()"</span>);
+        <span class="kw">break</span>;
+    <span class="kw">default</span>:
+        <span class="kw">throw</span> <span class="kw">new</span> <span class="fn">IllegalArgumentException</span>(<span class="st">"Unsupported: "</span> <span class="op">+</span> browser);
+}</pre>
+    </div>
+  </div>
+
+  <!-- ─── SECTION 17 ─────────────────────────────────────────── -->
+  <div class="section" id="s17">
+    <div class="section-header">
+      <div class="section-num">17</div>
+      <h2>Practice Task + Expected Output</h2>
+    </div>
+
+    <p>Type all of this from scratch. This task uses every concept from today — if, else if, for, while, for-each, break, continue. Do not skip it.</p>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Java</span><span class="code-file">Day2Practice.java</span></div>
+      <pre><span class="kw">public class</span> <span class="nm">Day2Practice</span> {
+
+    <span class="kw">public static void</span> <span class="fn">main</span>(<span class="ty">String</span>[] args) {
+
+        <span class="fn">System.out.println</span>(<span class="st">"====== TASK 1: Grade Checker ======"</span>);
+        <span class="ty">int</span>[] <span class="nm">scores</span> <span class="op">=</span> {<span class="nu">92</span>, <span class="nu">78</span>, <span class="nu">65</span>, <span class="nu">45</span>, <span class="nu">55</span>, <span class="nu">88</span>};
+        <span class="kw">for</span> (<span class="ty">int</span> <span class="nm">score</span> : scores) {
+            <span class="ty">String</span> <span class="nm">grade</span>;
+            <span class="kw">if</span>      (score <span class="op">&gt;=</span> <span class="nu">90</span>) grade <span class="op">=</span> <span class="st">"A"</span>;
+            <span class="kw">else if</span> (score <span class="op">&gt;=</span> <span class="nu">80</span>) grade <span class="op">=</span> <span class="st">"B"</span>;
+            <span class="kw">else if</span> (score <span class="op">&gt;=</span> <span class="nu">70</span>) grade <span class="op">=</span> <span class="st">"C"</span>;
+            <span class="kw">else if</span> (score <span class="op">&gt;=</span> <span class="nu">50</span>) grade <span class="op">=</span> <span class="st">"D"</span>;
+            <span class="kw">else</span>                   grade <span class="op">=</span> <span class="st">"F"</span>;
+            <span class="ty">String</span> <span class="nm">result</span> <span class="op">=</span> (score <span class="op">&gt;=</span> <span class="nu">50</span>) <span class="op">?</span> <span class="st">"PASS"</span> <span class="op">:</span> <span class="st">"FAIL"</span>;
+            <span class="fn">System.out.println</span>(<span class="st">"Score: "</span> <span class="op">+</span> score <span class="op">+</span> <span class="st">" → Grade: "</span>
+                               <span class="op">+</span> grade <span class="op">+</span> <span class="st">" ["</span> <span class="op">+</span> result <span class="op">+</span> <span class="st">"]"</span>);
+        }
+
+        <span class="fn">System.out.println</span>(<span class="st">"\n====== TASK 2: Even/Odd 1-10 ======"</span>);
+        <span class="kw">for</span> (<span class="ty">int</span> <span class="nm">i</span> <span class="op">=</span> <span class="nu">1</span>; <span class="nm">i</span> <span class="op">&lt;=</span> <span class="nu">10</span>; <span class="nm">i</span>++) {
+            <span class="kw">if</span> (i <span class="op">%</span> <span class="nu">2</span> <span class="op">==</span> <span class="nu">0</span>) {
+                <span class="fn">System.out.println</span>(<span class="nm">i</span> <span class="op">+</span> <span class="st">" → EVEN"</span>);
+            } <span class="kw">else</span> {
+                <span class="fn">System.out.println</span>(<span class="nm">i</span> <span class="op">+</span> <span class="st">" → ODD"</span>);
+            }
+        }
+
+        <span class="fn">System.out.println</span>(<span class="st">"\n====== TASK 3: Find Target User ======"</span>);
+        <span class="ty">String</span>[] <span class="nm">users</span> <span class="op">=</span> {<span class="st">"alice"</span>, <span class="st">"bob"</span>, <span class="st">"sagar"</span>, <span class="st">"dave"</span>, <span class="st">"eve"</span>};
+        <span class="ty">String</span> <span class="nm">targetUser</span> <span class="op">=</span> <span class="st">"sagar"</span>;
+        <span class="ty">boolean</span> <span class="nm">userFound</span> <span class="op">=</span> <span class="bool">false</span>;
+        <span class="kw">for</span> (<span class="ty">String</span> <span class="nm">user</span> : users) {
+            <span class="kw">if</span> (user.<span class="fn">equals</span>(targetUser)) {
+                <span class="fn">System.out.println</span>(<span class="st">"✓ Found: "</span> <span class="op">+</span> user);
+                userFound <span class="op">=</span> <span class="bool">true</span>;
+                <span class="kw">break</span>;
+            }
+            <span class="fn">System.out.println</span>(<span class="st">"  Checked: "</span> <span class="op">+</span> user);
+        }
+        <span class="kw">if</span> (<span class="op">!</span>userFound) {
+            <span class="fn">System.out.println</span>(<span class="st">"User not found: "</span> <span class="op">+</span> targetUser);
+        }
+
+        <span class="fn">System.out.println</span>(<span class="st">"\n====== TASK 4: Skip Inactive Users ======"</span>);
+        <span class="ty">String</span>[] <span class="nm">allUsers</span>    <span class="op">=</span> {<span class="st">"Admin"</span>, <span class="st">"User1"</span>, <span class="st">"Guest"</span>, <span class="st">"User2"</span>};
+        <span class="ty">boolean</span>[] <span class="nm">isActive</span>  <span class="op">=</span> {<span class="bool">true</span>, <span class="bool">false</span>, <span class="bool">false</span>, <span class="bool">true</span>};
+        <span class="kw">for</span> (<span class="ty">int</span> <span class="nm">i</span> <span class="op">=</span> <span class="nu">0</span>; <span class="nm">i</span> <span class="op">&lt;</span> allUsers.<span class="nm">length</span>; <span class="nm">i</span>++) {
+            <span class="kw">if</span> (<span class="op">!</span>isActive[<span class="nm">i</span>]) {
+                <span class="fn">System.out.println</span>(<span class="st">"  Skipped: "</span> <span class="op">+</span> allUsers[<span class="nm">i</span>] <span class="op">+</span> <span class="st">" (inactive)"</span>);
+                <span class="kw">continue</span>;
+            }
+            <span class="fn">System.out.println</span>(<span class="st">"✓ Processing: "</span> <span class="op">+</span> allUsers[<span class="nm">i</span>]);
+        }
+
+        <span class="fn">System.out.println</span>(<span class="st">"\n====== TASK 5: Login Retry ======"</span>);
+        <span class="ty">int</span> <span class="nm">loginAttempts</span> <span class="op">=</span> <span class="nu">0</span>;
+        <span class="ty">int</span> <span class="nm">maxAttempts</span>   <span class="op">=</span> <span class="nu">3</span>;
+        <span class="ty">boolean</span> <span class="nm">loggedIn</span>  <span class="op">=</span> <span class="bool">false</span>;
+        <span class="kw">while</span> (loginAttempts <span class="op">&lt;</span> maxAttempts <span class="op">&amp;&amp;</span> <span class="op">!</span>loggedIn) {
+            loginAttempts<span class="op">++</span>;
+            <span class="fn">System.out.println</span>(<span class="st">"Login attempt #"</span> <span class="op">+</span> loginAttempts);
+            <span class="kw">if</span> (loginAttempts <span class="op">==</span> <span class="nu">2</span>) {  <span class="cm">// simulate success on attempt 2</span>
+                loggedIn <span class="op">=</span> <span class="bool">true</span>;
+                <span class="fn">System.out.println</span>(<span class="st">"Login SUCCESS on attempt "</span> <span class="op">+</span> loginAttempts);
+            }
+        }
+        <span class="kw">if</span> (<span class="op">!</span>loggedIn) {
+            <span class="fn">System.out.println</span>(<span class="st">"Login FAILED after "</span> <span class="op">+</span> maxAttempts <span class="op">+</span> <span class="st">" attempts"</span>);
+        }
+
+        <span class="fn">System.out.println</span>(<span class="st">"\n====== TASK 6: Browser Switch ======"</span>);
+        <span class="ty">String</span>[] <span class="nm">testBrowsers</span> <span class="op">=</span> {<span class="st">"chrome"</span>, <span class="st">"firefox"</span>, <span class="st">"safari"</span>};
+        <span class="kw">for</span> (<span class="ty">String</span> <span class="nm">b</span> : testBrowsers) {
+            <span class="kw">switch</span> (b) {
+                <span class="kw">case</span> <span class="st">"chrome"</span>:
+                    <span class="fn">System.out.println</span>(<span class="st">"→ ChromeDriver initialized"</span>); <span class="kw">break</span>;
+                <span class="kw">case</span> <span class="st">"firefox"</span>:
+                    <span class="fn">System.out.println</span>(<span class="st">"→ FirefoxDriver initialized"</span>); <span class="kw">break</span>;
+                <span class="kw">default</span>:
+                    <span class="fn">System.out.println</span>(<span class="st">"→ "</span> <span class="op">+</span> b <span class="op">+</span> <span class="st">": Not supported yet"</span>);
+            }
+        }
+    }
+}</pre>
+    </div>
+
+    <h3>Expected Output</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Output</span><span class="code-file">Console</span></div>
+      <pre>====== TASK 1: Grade Checker ======
+Score: 92 → Grade: A [PASS]
+Score: 78 → Grade: C [PASS]
+Score: 65 → Grade: C [PASS]
+Score: 45 → Grade: F [FAIL]
+Score: 55 → Grade: D [PASS]
+Score: 88 → Grade: B [PASS]
+
+====== TASK 2: Even/Odd 1-10 ======
+1 → ODD
+2 → EVEN
+3 → ODD
+4 → EVEN
+5 → ODD
+6 → EVEN
+7 → ODD
+8 → EVEN
+9 → ODD
+10 → EVEN
+
+====== TASK 3: Find Target User ======
+  Checked: alice
+  Checked: bob
+✓ Found: sagar
+
+====== TASK 4: Skip Inactive Users ======
+✓ Processing: Admin
+  Skipped: User1 (inactive)
+  Skipped: Guest (inactive)
+✓ Processing: User2
+
+====== TASK 5: Login Retry ======
+Login attempt #1
+Login attempt #2
+Login SUCCESS on attempt 2
+
+====== TASK 6: Browser Switch ======
+→ ChromeDriver initialized
+→ FirefoxDriver initialized
+→ safari: Not supported yet</pre>
+    </div>
+
+    <div class="callout purple">
+      <span class="callout-icon">🎯</span>
+      <div class="callout-body">
+        <div class="callout-title">Extension Challenge</div>
+        <p>Add a Task 7: Print a 5×5 grid using nested loops where cells show <code>*</code> on the border and <code> </code> (space) inside. This builds pattern recognition useful for table traversal in Selenium.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── SECTION 18 ─────────────────────────────────────────── -->
+  <div class="section" id="s18">
+    <div class="section-header">
+      <div class="section-num">18</div>
+      <h2>Common Mistakes</h2>
+    </div>
+
+    <div class="mistake-grid">
+      <div class="mistake-card">
+        <div class="mistake-title">❌ = instead of == in conditions</div>
+        <p><code>if (x = 5)</code> assigns 5 to x and then evaluates x as boolean — compile error or wrong result. Always <code>==</code> inside conditions.</p>
+      </div>
+      <div class="mistake-card">
+        <div class="mistake-title">❌ Infinite while loop</div>
+        <p>Forgetting to update the variable inside while loop. Your program hangs. Always ask: "What makes this condition eventually false?"</p>
+      </div>
+      <div class="mistake-card">
+        <div class="mistake-title">❌ Missing break in switch</div>
+        <p>Without <code>break</code>, execution falls through to the next case. Always add <code>break</code> at the end of every case unless fall-through is intentional.</p>
+      </div>
+      <div class="mistake-card">
+        <div class="mistake-title">❌ Off-by-one in for loop</div>
+        <p><code>i &lt; 10</code> runs 0–9 (10 times). <code>i &lt;= 10</code> runs 0–10 (11 times). Know the difference — wrong boundary skips or repeats data.</p>
+      </div>
+      <div class="mistake-card">
+        <div class="mistake-title">❌ Using == to compare Strings in if</div>
+        <p><code>if (browser == "chrome")</code> may return false even when values match. Always <code>browser.equals("chrome")</code>.</p>
+      </div>
+      <div class="mistake-card">
+        <div class="mistake-title">❌ Wrong condition order in if-else if</div>
+        <p>Putting <code>score &gt;= 50</code> before <code>score &gt;= 80</code> means 80 gets caught by the first condition. Always most specific first.</p>
+      </div>
+      <div class="mistake-card">
+        <div class="mistake-title">❌ Modifying array in for-each</div>
+        <p>You cannot change array elements inside a for-each loop — the loop variable is a copy, not a reference. Use regular for loop for modifications.</p>
+      </div>
+      <div class="mistake-card">
+        <div class="mistake-title">❌ Semicolon after for()</div>
+        <p><code>for (int i = 0; i &lt; 5; i++);</code> — that semicolon creates an empty loop body. The actual block below runs only once. Easy to miss.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── SECTION 19 ─────────────────────────────────────────── -->
+  <div class="section" id="s19">
+    <div class="section-header">
+      <div class="section-num">19</div>
+      <h2>End of Day Checklist + Resources</h2>
+    </div>
+
+    <div class="checklist">
+      <div class="checklist-title">✦ End of Day 2 Checklist</div>
+      <div class="check-item"><div class="check-box"></div>I know all 6 comparison operators and can write them without looking</div>
+      <div class="check-item"><div class="check-box"></div>I understand &&, || and ! and can build compound conditions</div>
+      <div class="check-item"><div class="check-box"></div>I can write if / if-else / if-else if-else correctly</div>
+      <div class="check-item"><div class="check-box"></div>I understand ternary operator and when to use it vs if-else</div>
+      <div class="check-item"><div class="check-box"></div>I know why break is mandatory in switch statements</div>
+      <div class="check-item"><div class="check-box"></div>I can write a for loop with correct init, condition, and update</div>
+      <div class="check-item"><div class="check-box"></div>I know the difference between while and do-while (when body runs)</div>
+      <div class="check-item"><div class="check-box"></div>I can use for-each to loop through arrays cleanly</div>
+      <div class="check-item"><div class="check-box"></div>I know what break and continue do and when to use each</div>
+      <div class="check-item"><div class="check-box"></div>Practice task completed — all 6 tasks produce correct output</div>
+      <div class="check-item"><div class="check-box"></div>I can explain how conditions and loops will be used in Selenium</div>
+    </div>
+
+    <h3>Resources for Today</h3>
+    <ul class="resource-list">
+      <li><span class="res-icon">🎥</span><strong>YouTube:&nbsp;</strong><a href="https://youtube.com/@KunalKushwaha" target="_blank">Kunal Kushwaha — Java Bootcamp Episodes 3 &amp; 4</a> &nbsp;<span style="color:var(--textmuted);font-size:12px">Covers conditions and loops with great visual explanations.</span></li>
+      <li><span class="res-icon">🎥</span><strong>YouTube:&nbsp;</strong><a href="https://www.youtube.com/watch?v=RRubcjpTkks" target="_blank">Bro Code — Java Full Course (loops section)</a> &nbsp;<span style="color:var(--textmuted);font-size:12px">Extremely beginner friendly with good examples.</span></li>
+      <li><span class="res-icon">📖</span><strong>Docs:&nbsp;</strong><a href="https://docs.oracle.com/javase/tutorial/java/nutsandbolts/flow.html" target="_blank">Oracle Java Docs — Control Flow Statements</a> &nbsp;<span style="color:var(--textmuted);font-size:12px">Official reference for all if, switch, for, while.</span></li>
+      <li><span class="res-icon">⚡</span><strong>Practice:&nbsp;</strong><a href="https://www.hackerrank.com/domains/java" target="_blank">HackerRank — Java Control Flow Challenges</a> &nbsp;<span style="color:var(--textmuted);font-size:12px">Filter by "control flow" — do 2–3 exercises to reinforce.</span></li>
+    </ul>
+
+    <div class="callout tip">
+      <span class="callout-icon">🚀</span>
+      <div class="callout-body">
+        <div class="callout-title">Day 3 Preview — Methods &amp; Arrays</div>
+        <p>Tomorrow: <strong>Methods</strong> (reusable code blocks) and <strong>Arrays</strong> (storing multiple values). Everything you wrote today will get wrapped inside methods. That's how real Selenium code is structured — one method per action, one method per verification.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  <span>Day 2 of 65</span> &nbsp;·&nbsp; Selenium + Java Automation Roadmap &nbsp;·&nbsp; Phase 1 — Foundation &nbsp;·&nbsp; <span>Next: Day 3 — Methods &amp; Arrays</span>
+</div>
+
+</body>
+</html>

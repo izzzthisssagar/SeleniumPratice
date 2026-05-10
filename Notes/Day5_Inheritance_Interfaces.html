@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 5 — Inheritance & Interfaces</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Sora:wght@400;600;700;800&display=swap');
+:root{--bg:#0d1117;--bg2:#161b22;--bg3:#1e2530;--border:#30363d;--accent:#f0a500;--accent2:#58a6ff;--accent3:#3fb950;--accent4:#ff7b72;--accent5:#d2a8ff;--text:#e6edf3;--muted:#8b949e;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);line-height:1.75;font-size:15px;}
+.hero{background:linear-gradient(135deg,#0d1117,#161b22,#0d1a2e);border-bottom:2px solid var(--accent2);padding:48px 40px 36px;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:0;right:0;width:400px;height:400px;background:radial-gradient(circle,rgba(88,166,255,0.06),transparent 70%);pointer-events:none;}
+.hero-tag{display:inline-block;background:rgba(88,166,255,0.12);border:1px solid rgba(88,166,255,0.3);color:var(--accent2);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;padding:4px 12px;border-radius:20px;margin-bottom:16px;}
+.hero h1{font-size:34px;font-weight:800;line-height:1.2;margin-bottom:10px;}
+.hero h1 span{color:var(--accent2);}
+.hero-sub{color:var(--muted);font-size:14px;display:flex;gap:24px;flex-wrap:wrap;margin-top:16px;}
+.hero-sub span{display:flex;align-items:center;gap:6px;}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--accent2);display:inline-block;}
+.container{max-width:980px;margin:0 auto;padding:40px 32px 80px;}
+.toc{background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--accent2);border-radius:8px;padding:24px 28px;margin-bottom:48px;}
+.toc-title{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--accent2);margin-bottom:14px;}
+.toc ol{padding-left:20px;}.toc li{margin-bottom:6px;}
+.toc a{color:var(--muted);text-decoration:none;font-size:14px;}.toc a:hover{color:var(--accent2);}
+.section{margin-bottom:56px;}
+.section-header{display:flex;align-items:center;gap:14px;margin-bottom:24px;padding-bottom:14px;border-bottom:1px solid var(--border);}
+.section-num{background:var(--accent2);color:#000;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:12px;width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.section h2{font-size:22px;font-weight:700;}
+h3{font-size:16px;font-weight:600;color:var(--accent2);margin:28px 0 12px;display:flex;align-items:center;gap:8px;}
+h3::before{content:'▸';color:var(--accent);font-size:12px;}
+p{color:var(--muted);margin-bottom:14px;line-height:1.8;}strong{color:var(--text);font-weight:600;}
+.code-block{background:#010409;border:1px solid var(--border);border-radius:10px;margin:20px 0;overflow:hidden;}
+.code-header{background:var(--bg2);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
+.code-lang{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent2);letter-spacing:1px;text-transform:uppercase;font-weight:600;}
+.code-file{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);}
+pre{font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.85;padding:20px;overflow-x:auto;color:#e6edf3;}
+.kw{color:#ff7b72;font-weight:500;}.ty{color:#ffa657;}.st{color:#a5d6ff;}.cm{color:#6e7681;font-style:italic;}
+.nm{color:#79c0ff;}.nu{color:#79c0ff;}.fn{color:#d2a8ff;}.op{color:#ff7b72;}.bool{color:#3fb950;}
+code{font-family:'JetBrains Mono',monospace;font-size:12.5px;background:rgba(88,166,255,0.1);border:1px solid rgba(88,166,255,0.2);color:var(--accent2);padding:1px 7px;border-radius:4px;}
+.callout{border-radius:8px;padding:16px 20px;margin:20px 0;display:flex;gap:14px;align-items:flex-start;}
+.callout-icon{font-size:18px;flex-shrink:0;margin-top:1px;}.callout-body{flex:1;}
+.callout-title{font-weight:700;font-size:13px;margin-bottom:4px;}.callout p{margin-bottom:0;font-size:13.5px;}
+.note{background:rgba(88,166,255,0.07);border-left:3px solid var(--accent2);}.note .callout-title{color:var(--accent2);}
+.tip{background:rgba(63,185,80,0.07);border-left:3px solid var(--accent3);}.tip .callout-title{color:var(--accent3);}
+.warn{background:rgba(240,165,0,0.07);border-left:3px solid var(--accent);}.warn .callout-title{color:var(--accent);}
+.error{background:rgba(255,123,114,0.07);border-left:3px solid var(--accent4);}.error .callout-title{color:var(--accent4);}
+.purple{background:rgba(210,168,255,0.07);border-left:3px solid var(--accent5);}.purple .callout-title{color:var(--accent5);}
+.table-wrap{overflow-x:auto;margin:20px 0;}
+table{width:100%;border-collapse:collapse;font-size:13.5px;}
+thead tr{background:var(--bg2);border-bottom:2px solid var(--accent2);}
+th{padding:12px 16px;text-align:left;font-weight:700;font-size:12px;letter-spacing:0.5px;text-transform:uppercase;color:var(--accent2);}
+td{padding:11px 16px;border-bottom:1px solid var(--border);color:var(--muted);}
+tr:hover td{background:rgba(255,255,255,0.02);}
+td:first-child{font-family:'JetBrains Mono',monospace;color:var(--accent);font-size:13px;}
+.diagram-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:28px 24px;margin:24px 0;overflow:hidden;}
+.diagram-title{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:20px;text-align:center;}
+.hour-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(88,166,255,0.1);border:1px solid rgba(88,166,255,0.25);color:var(--accent2);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:1px;padding:5px 14px;border-radius:20px;margin-bottom:18px;margin-top:30px;}
+.mistake-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:20px 0;}
+.mistake-card{background:rgba(255,123,114,0.05);border:1px solid rgba(255,123,114,0.2);border-radius:8px;padding:16px;}
+.mistake-card .mt{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent4);font-weight:700;margin-bottom:8px;}
+.mistake-card p{font-size:13px;margin:0;}
+.checklist{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:24px 28px;margin:24px 0;}
+.checklist-title{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent3);letter-spacing:1.5px;text-transform:uppercase;font-weight:700;margin-bottom:16px;}
+.check-item{display:flex;align-items:flex-start;gap:12px;padding:9px 0;border-bottom:1px solid rgba(48,54,61,0.5);font-size:14px;color:var(--muted);}
+.check-item:last-child{border-bottom:none;}
+.check-box{width:18px;height:18px;border:2px solid var(--accent3);border-radius:4px;flex-shrink:0;margin-top:2px;}
+.resource-list{list-style:none;padding:0;margin:12px 0;}
+.resource-list li{padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;margin-bottom:8px;font-size:13.5px;display:flex;gap:10px;align-items:center;}
+.resource-list li a{color:var(--accent2);text-decoration:none;}
+.footer{background:var(--bg2);border-top:1px solid var(--border);padding:24px 40px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);}
+.footer span{color:var(--accent2);}
+::-webkit-scrollbar{width:6px;height:6px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+@media(max-width:640px){.hero{padding:32px 20px 24px;}.hero h1{font-size:24px;}.container{padding:24px 16px 60px;}}
+</style>
+</head>
+<body>
+<div class="hero">
+  <div class="hero-tag">Phase 1 &middot; Day 5 of 65</div>
+  <h1>Inheritance <span>&amp; Interfaces</span></h1>
+  <div class="hero-sub">
+    <span><span class="dot"></span>2 Hours</span>
+    <span><span class="dot"></span>Selenium + Java Track</span>
+    <span><span class="dot"></span>extends &middot; super &middot; override &middot; interface &middot; implements &middot; BaseTest</span>
+  </div>
+</div>
+<div class="container">
+
+<div class="toc">
+  <div class="toc-title">// Table of Contents</div>
+  <ol>
+    <li><a href="#s1">Why Inheritance &amp; Interfaces Are Critical for Selenium</a></li>
+    <li><a href="#s2">What is Inheritance?</a></li>
+    <li><a href="#s3">extends Keyword — Parent &amp; Child Classes</a></li>
+    <li><a href="#s4">super Keyword — Accessing Parent Members</a></li>
+    <li><a href="#s5">Method Overriding — @Override</a></li>
+    <li><a href="#s6">Inheritance Chain — Multi-Level</a></li>
+    <li><a href="#s7">What is NOT Inherited</a></li>
+    <li><a href="#s8">final Keyword with Classes &amp; Methods</a></li>
+    <li><a href="#s9">Abstract Classes</a></li>
+    <li><a href="#s10">What is an Interface?</a></li>
+    <li><a href="#s11">implements Keyword</a></li>
+    <li><a href="#s12">Interface vs Abstract Class</a></li>
+    <li><a href="#s13">Multiple Interfaces</a></li>
+    <li><a href="#s14">Default Methods in Interfaces (Java 8+)</a></li>
+    <li><a href="#s15">Selenium BaseTest — Real Framework Pattern</a></li>
+    <li><a href="#s16">WebDriver Interface in Selenium</a></li>
+    <li><a href="#s17">Practice Task + Expected Output</a></li>
+    <li><a href="#s18">Common Mistakes</a></li>
+    <li><a href="#s19">End of Day Checklist + Resources</a></li>
+  </ol>
+</div>
+
+<!-- S1 -->
+<div class="section" id="s1">
+  <div class="section-header"><div class="section-num">01</div><h2>Why Inheritance &amp; Interfaces Are Critical for Selenium</h2></div>
+  <div class="hour-badge">&#9200; Hour 1 — Inheritance (60 mins)</div>
+  <p>This is the day Selenium's framework design suddenly makes sense. Every professional Selenium project uses inheritance and interfaces in two specific ways — and you'll understand both by end of day.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Concept</th><th>Selenium Framework Usage</th></tr></thead>
+      <tbody>
+        <tr><td>extends (Inheritance)</td><td><code>LoginTest extends BaseTest</code> — every test class gets browser setup + teardown automatically</td></tr>
+        <tr><td>super()</td><td>BaseTest constructor initializes WebDriver. Child test calls <code>super()</code> to trigger it.</td></tr>
+        <tr><td>@Override</td><td>TestNG's <code>@BeforeMethod</code> / <code>@AfterMethod</code> override base lifecycle methods</td></tr>
+        <tr><td>Abstract class</td><td>BasePage — defines common page methods (waitForElement, getTitle) that every page must have</td></tr>
+        <tr><td>Interface</td><td><code>WebDriver</code> is an interface. ChromeDriver, FirefoxDriver both implement it — so your test works with any browser</td></tr>
+        <tr><td>implements</td><td>Your custom listeners implement TestNG's <code>ITestListener</code> interface for custom reporting</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- S2 -->
+<div class="section" id="s2">
+  <div class="section-header"><div class="section-num">02</div><h2>What is Inheritance?</h2></div>
+  <p>Inheritance lets a <strong>child class automatically get all the fields and methods of a parent class</strong>. You write common code once in the parent — all children get it for free. This is the "Don't Repeat Yourself" (DRY) principle in action.</p>
+  <div class="diagram-wrap">
+    <div class="diagram-title">// Inheritance Hierarchy — Parent passes down to Children</div>
+    <svg viewBox="0 0 700 260" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:700px;display:block;margin:0 auto">
+      <defs>
+        <marker id="inh" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto">
+          <polygon points="0,0 10,5 0,10" fill="none" stroke="#58a6ff" stroke-width="1.5"/>
+        </marker>
+      </defs>
+      <!-- Parent -->
+      <rect x="240" y="10" width="220" height="80" rx="10" fill="#0d1117" stroke="#f0a500" stroke-width="2"/>
+      <rect x="240" y="10" width="220" height="30" rx="10" fill="rgba(240,165,0,0.12)"/>
+      <rect x="240" y="28" width="220" height="12" fill="rgba(240,165,0,0.12)"/>
+      <text x="350" y="30" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#f0a500" font-weight="700">BaseTest (Parent)</text>
+      <text x="252" y="54" font-family="JetBrains Mono,monospace" font-size="10" fill="#3fb950">+ setupBrowser()</text>
+      <text x="252" y="70" font-family="JetBrains Mono,monospace" font-size="10" fill="#3fb950">+ teardown()</text>
+      <text x="252" y="82" font-family="JetBrains Mono,monospace" font-size="10" fill="#3fb950">+ takeScreenshot()</text>
+
+      <!-- Left child -->
+      <line x1="280" y1="90" x2="140" y2="165" stroke="#58a6ff" stroke-width="1.5" marker-end="url(#inh)"/>
+      <rect x="20" y="165" width="200" height="80" rx="10" fill="#0d1117" stroke="#58a6ff" stroke-width="1.5"/>
+      <rect x="20" y="165" width="200" height="28" rx="10" fill="rgba(88,166,255,0.12)"/>
+      <rect x="20" y="181" width="200" height="12" fill="rgba(88,166,255,0.12)"/>
+      <text x="120" y="182" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#58a6ff" font-weight="700">LoginTest (Child)</text>
+      <text x="32" y="207" font-family="JetBrains Mono,monospace" font-size="10" fill="#d2a8ff">+ testValidLogin()</text>
+      <text x="32" y="222" font-family="JetBrains Mono,monospace" font-size="10" fill="#d2a8ff">+ testInvalidLogin()</text>
+      <text x="32" y="238" font-family="JetBrains Mono,monospace" font-size="9" fill="#6e7681">inherits: setup, teardown...</text>
+
+      <!-- Middle child -->
+      <line x1="350" y1="90" x2="350" y2="165" stroke="#58a6ff" stroke-width="1.5" marker-end="url(#inh)"/>
+      <rect x="250" y="165" width="200" height="80" rx="10" fill="#0d1117" stroke="#58a6ff" stroke-width="1.5"/>
+      <rect x="250" y="165" width="200" height="28" rx="10" fill="rgba(88,166,255,0.12)"/>
+      <rect x="250" y="181" width="200" height="12" fill="rgba(88,166,255,0.12)"/>
+      <text x="350" y="182" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#58a6ff" font-weight="700">SearchTest (Child)</text>
+      <text x="262" y="207" font-family="JetBrains Mono,monospace" font-size="10" fill="#d2a8ff">+ testSearchByName()</text>
+      <text x="262" y="222" font-family="JetBrains Mono,monospace" font-size="10" fill="#d2a8ff">+ testSearchById()</text>
+      <text x="262" y="238" font-family="JetBrains Mono,monospace" font-size="9" fill="#6e7681">inherits: setup, teardown...</text>
+
+      <!-- Right child -->
+      <line x1="420" y1="90" x2="560" y2="165" stroke="#58a6ff" stroke-width="1.5" marker-end="url(#inh)"/>
+      <rect x="480" y="165" width="210" height="80" rx="10" fill="#0d1117" stroke="#58a6ff" stroke-width="1.5"/>
+      <rect x="480" y="165" width="210" height="28" rx="10" fill="rgba(88,166,255,0.12)"/>
+      <rect x="480" y="181" width="210" height="12" fill="rgba(88,166,255,0.12)"/>
+      <text x="585" y="182" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#58a6ff" font-weight="700">ReportTest (Child)</text>
+      <text x="492" y="207" font-family="JetBrains Mono,monospace" font-size="10" fill="#d2a8ff">+ testDownloadPDF()</text>
+      <text x="492" y="222" font-family="JetBrains Mono,monospace" font-size="10" fill="#d2a8ff">+ testExportCSV()</text>
+      <text x="492" y="238" font-family="JetBrains Mono,monospace" font-size="9" fill="#6e7681">inherits: setup, teardown...</text>
+
+      <text x="350" y="258" text-anchor="middle" font-family="Sora,sans-serif" font-size="10" fill="#6e7681">All 3 test classes get setupBrowser() and teardown() for FREE — written once in BaseTest</text>
+    </svg>
+  </div>
+</div>
+
+<!-- S3 -->
+<div class="section" id="s3">
+  <div class="section-header"><div class="section-num">03</div><h2>extends Keyword — Parent &amp; Child Classes</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">Inheritance_Basic.java</span></div>
+    <pre><span class="cm">// PARENT CLASS (also called: base class, superclass)</span>
+<span class="kw">public class</span> <span class="nm">Animal</span> {
+    <span class="ty">String</span> <span class="nm">name</span>;
+    <span class="ty">int</span>    <span class="nm">age</span>;
+
+    <span class="kw">public</span> <span class="fn">Animal</span>(<span class="ty">String</span> <span class="nm">name</span>, <span class="ty">int</span> <span class="nm">age</span>) {
+        <span class="kw">this</span>.name <span class="op">=</span> name;
+        <span class="kw">this</span>.age  <span class="op">=</span> age;
+    }
+
+    <span class="kw">public void</span> <span class="fn">eat</span>() {
+        <span class="fn">System.out.println</span>(name <span class="op">+</span> <span class="st">" is eating."</span>);
+    }
+
+    <span class="kw">public void</span> <span class="fn">sleep</span>() {
+        <span class="fn">System.out.println</span>(name <span class="op">+</span> <span class="st">" is sleeping."</span>);
+    }
+}
+
+<span class="cm">// CHILD CLASS (also called: derived class, subclass)</span>
+<span class="cm">// Dog gets ALL of Animal's fields and methods automatically</span>
+<span class="kw">public class</span> <span class="nm">Dog</span> <span class="kw">extends</span> <span class="nm">Animal</span> {
+
+    <span class="ty">String</span> <span class="nm">breed</span>;  <span class="cm">// Dog's own additional field</span>
+
+    <span class="kw">public</span> <span class="fn">Dog</span>(<span class="ty">String</span> <span class="nm">name</span>, <span class="ty">int</span> <span class="nm">age</span>, <span class="ty">String</span> <span class="nm">breed</span>) {
+        <span class="kw">super</span>(name, age);   <span class="cm">// call Animal's constructor first!</span>
+        <span class="kw">this</span>.breed <span class="op">=</span> breed;
+    }
+
+    <span class="kw">public void</span> <span class="fn">bark</span>() {   <span class="cm">// Dog's own method</span>
+        <span class="fn">System.out.println</span>(name <span class="op">+</span> <span class="st">" says: Woof!"</span>);
+    }
+}
+
+<span class="cm">// Using it</span>
+<span class="nm">Dog</span> <span class="nm">d</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">Dog</span>(<span class="st">"Bruno"</span>, <span class="nu">3</span>, <span class="st">"Labrador"</span>);
+d.<span class="fn">eat</span>();    <span class="cm">// ✓ inherited from Animal — Bruno is eating.</span>
+d.<span class="fn">sleep</span>();  <span class="cm">// ✓ inherited from Animal — Bruno is sleeping.</span>
+d.<span class="fn">bark</span>();   <span class="cm">// ✓ Dog's own method — Bruno says: Woof!</span>
+<span class="fn">System.out.println</span>(d.name);   <span class="cm">// ✓ inherited field — Bruno</span>
+<span class="fn">System.out.println</span>(d.breed);  <span class="cm">// ✓ own field — Labrador</span></pre>
+  </div>
+  <div class="callout warn">
+    <span class="callout-icon">&#9889;</span>
+    <div class="callout-body">
+      <div class="callout-title">Java only supports Single Inheritance for classes</div>
+      <p>A class can only <code>extend</code> ONE parent class. <code>class Dog extends Animal, Pet</code> is NOT allowed — compile error. To get behavior from multiple sources, use interfaces (Section 10). This is a fundamental Java rule.</p>
+    </div>
+  </div>
+</div>
+
+<!-- S4 -->
+<div class="section" id="s4">
+  <div class="section-header"><div class="section-num">04</div><h2>super Keyword — Accessing Parent Members</h2></div>
+  <p><code>super</code> refers to the parent class. Three uses: call parent constructor, call parent method, access parent field. You MUST call <code>super()</code> as the FIRST line in a child constructor if the parent has a non-default constructor.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">SuperKeyword.java</span></div>
+    <pre><span class="kw">public class</span> <span class="nm">Vehicle</span> {
+    <span class="ty">String</span> <span class="nm">brand</span>;
+    <span class="ty">int</span>    <span class="nm">speed</span>;
+
+    <span class="kw">public</span> <span class="fn">Vehicle</span>(<span class="ty">String</span> <span class="nm">brand</span>, <span class="ty">int</span> <span class="nm">speed</span>) {
+        <span class="kw">this</span>.brand <span class="op">=</span> brand;
+        <span class="kw">this</span>.speed <span class="op">=</span> speed;
+        <span class="fn">System.out.println</span>(<span class="st">"Vehicle created: "</span> <span class="op">+</span> brand);
+    }
+
+    <span class="kw">public void</span> <span class="fn">describe</span>() {
+        <span class="fn">System.out.println</span>(<span class="st">"Brand: "</span> <span class="op">+</span> brand <span class="op">+</span> <span class="st">" | Speed: "</span> <span class="op">+</span> speed);
+    }
+}
+
+<span class="kw">public class</span> <span class="nm">Car</span> <span class="kw">extends</span> <span class="nm">Vehicle</span> {
+    <span class="ty">int</span> <span class="nm">doors</span>;
+
+    <span class="kw">public</span> <span class="fn">Car</span>(<span class="ty">String</span> <span class="nm">brand</span>, <span class="ty">int</span> <span class="nm">speed</span>, <span class="ty">int</span> <span class="nm">doors</span>) {
+        <span class="kw">super</span>(brand, speed);  <span class="cm">// USE 1: call parent constructor — MUST be first line</span>
+        <span class="kw">this</span>.doors <span class="op">=</span> doors;
+    }
+
+    <span class="kw">public void</span> <span class="fn">describe</span>() {        <span class="cm">// overrides parent's describe()</span>
+        <span class="kw">super</span>.<span class="fn">describe</span>();             <span class="cm">// USE 2: call parent method first</span>
+        <span class="fn">System.out.println</span>(<span class="st">"Doors: "</span> <span class="op">+</span> doors);  <span class="cm">// then add own info</span>
+    }
+}
+
+<span class="nm">Car</span> <span class="nm">c</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">Car</span>(<span class="st">"Toyota"</span>, <span class="nu">180</span>, <span class="nu">4</span>);
+<span class="cm">// Output: Vehicle created: Toyota   (parent constructor ran first)</span>
+c.<span class="fn">describe</span>();
+<span class="cm">// Output: Brand: Toyota | Speed: 180</span>
+<span class="cm">//         Doors: 4</span></pre>
+  </div>
+  <div class="callout note">
+    <span class="callout-icon">&#128204;</span>
+    <div class="callout-body">
+      <div class="callout-title">super() must be the FIRST line in child constructor</div>
+      <p>If you write anything before <code>super()</code>, you get a compile error: "call to super must be first statement in constructor." If you don't call <code>super()</code> at all and the parent has no default constructor, Java also throws a compile error. Always call it first.</p>
+    </div>
+  </div>
+</div>
+
+<!-- S5 -->
+<div class="section" id="s5">
+  <div class="section-header"><div class="section-num">05</div><h2>Method Overriding — @Override</h2></div>
+  <p>A child class can <strong>replace a parent method with its own version</strong>. Same name, same parameters — different body. When you call that method on a child object, the child version runs. The <code>@Override</code> annotation tells Java "I'm intentionally replacing a parent method" — it catches typos.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">MethodOverride.java</span></div>
+    <pre><span class="kw">public class</span> <span class="nm">Shape</span> {
+    <span class="kw">public</span> <span class="ty">double</span> <span class="fn">area</span>() {
+        <span class="kw">return</span> <span class="nu">0</span>;
+    }
+    <span class="kw">public void</span> <span class="fn">draw</span>() {
+        <span class="fn">System.out.println</span>(<span class="st">"Drawing a shape"</span>);
+    }
+}
+
+<span class="kw">public class</span> <span class="nm">Circle</span> <span class="kw">extends</span> <span class="nm">Shape</span> {
+    <span class="ty">double</span> <span class="nm">radius</span>;
+
+    <span class="kw">public</span> <span class="fn">Circle</span>(<span class="ty">double</span> <span class="nm">radius</span>) { <span class="kw">this</span>.radius <span class="op">=</span> radius; }
+
+    <span class="cm">// @Override tells Java: this replaces parent's area()</span>
+    <span class="nm">@Override</span>
+    <span class="kw">public</span> <span class="ty">double</span> <span class="fn">area</span>() {
+        <span class="kw">return</span> Math.PI <span class="op">*</span> radius <span class="op">*</span> radius;
+    }
+
+    <span class="nm">@Override</span>
+    <span class="kw">public void</span> <span class="fn">draw</span>() {
+        <span class="fn">System.out.println</span>(<span class="st">"Drawing a circle with radius "</span> <span class="op">+</span> radius);
+    }
+}
+
+<span class="kw">public class</span> <span class="nm">Rectangle</span> <span class="kw">extends</span> <span class="nm">Shape</span> {
+    <span class="ty">double</span> <span class="nm">w</span>, <span class="nm">h</span>;
+    <span class="kw">public</span> <span class="fn">Rectangle</span>(<span class="ty">double</span> <span class="nm">w</span>, <span class="ty">double</span> <span class="nm">h</span>) { <span class="kw">this</span>.w <span class="op">=</span> w; <span class="kw">this</span>.h <span class="op">=</span> h; }
+
+    <span class="nm">@Override</span>
+    <span class="kw">public</span> <span class="ty">double</span> <span class="fn">area</span>() { <span class="kw">return</span> w <span class="op">*</span> h; }
+
+    <span class="nm">@Override</span>
+    <span class="kw">public void</span> <span class="fn">draw</span>() {
+        <span class="fn">System.out.println</span>(<span class="st">"Drawing rectangle "</span> <span class="op">+</span> w <span class="op">+</span> <span class="st">"x"</span> <span class="op">+</span> h);
+    }
+}
+
+<span class="cm">// Polymorphism: Shape reference holds different object types</span>
+<span class="nm">Shape</span>[] <span class="nm">shapes</span> <span class="op">=</span> { <span class="kw">new</span> <span class="fn">Circle</span>(<span class="nu">5</span>), <span class="kw">new</span> <span class="fn">Rectangle</span>(<span class="nu">4</span>, <span class="nu">6</span>) };
+<span class="kw">for</span> (<span class="nm">Shape</span> <span class="nm">s</span> : shapes) {
+    s.<span class="fn">draw</span>();
+    <span class="fn">System.out.printf</span>(<span class="st">"  Area: %.2f%n"</span>, s.<span class="fn">area</span>());
+}
+<span class="cm">// Drawing a circle with radius 5.0    Area: 78.54</span>
+<span class="cm">// Drawing rectangle 4.0x6.0           Area: 24.00</span></pre>
+  </div>
+  <div class="callout tip">
+    <span class="callout-icon">&#9989;</span>
+    <div class="callout-body">
+      <div class="callout-title">Always write @Override — never skip it</div>
+      <p>Without <code>@Override</code>, if you spell the method name wrong (e.g. <code>Areaa()</code>), Java silently creates a NEW method instead of overriding. With <code>@Override</code>, Java immediately throws a compile error if the method doesn't match any parent method. It's your safety net.</p>
+    </div>
+  </div>
+</div>
+
+<!-- S6 -->
+<div class="section" id="s6">
+  <div class="section-header"><div class="section-num">06</div><h2>Inheritance Chain — Multi-Level</h2></div>
+  <p>A child class can itself be extended. This creates a chain: Grandparent → Parent → Child. Each level inherits from all levels above it.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">MultiLevel.java</span></div>
+    <pre><span class="cm">// Level 1 — Grandparent</span>
+<span class="kw">public class</span> <span class="nm">BaseTest</span> {
+    <span class="kw">public void</span> <span class="fn">setupBrowser</span>() {
+        <span class="fn">System.out.println</span>(<span class="st">"Browser started"</span>);
+    }
+    <span class="kw">public void</span> <span class="fn">teardown</span>() {
+        <span class="fn">System.out.println</span>(<span class="st">"Browser closed"</span>);
+    }
+}
+
+<span class="cm">// Level 2 — Parent (extends BaseTest)</span>
+<span class="kw">public class</span> <span class="nm">LoginPageTest</span> <span class="kw">extends</span> <span class="nm">BaseTest</span> {
+    <span class="kw">public void</span> <span class="fn">navigateToLogin</span>() {
+        <span class="fn">System.out.println</span>(<span class="st">"Navigated to login page"</span>);
+    }
+}
+
+<span class="cm">// Level 3 — Child (extends LoginPageTest, inherits from BOTH)</span>
+<span class="kw">public class</span> <span class="nm">LoginValidTest</span> <span class="kw">extends</span> <span class="nm">LoginPageTest</span> {
+    <span class="kw">public void</span> <span class="fn">testValidLogin</span>() {
+        <span class="fn">setupBrowser</span>();     <span class="cm">// ✓ inherited from BaseTest (2 levels up)</span>
+        <span class="fn">navigateToLogin</span>(); <span class="cm">// ✓ inherited from LoginPageTest (1 level up)</span>
+        <span class="fn">System.out.println</span>(<span class="st">"Running valid login test"</span>);
+        <span class="fn">teardown</span>();         <span class="cm">// ✓ inherited from BaseTest (2 levels up)</span>
+    }
+}
+
+<span class="nm">LoginValidTest</span> <span class="nm">t</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">LoginValidTest</span>();
+t.<span class="fn">testValidLogin</span>();
+<span class="cm">// Browser started</span>
+<span class="cm">// Navigated to login page</span>
+<span class="cm">// Running valid login test</span>
+<span class="cm">// Browser closed</span></pre>
+  </div>
+</div>
+
+<!-- S7 -->
+<div class="section" id="s7">
+  <div class="section-header"><div class="section-num">07</div><h2>What is NOT Inherited</h2></div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Not Inherited</th><th>Reason</th><th>Example</th></tr></thead>
+      <tbody>
+        <tr><td>private fields</td><td>Private = same class only. Child can't touch them directly.</td><td>Use getter from parent.</td></tr>
+        <tr><td>private methods</td><td>Same — private scope stays in declaring class.</td><td>Make it protected if child needs it.</td></tr>
+        <tr><td>Constructors</td><td>Constructors are not inherited. Must call via <code>super()</code>.</td><td><code>super(username, password)</code></td></tr>
+        <tr><td>static members</td><td>Static belongs to the class itself — not passed to children through inheritance.</td><td>Access via <code>ParentClass.staticMethod()</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">PrivateVsProtected.java</span></div>
+    <pre><span class="kw">public class</span> <span class="nm">Parent</span> {
+    <span class="kw">private</span>   <span class="ty">String</span> <span class="nm">secret</span>    <span class="op">=</span> <span class="st">"private"</span>;   <span class="cm">// child CANNOT access</span>
+    <span class="kw">protected</span> <span class="ty">String</span> <span class="nm">shared</span>     <span class="op">=</span> <span class="st">"protected"</span>; <span class="cm">// child CAN access</span>
+    <span class="kw">public</span>    <span class="ty">String</span> <span class="nm">open</span>       <span class="op">=</span> <span class="st">"public"</span>;    <span class="cm">// everyone CAN access</span>
+
+    <span class="kw">protected</span> <span class="ty">String</span> <span class="fn">getSecret</span>() { <span class="kw">return</span> secret; }  <span class="cm">// child can call this</span>
+}
+
+<span class="kw">public class</span> <span class="nm">Child</span> <span class="kw">extends</span> <span class="nm">Parent</span> {
+    <span class="kw">public void</span> <span class="fn">test</span>() {
+        <span class="cm">// System.out.println(secret); ← ERROR: private, cannot access</span>
+        <span class="fn">System.out.println</span>(shared);     <span class="cm">// ✓ protected — accessible</span>
+        <span class="fn">System.out.println</span>(open);       <span class="cm">// ✓ public — accessible</span>
+        <span class="fn">System.out.println</span>(<span class="fn">getSecret</span>()); <span class="cm">// ✓ via protected getter</span>
+    }
+}</pre>
+  </div>
+</div>
+
+<!-- S8 -->
+<div class="section" id="s8">
+  <div class="section-header"><div class="section-num">08</div><h2>final Keyword with Classes &amp; Methods</h2></div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Usage</th><th>Effect</th><th>Example</th></tr></thead>
+      <tbody>
+        <tr><td><code>final class</code></td><td>Cannot be extended — no child classes allowed</td><td><code>final class Utils { }</code></td></tr>
+        <tr><td><code>final method</code></td><td>Cannot be overridden by child classes</td><td><code>public final void setup() { }</code></td></tr>
+        <tr><td><code>final variable</code></td><td>Constant — value cannot change after assignment (Day 1)</td><td><code>final int MAX = 30;</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout note">
+    <span class="callout-icon">&#128204;</span>
+    <div class="callout-body">
+      <div class="callout-title">Selenium uses final for constants</div>
+      <p>In your framework's Config class, all URLs, credentials, and timeout values will be <code>public static final</code>. The <code>String</code> class itself is a <code>final</code> class in Java — you cannot extend it.</p>
+    </div>
+  </div>
+</div>
+
+<!-- S9 -->
+<div class="section" id="s9">
+  <div class="section-header"><div class="section-num">09</div><h2>Abstract Classes</h2></div>
+  <p>An <strong>abstract class</strong> is a class that <strong>cannot be instantiated directly</strong> — you can only create objects from its subclasses. It can have both regular methods (with code) and abstract methods (no code — subclasses must implement them). Used for BasePage in Selenium.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">AbstractClass.java</span></div>
+    <pre><span class="cm">// abstract class — cannot do: new BasePage()</span>
+<span class="kw">public abstract class</span> <span class="nm">BasePage</span> {
+
+    <span class="ty">String</span> <span class="nm">url</span>;
+
+    <span class="kw">public</span> <span class="fn">BasePage</span>(<span class="ty">String</span> <span class="nm">url</span>) { <span class="kw">this</span>.url <span class="op">=</span> url; }
+
+    <span class="cm">// Regular method — has implementation, inherited as-is</span>
+    <span class="kw">public void</span> <span class="fn">navigateTo</span>() {
+        <span class="fn">System.out.println</span>(<span class="st">"Navigating to: "</span> <span class="op">+</span> url);
+    }
+
+    <span class="kw">public void</span> <span class="fn">waitForLoad</span>() {
+        <span class="fn">System.out.println</span>(<span class="st">"Waiting for page to load..."</span>);
+    }
+
+    <span class="cm">// Abstract method — no body! Subclasses MUST implement this</span>
+    <span class="kw">public abstract void</span> <span class="fn">verifyPageLoaded</span>();
+    <span class="kw">public abstract</span> <span class="ty">String</span> <span class="fn">getPageTitle</span>();
+}
+
+<span class="cm">// Concrete class — provides implementations for abstract methods</span>
+<span class="kw">public class</span> <span class="nm">LoginPage</span> <span class="kw">extends</span> <span class="nm">BasePage</span> {
+
+    <span class="kw">public</span> <span class="fn">LoginPage</span>() {
+        <span class="kw">super</span>(<span class="st">"https://opensource-demo.orangehrmlive.com"</span>);
+    }
+
+    <span class="nm">@Override</span>
+    <span class="kw">public void</span> <span class="fn">verifyPageLoaded</span>() {    <span class="cm">// MUST implement abstract method</span>
+        <span class="fn">System.out.println</span>(<span class="st">"Verifying login page elements..."</span>);
+    }
+
+    <span class="nm">@Override</span>
+    <span class="kw">public</span> <span class="ty">String</span> <span class="fn">getPageTitle</span>() {      <span class="cm">// MUST implement abstract method</span>
+        <span class="kw">return</span> <span class="st">"OrangeHRM"</span>;
+    }
+}
+
+<span class="cm">// new BasePage() ← ERROR: cannot instantiate abstract class</span>
+<span class="nm">LoginPage</span> <span class="nm">page</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">LoginPage</span>();  <span class="cm">// ✓ concrete class is fine</span>
+page.<span class="fn">navigateTo</span>();
+page.<span class="fn">waitForLoad</span>();
+page.<span class="fn">verifyPageLoaded</span>();
+<span class="fn">System.out.println</span>(page.<span class="fn">getPageTitle</span>());</pre>
+  </div>
+</div>
+
+<!-- S10 -->
+<div class="section" id="s10">
+  <div class="section-header"><div class="section-num">10</div><h2>What is an Interface?</h2></div>
+  <div class="hour-badge">&#9200; Hour 2 — Interfaces (60 mins)</div>
+  <p>An <strong>interface</strong> is a <strong>contract</strong> — a list of methods that any implementing class MUST provide. It defines WHAT something can do, not HOW it does it. Before Java 8, interfaces had zero implementation code at all.</p>
+  <div class="diagram-wrap">
+    <div class="diagram-title">// Interface = Contract &nbsp;&nbsp; Class = Implementation of Contract</div>
+    <svg viewBox="0 0 700 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:700px;display:block;margin:0 auto">
+      <defs><marker id="imp" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto"><polygon points="0,0 10,5 0,10" fill="none" stroke="#3fb950" stroke-width="1.5" stroke-dasharray="2,1"/></marker></defs>
+      <!-- Interface -->
+      <rect x="240" y="10" width="220" height="100" rx="10" fill="#0d1117" stroke="#d2a8ff" stroke-width="2"/>
+      <rect x="240" y="10" width="220" height="30" rx="10" fill="rgba(210,168,255,0.12)"/>
+      <rect x="240" y="28" width="220" height="12" fill="rgba(210,168,255,0.12)"/>
+      <text x="350" y="28" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#d2a8ff">&lt;&lt;interface&gt;&gt;</text>
+      <text x="350" y="43" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="12" fill="#d2a8ff" font-weight="700">WebDriver</text>
+      <text x="252" y="64" font-family="JetBrains Mono,monospace" font-size="10" fill="#8b949e">get(String url)</text>
+      <text x="252" y="80" font-family="JetBrains Mono,monospace" font-size="10" fill="#8b949e">findElement(By by)</text>
+      <text x="252" y="96" font-family="JetBrains Mono,monospace" font-size="10" fill="#8b949e">getTitle()</text>
+      <text x="252" y="108" font-family="JetBrains Mono,monospace" font-size="10" fill="#8b949e">quit()</text>
+      <text x="350" y="125" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#6e7681">Contract: no implementation</text>
+
+      <!-- Arrows + implementing classes -->
+      <line x1="280" y1="110" x2="120" y2="155" stroke="#3fb950" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#imp)"/>
+      <rect x="20" y="155" width="190" height="38" rx="8" fill="#1e2530" stroke="#3fb950" stroke-width="1.5"/>
+      <text x="115" y="173" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#3fb950">ChromeDriver</text>
+      <text x="115" y="187" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#6e7681">implements WebDriver</text>
+
+      <line x1="350" y1="110" x2="350" y2="155" stroke="#3fb950" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#imp)"/>
+      <rect x="255" y="155" width="190" height="38" rx="8" fill="#1e2530" stroke="#3fb950" stroke-width="1.5"/>
+      <text x="350" y="173" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#3fb950">FirefoxDriver</text>
+      <text x="350" y="187" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#6e7681">implements WebDriver</text>
+
+      <line x1="420" y1="110" x2="580" y2="155" stroke="#3fb950" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#imp)"/>
+      <rect x="490" y="155" width="190" height="38" rx="8" fill="#1e2530" stroke="#3fb950" stroke-width="1.5"/>
+      <text x="585" y="173" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#3fb950">EdgeDriver</text>
+      <text x="585" y="187" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#6e7681">implements WebDriver</text>
+    </svg>
+  </div>
+  <p>Because all three drivers implement <code>WebDriver</code>, your test code can declare <code>WebDriver driver</code> and swap between Chrome, Firefox, or Edge <strong>without changing a single line of test code</strong>. This is the power of interfaces.</p>
+</div>
+
+<!-- S11 -->
+<div class="section" id="s11">
+  <div class="section-header"><div class="section-num">11</div><h2>implements Keyword</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">InterfaceImpl.java</span></div>
+    <pre><span class="cm">// Define the interface (contract)</span>
+<span class="kw">public interface</span> <span class="nm">Testable</span> {
+    <span class="kw">void</span> <span class="fn">setup</span>();         <span class="cm">// no body — implementing class must provide it</span>
+    <span class="kw">void</span> <span class="fn">runTest</span>();
+    <span class="kw">void</span> <span class="fn">teardown</span>();
+    <span class="ty">String</span> <span class="fn">getTestName</span>();
+}
+
+<span class="cm">// Class implements the interface — must provide ALL methods</span>
+<span class="kw">public class</span> <span class="nm">LoginTest</span> <span class="kw">implements</span> <span class="nm">Testable</span> {
+
+    <span class="nm">@Override</span>
+    <span class="kw">public void</span> <span class="fn">setup</span>() {
+        <span class="fn">System.out.println</span>(<span class="st">"Opening Chrome browser..."</span>);
+    }
+
+    <span class="nm">@Override</span>
+    <span class="kw">public void</span> <span class="fn">runTest</span>() {
+        <span class="fn">System.out.println</span>(<span class="st">"Running login test..."</span>);
+    }
+
+    <span class="nm">@Override</span>
+    <span class="kw">public void</span> <span class="fn">teardown</span>() {
+        <span class="fn">System.out.println</span>(<span class="st">"Closing browser..."</span>);
+    }
+
+    <span class="nm">@Override</span>
+    <span class="kw">public</span> <span class="ty">String</span> <span class="fn">getTestName</span>() {
+        <span class="kw">return</span> <span class="st">"Login Module Test"</span>;
+    }
+}
+
+<span class="cm">// Use interface as type — can hold any implementing class</span>
+<span class="nm">Testable</span> <span class="nm">test</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">LoginTest</span>();
+test.<span class="fn">setup</span>();
+test.<span class="fn">runTest</span>();
+test.<span class="fn">teardown</span>();
+<span class="fn">System.out.println</span>(test.<span class="fn">getTestName</span>());</pre>
+  </div>
+  <div class="callout error">
+    <span class="callout-icon">&#128680;</span>
+    <div class="callout-body">
+      <div class="callout-title">Must implement ALL methods from interface</div>
+      <p>If your class says <code>implements Testable</code> but doesn't provide all 4 methods, you get a compile error: "class must implement abstract method." No exceptions — you implement ALL or none (unless it's an abstract class).</p>
+    </div>
+  </div>
+</div>
+
+<!-- S12 -->
+<div class="section" id="s12">
+  <div class="section-header"><div class="section-num">12</div><h2>Interface vs Abstract Class</h2></div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Feature</th><th>Interface</th><th>Abstract Class</th></tr></thead>
+      <tbody>
+        <tr><td>Keyword</td><td><code>interface</code> / <code>implements</code></td><td><code>abstract class</code> / <code>extends</code></td></tr>
+        <tr><td>Multiple?</td><td>A class can implement MANY interfaces</td><td>A class can extend only ONE</td></tr>
+        <tr><td>Has code?</td><td>Only default/static methods (Java 8+)</td><td>Yes — can have fully implemented methods</td></tr>
+        <tr><td>Fields?</td><td>Only public static final constants</td><td>Yes — any type of fields</td></tr>
+        <tr><td>Constructor?</td><td>No</td><td>Yes</td></tr>
+        <tr><td>Use for?</td><td>Defining a capability/contract (CAN do)</td><td>Defining a base type with shared code (IS a)</td></tr>
+        <tr><td>Selenium example</td><td><code>WebDriver</code>, <code>ITestListener</code></td><td><code>BasePage</code>, <code>BaseTest</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- S13 -->
+<div class="section" id="s13">
+  <div class="section-header"><div class="section-num">13</div><h2>Multiple Interfaces</h2></div>
+  <p>A class can implement multiple interfaces — this is how Java gives you "multiple inheritance" safely. Each interface adds a new capability.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">MultipleInterfaces.java</span></div>
+    <pre><span class="kw">public interface</span> <span class="nm">Loggable</span> {
+    <span class="kw">void</span> <span class="fn">logInfo</span>(<span class="ty">String</span> <span class="nm">msg</span>);
+    <span class="kw">void</span> <span class="fn">logError</span>(<span class="ty">String</span> <span class="nm">msg</span>);
+}
+
+<span class="kw">public interface</span> <span class="nm">Screenshottable</span> {
+    <span class="kw">void</span> <span class="fn">takeScreenshot</span>(<span class="ty">String</span> <span class="nm">filename</span>);
+}
+
+<span class="kw">public interface</span> <span class="nm">Reportable</span> {
+    <span class="kw">void</span> <span class="fn">generateReport</span>();
+}
+
+<span class="cm">// One class implements ALL THREE — gets all capabilities</span>
+<span class="kw">public class</span> <span class="nm">TestRunner</span> <span class="kw">implements</span> <span class="nm">Loggable</span>, <span class="nm">Screenshottable</span>, <span class="nm">Reportable</span> {
+
+    <span class="nm">@Override</span>
+    <span class="kw">public void</span> <span class="fn">logInfo</span>(<span class="ty">String</span> <span class="nm">msg</span>)  { <span class="fn">System.out.println</span>(<span class="st">"[INFO] "</span> <span class="op">+</span> msg); }
+
+    <span class="nm">@Override</span>
+    <span class="kw">public void</span> <span class="fn">logError</span>(<span class="ty">String</span> <span class="nm">msg</span>) { <span class="fn">System.out.println</span>(<span class="st">"[ERROR] "</span> <span class="op">+</span> msg); }
+
+    <span class="nm">@Override</span>
+    <span class="kw">public void</span> <span class="fn">takeScreenshot</span>(<span class="ty">String</span> <span class="nm">f</span>) {
+        <span class="fn">System.out.println</span>(<span class="st">"Screenshot saved: "</span> <span class="op">+</span> f);
+    }
+
+    <span class="nm">@Override</span>
+    <span class="kw">public void</span> <span class="fn">generateReport</span>() {
+        <span class="fn">System.out.println</span>(<span class="st">"HTML report generated."</span>);
+    }
+}
+
+<span class="nm">TestRunner</span> <span class="nm">runner</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">TestRunner</span>();
+runner.<span class="fn">logInfo</span>(<span class="st">"Test started"</span>);
+runner.<span class="fn">takeScreenshot</span>(<span class="st">"login_fail.png"</span>);
+runner.<span class="fn">logError</span>(<span class="st">"Element not found"</span>);
+runner.<span class="fn">generateReport</span>();</pre>
+  </div>
+</div>
+
+<!-- S14 -->
+<div class="section" id="s14">
+  <div class="section-header"><div class="section-num">14</div><h2>Default Methods in Interfaces (Java 8+)</h2></div>
+  <p>Since Java 8, interfaces can have <code>default</code> methods — methods with a body that implementing classes can use or override. This lets you add new methods to an interface without breaking all existing implementations.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">DefaultMethod.java</span></div>
+    <pre><span class="kw">public interface</span> <span class="nm">Clickable</span> {
+
+    <span class="cm">// Abstract — implementing class MUST provide this</span>
+    <span class="kw">void</span> <span class="fn">click</span>();
+
+    <span class="cm">// Default — implementing class CAN override, but doesn't have to</span>
+    <span class="kw">default void</span> <span class="fn">clickAndWait</span>(<span class="ty">int</span> <span class="nm">seconds</span>) {
+        <span class="fn">click</span>();   <span class="cm">// calls the abstract method</span>
+        <span class="fn">System.out.println</span>(<span class="st">"Waiting "</span> <span class="op">+</span> seconds <span class="op">+</span> <span class="st">" seconds after click"</span>);
+    }
+
+    <span class="cm">// Static method in interface — called via InterfaceName.method()</span>
+    <span class="kw">static void</span> <span class="fn">printInfo</span>() {
+        <span class="fn">System.out.println</span>(<span class="st">"Clickable interface — use for all clickable elements"</span>);
+    }
+}
+
+<span class="kw">public class</span> <span class="nm">Button</span> <span class="kw">implements</span> <span class="nm">Clickable</span> {
+    <span class="ty">String</span> <span class="nm">label</span>;
+    <span class="kw">public</span> <span class="fn">Button</span>(<span class="ty">String</span> <span class="nm">label</span>) { <span class="kw">this</span>.label <span class="op">=</span> label; }
+
+    <span class="nm">@Override</span>
+    <span class="kw">public void</span> <span class="fn">click</span>() { <span class="fn">System.out.println</span>(<span class="st">"Clicked: "</span> <span class="op">+</span> label); }
+    <span class="cm">// clickAndWait is inherited from interface default — no need to override</span>
+}
+
+<span class="nm">Button</span> <span class="nm">btn</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">Button</span>(<span class="st">"Submit"</span>);
+btn.<span class="fn">click</span>();            <span class="cm">// Clicked: Submit</span>
+btn.<span class="fn">clickAndWait</span>(<span class="nu">2</span>);   <span class="cm">// Clicked: Submit  |  Waiting 2 seconds after click</span>
+Clickable.<span class="fn">printInfo</span>(); <span class="cm">// static method on interface</span></pre>
+  </div>
+</div>
+
+<!-- S15 -->
+<div class="section" id="s15">
+  <div class="section-header"><div class="section-num">15</div><h2>Selenium BaseTest — Real Framework Pattern</h2></div>
+  <p>This is exactly how your test framework will be structured on Day 37+. Study this closely — it combines inheritance, constructors, and the lifecycle pattern used by TestNG.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">BaseTest.java — Your actual framework (Day 37+)</span></div>
+    <pre><span class="cm">// Parent class — written ONCE, used by ALL test classes</span>
+<span class="kw">public class</span> <span class="nm">BaseTest</span> {
+
+    <span class="cm">// WebDriver driver;  ← real Selenium (Day 13+)</span>
+    <span class="ty">String</span> <span class="nm">browser</span>;
+
+    <span class="kw">public</span> <span class="fn">BaseTest</span>(<span class="ty">String</span> <span class="nm">browser</span>) {
+        <span class="kw">this</span>.browser <span class="op">=</span> browser;
+    }
+
+    <span class="cm">// @BeforeMethod in TestNG — runs before EACH test</span>
+    <span class="kw">public void</span> <span class="fn">setUp</span>() {
+        <span class="fn">System.out.println</span>(<span class="st">"[SETUP] Starting "</span> <span class="op">+</span> browser <span class="op">+</span> <span class="st">" browser"</span>);
+        <span class="cm">// driver = new ChromeDriver(); ← Day 11</span>
+    }
+
+    <span class="cm">// @AfterMethod in TestNG — runs after EACH test</span>
+    <span class="kw">public void</span> <span class="fn">tearDown</span>() {
+        <span class="fn">System.out.println</span>(<span class="st">"[TEARDOWN] Closing browser"</span>);
+        <span class="cm">// driver.quit(); ← Day 11</span>
+    }
+
+    <span class="kw">public void</span> <span class="fn">takeScreenshot</span>(<span class="ty">String</span> <span class="nm">name</span>) {
+        <span class="fn">System.out.println</span>(<span class="st">"[SCREENSHOT] Saved: "</span> <span class="op">+</span> name <span class="op">+</span> <span class="st">".png"</span>);
+    }
+}
+
+<span class="cm">// Child class — only has login-specific tests</span>
+<span class="kw">public class</span> <span class="nm">LoginTest</span> <span class="kw">extends</span> <span class="nm">BaseTest</span> {
+
+    <span class="kw">public</span> <span class="fn">LoginTest</span>() {
+        <span class="kw">super</span>(<span class="st">"Chrome"</span>);  <span class="cm">// pass browser to BaseTest</span>
+    }
+
+    <span class="kw">public void</span> <span class="fn">testValidLogin</span>() {
+        <span class="fn">setUp</span>();                   <span class="cm">// inherited</span>
+        <span class="fn">System.out.println</span>(<span class="st">"  → Entering credentials"</span>);
+        <span class="fn">System.out.println</span>(<span class="st">"  → Clicking login"</span>);
+        <span class="fn">System.out.println</span>(<span class="st">"  → Verifying dashboard"</span>);
+        <span class="fn">System.out.println</span>(<span class="st">"  ✓ LOGIN TEST PASSED"</span>);
+        <span class="fn">tearDown</span>();                <span class="cm">// inherited</span>
+    }
+
+    <span class="kw">public void</span> <span class="fn">testInvalidLogin</span>() {
+        <span class="fn">setUp</span>();
+        <span class="fn">System.out.println</span>(<span class="st">"  → Entering wrong password"</span>);
+        <span class="fn">System.out.println</span>(<span class="st">"  → Verifying error message"</span>);
+        <span class="fn">takeScreenshot</span>(<span class="st">"invalid_login_fail"</span>);  <span class="cm">// inherited</span>
+        <span class="fn">System.out.println</span>(<span class="st">"  ✓ INVALID LOGIN TEST PASSED"</span>);
+        <span class="fn">tearDown</span>();
+    }
+}
+
+<span class="cm">// Run it</span>
+<span class="nm">LoginTest</span> <span class="nm">t</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">LoginTest</span>();
+t.<span class="fn">testValidLogin</span>();
+<span class="fn">System.out.println</span>();
+t.<span class="fn">testInvalidLogin</span>();</pre>
+  </div>
+</div>
+
+<!-- S16 -->
+<div class="section" id="s16">
+  <div class="section-header"><div class="section-num">16</div><h2>WebDriver Interface in Selenium</h2></div>
+  <p>This is the most important real-world interface you'll use. Understanding it now means Day 11 (First Selenium Script) will feel natural, not confusing.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">WebDriverInterface.java — Selenium Day 11+ preview</span></div>
+    <pre><span class="cm">// WebDriver is an INTERFACE defined by Selenium</span>
+<span class="cm">// ChromeDriver, FirefoxDriver, EdgeDriver all implement it</span>
+
+<span class="cm">// Day 11 — you'll write this:</span>
+<span class="cm">// WebDriver driver = new ChromeDriver();   ← interface type, ChromeDriver object</span>
+<span class="cm">// WebDriver driver = new FirefoxDriver();  ← SAME variable, different browser</span>
+<span class="cm">// WebDriver driver = new EdgeDriver();     ← swap browsers by changing ONE line</span>
+
+<span class="cm">// Because WebDriver is the type, your test code works with ANY browser:</span>
+<span class="cm">// driver.get("https://site.com");    ← works for chrome, firefox, edge</span>
+<span class="cm">// driver.findElement(By.id("btn")); ← works for all</span>
+<span class="cm">// driver.getTitle();                 ← works for all</span>
+<span class="cm">// driver.quit();                     ← works for all</span>
+
+<span class="cm">// This is EXACTLY the same pattern as:</span>
+<span class="kw">interface</span> <span class="nm">WebDriver</span> {          <span class="cm">// contract</span>
+    <span class="kw">void</span> <span class="fn">get</span>(<span class="ty">String</span> <span class="nm">url</span>);
+    <span class="ty">String</span> <span class="fn">getTitle</span>();
+    <span class="kw">void</span> <span class="fn">quit</span>();
+}
+
+<span class="kw">class</span> <span class="nm">ChromeDriver</span> <span class="kw">implements</span> <span class="nm">WebDriver</span> {   <span class="cm">// chrome implementation</span>
+    <span class="kw">public void</span> <span class="fn">get</span>(<span class="ty">String</span> <span class="nm">url</span>)  { <span class="fn">System.out.println</span>(<span class="st">"Chrome → "</span> <span class="op">+</span> url); }
+    <span class="kw">public</span> <span class="ty">String</span> <span class="fn">getTitle</span>()    { <span class="kw">return</span> <span class="st">"Chrome Title"</span>; }
+    <span class="kw">public void</span> <span class="fn">quit</span>()          { <span class="fn">System.out.println</span>(<span class="st">"Chrome closed"</span>); }
+}
+
+<span class="kw">class</span> <span class="nm">FirefoxDriver</span> <span class="kw">implements</span> <span class="nm">WebDriver</span> {  <span class="cm">// firefox implementation</span>
+    <span class="kw">public void</span> <span class="fn">get</span>(<span class="ty">String</span> <span class="nm">url</span>)  { <span class="fn">System.out.println</span>(<span class="st">"Firefox → "</span> <span class="op">+</span> url); }
+    <span class="kw">public</span> <span class="ty">String</span> <span class="fn">getTitle</span>()    { <span class="kw">return</span> <span class="st">"Firefox Title"</span>; }
+    <span class="kw">public void</span> <span class="fn">quit</span>()          { <span class="fn">System.out.println</span>(<span class="st">"Firefox closed"</span>); }
+}
+
+<span class="cm">// Test works with BOTH — just change the right side</span>
+<span class="nm">WebDriver</span> <span class="nm">driver</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">ChromeDriver</span>();
+driver.<span class="fn">get</span>(<span class="st">"https://orangehrm.com"</span>);  <span class="cm">// Chrome → https://orangehrm.com</span>
+<span class="fn">System.out.println</span>(driver.<span class="fn">getTitle</span>());
+driver.<span class="fn">quit</span>();
+
+driver <span class="op">=</span> <span class="kw">new</span> <span class="fn">FirefoxDriver</span>();        <span class="cm">// swap — test code unchanged!</span>
+driver.<span class="fn">get</span>(<span class="st">"https://orangehrm.com"</span>);  <span class="cm">// Firefox → https://orangehrm.com</span>
+driver.<span class="fn">quit</span>();</pre>
+  </div>
+  <div class="callout purple">
+    <span class="callout-icon">&#127775;</span>
+    <div class="callout-body">
+      <div class="callout-title">You just understood how Selenium's core architecture works</div>
+      <p><code>WebDriver driver = new ChromeDriver()</code> — that single line you'll write 100 times in Phase 2 — is just interface polymorphism. The interface type on the left, the concrete implementation on the right. Today is the day that line stops being magic and starts making sense.</p>
+    </div>
+  </div>
+</div>
+
+<!-- S17 -->
+<div class="section" id="s17">
+  <div class="section-header"><div class="section-num">17</div><h2>Practice Task + Expected Output</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">Day5Practice.java</span></div>
+    <pre><span class="kw">public class</span> <span class="nm">Day5Practice</span> {
+
+    <span class="cm">// ── Interface ────────────────────────────────────────────</span>
+    <span class="kw">interface</span> <span class="nm">TestLifecycle</span> {
+        <span class="kw">void</span> <span class="fn">beforeTest</span>();
+        <span class="kw">void</span> <span class="fn">afterTest</span>();
+        <span class="ty">String</span> <span class="fn">getTestName</span>();
+
+        <span class="kw">default void</span> <span class="fn">runWithLifecycle</span>() {
+            <span class="fn">beforeTest</span>();
+            <span class="fn">System.out.println</span>(<span class="st">"  Running: "</span> <span class="op">+</span> <span class="fn">getTestName</span>());
+            <span class="fn">afterTest</span>();
+        }
+    }
+
+    <span class="cm">// ── Abstract base ────────────────────────────────────────</span>
+    <span class="kw">static abstract class</span> <span class="nm">BaseTest</span> <span class="kw">implements</span> <span class="nm">TestLifecycle</span> {
+        <span class="kw">protected</span> <span class="ty">String</span> <span class="nm">browser</span>;
+        <span class="kw">protected</span> <span class="ty">int</span>    <span class="nm">passCount</span> <span class="op">=</span> <span class="nu">0</span>;
+        <span class="kw">protected</span> <span class="ty">int</span>    <span class="nm">failCount</span> <span class="op">=</span> <span class="nu">0</span>;
+
+        <span class="kw">public</span> <span class="fn">BaseTest</span>(<span class="ty">String</span> <span class="nm">browser</span>) {
+            <span class="kw">this</span>.browser <span class="op">=</span> browser;
+        }
+
+        <span class="nm">@Override</span>
+        <span class="kw">public void</span> <span class="fn">beforeTest</span>() {
+            <span class="fn">System.out.println</span>(<span class="st">"  [SETUP] "</span> <span class="op">+</span> browser <span class="op">+</span> <span class="st">" started"</span>);
+        }
+
+        <span class="nm">@Override</span>
+        <span class="kw">public void</span> <span class="fn">afterTest</span>() {
+            <span class="fn">System.out.println</span>(<span class="st">"  [DONE] Pass:"</span> <span class="op">+</span> passCount <span class="op">+</span> <span class="st">" Fail:"</span> <span class="op">+</span> failCount);
+        }
+
+        <span class="cm">// Abstract — each subclass defines its own steps</span>
+        <span class="kw">public abstract void</span> <span class="fn">executeTests</span>();
+    }
+
+    <span class="cm">// ── Concrete child 1 ─────────────────────────────────────</span>
+    <span class="kw">static class</span> <span class="nm">LoginTest</span> <span class="kw">extends</span> <span class="nm">BaseTest</span> {
+        <span class="kw">public</span> <span class="fn">LoginTest</span>() { <span class="kw">super</span>(<span class="st">"Chrome"</span>); }
+
+        <span class="nm">@Override</span>
+        <span class="kw">public</span> <span class="ty">String</span> <span class="fn">getTestName</span>() { <span class="kw">return</span> <span class="st">"Login Module"</span>; }
+
+        <span class="nm">@Override</span>
+        <span class="kw">public void</span> <span class="fn">executeTests</span>() {
+            <span class="fn">System.out.println</span>(<span class="st">"    ✓ Valid login"</span>);       passCount<span class="op">++</span>;
+            <span class="fn">System.out.println</span>(<span class="st">"    ✗ Wrong password"</span>);     failCount<span class="op">++</span>;
+            <span class="fn">System.out.println</span>(<span class="st">"    ✓ Remember me"</span>);        passCount<span class="op">++</span>;
+        }
+    }
+
+    <span class="cm">// ── Concrete child 2 ─────────────────────────────────────</span>
+    <span class="kw">static class</span> <span class="nm">SearchTest</span> <span class="kw">extends</span> <span class="nm">BaseTest</span> {
+        <span class="kw">public</span> <span class="fn">SearchTest</span>() { <span class="kw">super</span>(<span class="st">"Firefox"</span>); }
+
+        <span class="nm">@Override</span>
+        <span class="kw">public</span> <span class="ty">String</span> <span class="fn">getTestName</span>() { <span class="kw">return</span> <span class="st">"Search Module"</span>; }
+
+        <span class="nm">@Override</span>
+        <span class="kw">public void</span> <span class="fn">executeTests</span>() {
+            <span class="fn">System.out.println</span>(<span class="st">"    ✓ Search by name"</span>);    passCount<span class="op">++</span>;
+            <span class="fn">System.out.println</span>(<span class="st">"    ✓ Search by ID"</span>);      passCount<span class="op">++</span>;
+            <span class="fn">System.out.println</span>(<span class="st">"    ✗ No results found"</span>);  failCount<span class="op">++</span>;
+        }
+    }
+
+    <span class="cm">// ── WebDriver interface demo ──────────────────────────────</span>
+    <span class="kw">interface</span> <span class="nm">WebDriver</span> {
+        <span class="kw">void</span> <span class="fn">get</span>(<span class="ty">String</span> <span class="nm">url</span>);
+        <span class="ty">String</span> <span class="fn">getBrowser</span>();
+        <span class="kw">void</span> <span class="fn">quit</span>();
+    }
+
+    <span class="kw">static class</span> <span class="nm">ChromeDriver</span> <span class="kw">implements</span> <span class="nm">WebDriver</span> {
+        <span class="kw">public void</span> <span class="fn">get</span>(<span class="ty">String</span> <span class="nm">url</span>) { <span class="fn">System.out.println</span>(<span class="st">"  Chrome → "</span> <span class="op">+</span> url); }
+        <span class="kw">public</span> <span class="ty">String</span> <span class="fn">getBrowser</span>()  { <span class="kw">return</span> <span class="st">"Chrome"</span>; }
+        <span class="kw">public void</span> <span class="fn">quit</span>()         { <span class="fn">System.out.println</span>(<span class="st">"  Chrome closed"</span>); }
+    }
+
+    <span class="kw">static class</span> <span class="nm">FirefoxDriver</span> <span class="kw">implements</span> <span class="nm">WebDriver</span> {
+        <span class="kw">public void</span> <span class="fn">get</span>(<span class="ty">String</span> <span class="nm">url</span>) { <span class="fn">System.out.println</span>(<span class="st">"  Firefox → "</span> <span class="op">+</span> url); }
+        <span class="kw">public</span> <span class="ty">String</span> <span class="fn">getBrowser</span>()  { <span class="kw">return</span> <span class="st">"Firefox"</span>; }
+        <span class="kw">public void</span> <span class="fn">quit</span>()         { <span class="fn">System.out.println</span>(<span class="st">"  Firefox closed"</span>); }
+    }
+
+    <span class="cm">// ── MAIN ─────────────────────────────────────────────────</span>
+    <span class="kw">public static void</span> <span class="fn">main</span>(<span class="ty">String</span>[] args) {
+
+        <span class="fn">System.out.println</span>(<span class="st">"====== TEST SUITE RUN ======"</span>);
+
+        <span class="nm">BaseTest</span>[] <span class="nm">tests</span> <span class="op">=</span> { <span class="kw">new</span> <span class="fn">LoginTest</span>(), <span class="kw">new</span> <span class="fn">SearchTest</span>() };
+        <span class="kw">for</span> (<span class="nm">BaseTest</span> <span class="nm">t</span> : tests) {
+            t.<span class="fn">runWithLifecycle</span>();   <span class="cm">// default method from interface</span>
+            t.<span class="fn">executeTests</span>();      <span class="cm">// abstract method — each class does its own</span>
+            t.<span class="fn">afterTest</span>();          <span class="cm">// overridden from BaseTest</span>
+            <span class="fn">System.out.println</span>();
+        }
+
+        <span class="fn">System.out.println</span>(<span class="st">"====== WEBDRIVER DEMO ======"</span>);
+        <span class="nm">WebDriver</span>[] <span class="nm">drivers</span> <span class="op">=</span> { <span class="kw">new</span> <span class="fn">ChromeDriver</span>(), <span class="kw">new</span> <span class="fn">FirefoxDriver</span>() };
+        <span class="kw">for</span> (<span class="nm">WebDriver</span> <span class="nm">d</span> : drivers) {
+            <span class="fn">System.out.println</span>(<span class="st">"Using: "</span> <span class="op">+</span> d.<span class="fn">getBrowser</span>());
+            d.<span class="fn">get</span>(<span class="st">"https://orangehrm.com"</span>);
+            d.<span class="fn">quit</span>();
+        }
+    }
+}</pre>
+  </div>
+  <h3>Expected Output</h3>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Output</span><span class="code-file">Console</span></div>
+    <pre>====== TEST SUITE RUN ======
+  [SETUP] Chrome started
+  Running: Login Module
+    ✓ Valid login
+    ✗ Wrong password
+    ✓ Remember me
+  [DONE] Pass:2 Fail:1
+
+  [SETUP] Firefox started
+  Running: Search Module
+    ✓ Search by name
+    ✓ Search by ID
+    ✗ No results found
+  [DONE] Pass:2 Fail:1
+
+====== WEBDRIVER DEMO ======
+Using: Chrome
+  Chrome → https://orangehrm.com
+  Chrome closed
+Using: Firefox
+  Firefox → https://orangehrm.com
+  Firefox closed</pre>
+  </div>
+  <div class="callout purple">
+    <span class="callout-icon">&#127919;</span>
+    <div class="callout-body">
+      <div class="callout-title">Extension Challenge</div>
+      <p>Add an <code>EdgeDriver</code> class that implements <code>WebDriver</code> and add it to the drivers array. Also add a 3rd test class <code>LogoutTest extends BaseTest</code> with its own test steps and add it to the tests array. Everything should work without changing main() significantly.</p>
+    </div>
+  </div>
+</div>
+
+<!-- S18 -->
+<div class="section" id="s18">
+  <div class="section-header"><div class="section-num">18</div><h2>Common Mistakes</h2></div>
+  <div class="mistake-grid">
+    <div class="mistake-card"><div class="mt">&#10060; extends multiple classes</div><p><code>class Dog extends Animal, Pet</code> — NOT allowed. Java only supports single class inheritance. Use interfaces for multiple behaviors.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; Forgetting super() in child</div><p>If parent has a constructor with parameters and child doesn't call <code>super()</code>, compile error. Always call <code>super(args)</code> as first line.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; Overriding private method</div><p>Private methods can't be overridden — child creates a NEW method with same name instead. Use <code>protected</code> if child needs to override it.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; Not implementing all interface methods</div><p>If you implement an interface and miss any method, you get compile error unless the class is declared abstract.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; Calling super() mid-method</div><p><code>super()</code> must be the VERY FIRST line in a constructor. Putting it after any other statement = compile error.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; Instantiating abstract class</div><p><code>new BasePage()</code> when BasePage is abstract — compile error. You can only instantiate concrete subclasses.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; Typo in @Override method</div><p>Without <code>@Override</code>, a typo creates a new method silently. Always use <code>@Override</code> so Java catches mismatches immediately.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; Interface fields aren't mutable</div><p>All fields in an interface are implicitly <code>public static final</code>. You can't have regular instance fields in an interface — only constants.</p></div>
+  </div>
+</div>
+
+<!-- S19 -->
+<div class="section" id="s19">
+  <div class="section-header"><div class="section-num">19</div><h2>End of Day Checklist + Resources</h2></div>
+  <div class="checklist">
+    <div class="checklist-title">&#10022; End of Day 5 Checklist</div>
+    <div class="check-item"><div class="check-box"></div>I can write a parent class and a child class using extends</div>
+    <div class="check-item"><div class="check-box"></div>I know when and how to use super() in a child constructor</div>
+    <div class="check-item"><div class="check-box"></div>I can override a parent method using @Override correctly</div>
+    <div class="check-item"><div class="check-box"></div>I understand protected vs private and what child classes can access</div>
+    <div class="check-item"><div class="check-box"></div>I can write an abstract class with both concrete and abstract methods</div>
+    <div class="check-item"><div class="check-box"></div>I can write an interface and implement it in a class</div>
+    <div class="check-item"><div class="check-box"></div>I know the difference between interface (contract) and abstract class (partial impl)</div>
+    <div class="check-item"><div class="check-box"></div>I can implement multiple interfaces on one class</div>
+    <div class="check-item"><div class="check-box"></div>I understand why WebDriver in Selenium is an interface</div>
+    <div class="check-item"><div class="check-box"></div>I can explain how BaseTest + LoginTest extends BaseTest works in a framework</div>
+    <div class="check-item"><div class="check-box"></div>Practice task completed — both suite run + WebDriver demo output match</div>
+  </div>
+  <h3>Resources for Today</h3>
+  <ul class="resource-list">
+    <li><span>&#127909;</span><strong>YouTube:&nbsp;</strong><a href="https://youtube.com/@KunalKushwaha" target="_blank">Kunal Kushwaha — Java Episodes 11, 12 (Inheritance + Interfaces)</a> &nbsp;<span style="color:var(--muted);font-size:12px">Best free explanation of these concepts with real examples.</span></li>
+    <li><span>&#128214;</span><strong>Docs:&nbsp;</strong><a href="https://docs.oracle.com/javase/tutorial/java/IandI/index.html" target="_blank">Oracle Java — Interfaces and Inheritance</a> &nbsp;<span style="color:var(--muted);font-size:12px">Official tutorial covering everything from today in depth.</span></li>
+    <li><span>&#127947;</span><strong>Practice:&nbsp;</strong><a href="https://exercism.org/tracks/java" target="_blank">Exercism Java — "Need for Speed" exercise</a> &nbsp;<span style="color:var(--muted);font-size:12px">Forces you to use inheritance with a parent class and overriding.</span></li>
+  </ul>
+  <div class="callout tip">
+    <span class="callout-icon">&#128640;</span>
+    <div class="callout-body">
+      <div class="callout-title">Day 6 Preview — Collections (List &amp; HashMap)</div>
+      <p>Tomorrow: <strong>ArrayList</strong> and <strong>HashMap</strong> — the dynamic versions of arrays that can grow, shrink, and search. In Selenium, <code>List&lt;WebElement&gt;</code> is what <code>findElements()</code> returns. You'll use it constantly from Day 14 onwards. One more day of Java, then Selenium starts on Day 9.</p>
+    </div>
+  </div>
+</div>
+
+</div>
+<div class="footer">
+  <span>Day 5 of 65</span> &nbsp;&middot;&nbsp; Selenium + Java Automation Roadmap &nbsp;&middot;&nbsp; Phase 1 &mdash; Foundation &nbsp;&middot;&nbsp; <span>Next: Day 6 &mdash; Collections: List &amp; HashMap</span>
+</div>
+</body>
+</html>

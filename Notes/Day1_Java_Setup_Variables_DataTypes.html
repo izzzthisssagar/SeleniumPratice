@@ -1,0 +1,1700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 1 — Java Setup + Variables & Data Types</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Sora:wght@300;400;500;600;700;800&display=swap');
+
+  :root {
+    --bg:        #0d1117;
+    --bg2:       #161b22;
+    --bg3:       #1e2530;
+    --border:    #30363d;
+    --accent:    #f0a500;
+    --accent2:   #58a6ff;
+    --accent3:   #3fb950;
+    --accent4:   #ff7b72;
+    --accent5:   #d2a8ff;
+    --text:      #e6edf3;
+    --textmuted: #8b949e;
+    --code-bg:   #0d1117;
+    --tag-bg:    #1c2a3a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Sora', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.75;
+    font-size: 15px;
+  }
+
+  /* ─── HEADER ─────────────────────────────────────────────── */
+  .hero {
+    background: linear-gradient(135deg, #0d1117 0%, #161b22 60%, #1a2332 100%);
+    border-bottom: 2px solid var(--accent);
+    padding: 48px 40px 36px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; top: 0; right: 0;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(240,165,0,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-tag {
+    display: inline-block;
+    background: rgba(240,165,0,0.12);
+    border: 1px solid rgba(240,165,0,0.3);
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 16px;
+  }
+  .hero h1 {
+    font-size: 34px;
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 10px;
+  }
+  .hero h1 span { color: var(--accent); }
+  .hero-sub {
+    color: var(--textmuted);
+    font-size: 14px;
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-top: 16px;
+  }
+  .hero-sub span {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); display: inline-block; }
+
+  /* ─── LAYOUT ──────────────────────────────────────────────── */
+  .container { max-width: 980px; margin: 0 auto; padding: 40px 32px 80px; }
+
+  /* ─── TABLE OF CONTENTS ──────────────────────────────────── */
+  .toc {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent2);
+    border-radius: 8px;
+    padding: 24px 28px;
+    margin-bottom: 48px;
+  }
+  .toc-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent2);
+    margin-bottom: 14px;
+  }
+  .toc ol { padding-left: 20px; }
+  .toc li { margin-bottom: 6px; }
+  .toc a { color: var(--textmuted); text-decoration: none; font-size: 14px; transition: color 0.2s; }
+  .toc a:hover { color: var(--accent); }
+
+  /* ─── SECTION ─────────────────────────────────────────────── */
+  .section { margin-bottom: 56px; }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 24px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-num {
+    background: var(--accent);
+    color: #000;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 12px;
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .section h2 {
+    font-size: 22px;
+    font-weight: 700;
+  }
+
+  h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--accent2);
+    margin: 28px 0 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  h3::before {
+    content: '▸';
+    color: var(--accent);
+    font-size: 12px;
+  }
+
+  p { color: var(--textmuted); margin-bottom: 14px; line-height: 1.8; }
+  strong { color: var(--text); font-weight: 600; }
+
+  /* ─── CODE ────────────────────────────────────────────────── */
+  .code-block {
+    background: #010409;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin: 20px 0;
+    overflow: hidden;
+  }
+  .code-header {
+    background: var(--bg2);
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+  }
+  .code-lang {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  .code-file {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--textmuted);
+  }
+  pre {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.85;
+    padding: 20px 20px;
+    overflow-x: auto;
+    color: #e6edf3;
+  }
+
+  /* syntax highlight classes */
+  .kw { color: #ff7b72; font-weight: 500; }   /* keywords */
+  .ty { color: #ffa657; }                       /* types */
+  .st { color: #a5d6ff; }                       /* strings */
+  .cm { color: #6e7681; font-style: italic; }   /* comments */
+  .nm { color: #79c0ff; }                       /* names/vars */
+  .nu { color: #79c0ff; }                       /* numbers */
+  .fn { color: #d2a8ff; }                       /* functions */
+  .op { color: #ff7b72; }                       /* operators */
+
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    background: rgba(240,165,0,0.1);
+    border: 1px solid rgba(240,165,0,0.2);
+    color: var(--accent);
+    padding: 1px 7px;
+    border-radius: 4px;
+  }
+
+  /* ─── CALLOUT BOXES ───────────────────────────────────────── */
+  .callout {
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 20px 0;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .callout-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+  .callout-body { flex: 1; }
+  .callout-title { font-weight: 700; font-size: 13px; margin-bottom: 4px; }
+  .callout p { margin-bottom: 0; font-size: 13.5px; }
+
+  .callout.note    { background: rgba(88,166,255,0.07); border-left: 3px solid var(--accent2); }
+  .callout.note .callout-title { color: var(--accent2); }
+  .callout.tip     { background: rgba(63,185,80,0.07);  border-left: 3px solid var(--accent3); }
+  .callout.tip .callout-title { color: var(--accent3); }
+  .callout.warn    { background: rgba(240,165,0,0.07);  border-left: 3px solid var(--accent); }
+  .callout.warn .callout-title { color: var(--accent); }
+  .callout.error   { background: rgba(255,123,114,0.07); border-left: 3px solid var(--accent4); }
+  .callout.error .callout-title { color: var(--accent4); }
+  .callout.purple  { background: rgba(210,168,255,0.07); border-left: 3px solid var(--accent5); }
+  .callout.purple .callout-title { color: var(--accent5); }
+
+  /* ─── TABLES ──────────────────────────────────────────────── */
+  .table-wrap { overflow-x: auto; margin: 20px 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  thead tr { background: var(--bg2); border-bottom: 2px solid var(--accent); }
+  th { padding: 12px 16px; text-align: left; font-weight: 700; font-size: 12px;
+       letter-spacing: 0.5px; text-transform: uppercase; color: var(--accent); }
+  td { padding: 11px 16px; border-bottom: 1px solid var(--border); color: var(--textmuted); }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+  td:first-child { font-family: 'JetBrains Mono', monospace; color: var(--accent2); font-size: 13px; }
+
+  /* ─── DIAGRAM ─────────────────────────────────────────────── */
+  .diagram-wrap {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px 24px;
+    margin: 24px 0;
+    overflow: hidden;
+  }
+  .diagram-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--textmuted);
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  /* ─── MEMORY DIAGRAM ──────────────────────────────────────── */
+  .memory-grid {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 20px 0;
+  }
+  .memory-cell {
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    min-width: 140px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .memory-cell:hover { border-color: var(--accent); }
+  .memory-cell-type {
+    background: var(--bg3);
+    padding: 5px 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--accent4);
+    letter-spacing: 1px;
+    border-bottom: 1px solid var(--border);
+  }
+  .memory-cell-name {
+    padding: 6px 10px 2px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--accent2);
+    font-weight: 600;
+  }
+  .memory-cell-value {
+    padding: 2px 10px 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent3);
+  }
+  .memory-cell-addr {
+    padding: 4px 10px 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--textmuted);
+    border-top: 1px solid var(--border);
+    margin-top: 2px;
+  }
+
+  /* ─── CHECKLIST ───────────────────────────────────────────── */
+  .checklist {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px 28px;
+    margin: 24px 0;
+  }
+  .checklist-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--accent3);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+  .check-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 9px 0;
+    border-bottom: 1px solid rgba(48,54,61,0.5);
+    font-size: 14px;
+    color: var(--textmuted);
+  }
+  .check-item:last-child { border-bottom: none; }
+  .check-box {
+    width: 18px; height: 18px;
+    border: 2px solid var(--accent3);
+    border-radius: 4px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  /* ─── HOUR BADGE ──────────────────────────────────────────── */
+  .hour-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(240,165,0,0.1);
+    border: 1px solid rgba(240,165,0,0.25);
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 5px 14px;
+    border-radius: 20px;
+    margin-bottom: 18px;
+    margin-top: 30px;
+  }
+
+  /* ─── MISTAKE CARDS ───────────────────────────────────────── */
+  .mistake-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin: 20px 0; }
+  .mistake-card {
+    background: rgba(255,123,114,0.05);
+    border: 1px solid rgba(255,123,114,0.2);
+    border-radius: 8px;
+    padding: 16px;
+  }
+  .mistake-card .mistake-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--accent4);
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .mistake-card p { font-size: 13px; margin: 0; }
+
+  /* ─── STEP LIST ───────────────────────────────────────────── */
+  .step-list { list-style: none; padding: 0; margin: 16px 0; }
+  .step-list li {
+    display: flex;
+    gap: 14px;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(48,54,61,0.5);
+    align-items: flex-start;
+  }
+  .step-list li:last-child { border-bottom: none; }
+  .step-num {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    width: 26px; height: 26px;
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .step-content { flex: 1; }
+  .step-content strong { display: block; color: var(--text); font-size: 14px; margin-bottom: 3px; }
+  .step-content span { font-size: 13px; color: var(--textmuted); }
+
+  /* ─── RESOURCES ───────────────────────────────────────────── */
+  .resource-list { list-style: none; padding: 0; margin: 12px 0; }
+  .resource-list li {
+    padding: 10px 14px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    margin-bottom: 8px;
+    font-size: 13.5px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .resource-list li a { color: var(--accent2); text-decoration: none; }
+  .resource-list li a:hover { text-decoration: underline; }
+  .res-icon { font-size: 16px; }
+
+  /* ─── TAG PILLS ───────────────────────────────────────────── */
+  .tag {
+    display: inline-block;
+    background: var(--tag-bg);
+    border: 1px solid var(--border);
+    color: var(--accent2);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 2px 10px;
+    border-radius: 12px;
+    margin: 3px 3px 3px 0;
+  }
+
+  /* ─── DIVIDER ─────────────────────────────────────────────── */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 40px 0;
+  }
+
+  /* ─── FOOTER ──────────────────────────────────────────────── */
+  .footer {
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+    padding: 24px 40px;
+    text-align: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--textmuted);
+  }
+  .footer span { color: var(--accent); }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  @media (max-width: 640px) {
+    .hero { padding: 32px 20px 24px; }
+    .hero h1 { font-size: 24px; }
+    .container { padding: 24px 16px 60px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--  HERO                                                        -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="hero">
+  <div class="hero-tag">Phase 1 · Day 1 of 65</div>
+  <h1>Java Setup + <span>Variables</span> &amp; Data Types</h1>
+  <div class="hero-sub">
+    <span><span class="dot"></span> 2 Hours</span>
+    <span><span class="dot"></span> Selenium + Java Track</span>
+    <span><span class="dot"></span> Complete Beginner</span>
+    <span><span class="dot"></span> Foundation Phase</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--  MAIN CONTENT                                               -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="container">
+
+  <!-- TABLE OF CONTENTS -->
+  <div class="toc">
+    <div class="toc-title">// Table of Contents</div>
+    <ol>
+      <li><a href="#s1">What is Java? — The Big Picture</a></li>
+      <li><a href="#s2">JDK, JRE &amp; JVM — Architecture</a></li>
+      <li><a href="#s3">How Java Code Runs — Compile to Execute</a></li>
+      <li><a href="#s4">Environment Setup (JDK + IntelliJ)</a></li>
+      <li><a href="#s5">Anatomy of a Java Program</a></li>
+      <li><a href="#s6">Variables — What They Are &amp; How Memory Works</a></li>
+      <li><a href="#s7">Primitive Data Types (All 8)</a></li>
+      <li><a href="#s8">String — The Non-Primitive You Must Know</a></li>
+      <li><a href="#s9">Type Casting — Implicit &amp; Explicit</a></li>
+      <li><a href="#s10">Naming Conventions &amp; Best Practices</a></li>
+      <li><a href="#s11">Constants — final Keyword</a></li>
+      <li><a href="#s12">Comments in Java</a></li>
+      <li><a href="#s13">Print Statements &amp; String Formatting</a></li>
+      <li><a href="#s14">Practice Task + Expected Output</a></li>
+      <li><a href="#s15">Common Mistakes</a></li>
+      <li><a href="#s16">End of Day Checklist + Resources</a></li>
+    </ol>
+  </div>
+
+  <!-- ──────────────────────────────────────────────────────── -->
+  <!-- SECTION 1: WHAT IS JAVA                                  -->
+  <!-- ──────────────────────────────────────────────────────── -->
+  <div class="section" id="s1">
+    <div class="section-header">
+      <div class="section-num">01</div>
+      <h2>What is Java? — The Big Picture</h2>
+    </div>
+
+    <p>Java is a <strong>high-level, object-oriented, platform-independent programming language</strong> created by James Gosling at Sun Microsystems in 1995. Today it is owned by Oracle.</p>
+
+    <p>In the world of test automation, <strong>Java is the #1 language used with Selenium WebDriver</strong> in enterprise environments — especially in Nepal, India, and globally. Most QA job descriptions that mention Selenium also expect Java.</p>
+
+    <h3>Why Java for Automation?</h3>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Reason</th><th>What it means for you</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Most used with Selenium</td><td>Selenium was built in Java. Most documentation and tutorials are Java-first.</td></tr>
+          <tr><td>Strongly typed</td><td>Catches errors at compile time, not at runtime. Safer test code.</td></tr>
+          <tr><td>OOP support</td><td>Page Object Model (POM) pattern relies completely on OOP concepts.</td></tr>
+          <tr><td>Large ecosystem</td><td>Maven, TestNG, JUnit, Allure, ExtentReports — all Java-native.</td></tr>
+          <tr><td>Job market</td><td>Nepal's top IT companies (Leapfrog, Cotiviti) use Java-Selenium extensively.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout note">
+      <span class="callout-icon">💡</span>
+      <div class="callout-body">
+        <div class="callout-title">Java vs Other Languages for Selenium</div>
+        <p>Python is simpler to learn but Java dominates in enterprise QA. Since your goal is jobs at companies like Leapfrog and Cotiviti, Java is the correct choice. Stick with it.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ──────────────────────────────────────────────────────── -->
+  <!-- SECTION 2: JDK JRE JVM                                   -->
+  <!-- ──────────────────────────────────────────────────────── -->
+  <div class="section" id="s2">
+    <div class="section-header">
+      <div class="section-num">02</div>
+      <h2>JDK, JRE &amp; JVM — Architecture</h2>
+    </div>
+
+    <p>Before you write a single line of code, you must understand <strong>three terms</strong> that you will hear in every Java job interview. They are nested inside each other like Russian dolls.</p>
+
+    <!-- SVG DIAGRAM: JDK → JRE → JVM -->
+    <div class="diagram-wrap">
+      <div class="diagram-title">// JDK · JRE · JVM — Nested Architecture</div>
+      <svg viewBox="0 0 720 340" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:720px;display:block;margin:0 auto">
+        <defs>
+          <linearGradient id="jdkGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#f0a500" stop-opacity="0.12"/>
+            <stop offset="100%" stop-color="#f0a500" stop-opacity="0.04"/>
+          </linearGradient>
+          <linearGradient id="jreGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#58a6ff" stop-opacity="0.14"/>
+            <stop offset="100%" stop-color="#58a6ff" stop-opacity="0.05"/>
+          </linearGradient>
+          <linearGradient id="jvmGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#3fb950" stop-opacity="0.16"/>
+            <stop offset="100%" stop-color="#3fb950" stop-opacity="0.06"/>
+          </linearGradient>
+        </defs>
+        <!-- JDK outer box -->
+        <rect x="20" y="20" width="680" height="300" rx="14" fill="url(#jdkGrad)" stroke="#f0a500" stroke-width="1.5" stroke-dasharray="5,3"/>
+        <text x="40" y="46" font-family="JetBrains Mono,monospace" font-size="13" font-weight="700" fill="#f0a500">JDK — Java Development Kit</text>
+        <text x="40" y="62" font-family="Sora,sans-serif" font-size="11" fill="#8b949e">Everything a developer needs to write, compile and run Java code</text>
+
+        <!-- JRE box -->
+        <rect x="40" y="78" width="520" height="222" rx="10" fill="url(#jreGrad)" stroke="#58a6ff" stroke-width="1.5" stroke-dasharray="5,3"/>
+        <text x="58" y="100" font-family="JetBrains Mono,monospace" font-size="12" font-weight="700" fill="#58a6ff">JRE — Java Runtime Environment</text>
+        <text x="58" y="115" font-family="Sora,sans-serif" font-size="11" fill="#8b949e">Everything needed to RUN (not write) Java programs</text>
+
+        <!-- JVM box -->
+        <rect x="58" y="128" width="340" height="152" rx="8" fill="url(#jvmGrad)" stroke="#3fb950" stroke-width="1.5"/>
+        <text x="76" y="150" font-family="JetBrains Mono,monospace" font-size="12" font-weight="700" fill="#3fb950">JVM — Java Virtual Machine</text>
+        <text x="76" y="165" font-family="Sora,sans-serif" font-size="10" fill="#8b949e">The engine that executes bytecode</text>
+
+        <!-- JVM internals -->
+        <rect x="74" y="175" width="100" height="38" rx="5" fill="#0d1117" stroke="#30363d"/>
+        <text x="84" y="191" font-family="JetBrains Mono,monospace" font-size="9" fill="#d2a8ff">Class Loader</text>
+        <text x="84" y="204" font-family="Sora,sans-serif" font-size="8.5" fill="#6e7681">Loads .class files</text>
+
+        <rect x="186" y="175" width="100" height="38" rx="5" fill="#0d1117" stroke="#30363d"/>
+        <text x="196" y="191" font-family="JetBrains Mono,monospace" font-size="9" fill="#d2a8ff">Memory Area</text>
+        <text x="196" y="204" font-family="Sora,sans-serif" font-size="8.5" fill="#6e7681">Heap, Stack, etc.</text>
+
+        <rect x="298" y="175" width="90" height="38" rx="5" fill="#0d1117" stroke="#30363d"/>
+        <text x="308" y="191" font-family="JetBrains Mono,monospace" font-size="9" fill="#d2a8ff">Exec Engine</text>
+        <text x="308" y="204" font-family="Sora,sans-serif" font-size="8.5" fill="#6e7681">Runs bytecode</text>
+
+        <!-- JRE libraries -->
+        <rect x="74" y="228" width="310" height="30" rx="5" fill="#0d1117" stroke="#30363d"/>
+        <text x="84" y="248" font-family="JetBrains Mono,monospace" font-size="9" fill="#58a6ff">Core Libraries: </text>
+        <text x="162" y="248" font-family="Sora,sans-serif" font-size="9" fill="#8b949e">java.lang, java.util, java.io, java.net ...</text>
+
+        <!-- JDK-only tools (right side) -->
+        <rect x="580" y="78" width="104" height="222" rx="8" fill="#0d1117" stroke="#30363d"/>
+        <text x="600" y="105" font-family="JetBrains Mono,monospace" font-size="9" font-weight="700" fill="#f0a500">JDK Only</text>
+        <text x="592" y="123" font-family="JetBrains Mono,monospace" font-size="9" fill="#d2a8ff">javac</text>
+        <text x="592" y="136" font-family="Sora,sans-serif" font-size="8.5" fill="#6e7681">compiler</text>
+        <line x1="590" y1="142" x2="672" y2="142" stroke="#30363d" stroke-width="1"/>
+        <text x="592" y="160" font-family="JetBrains Mono,monospace" font-size="9" fill="#d2a8ff">javadoc</text>
+        <text x="592" y="173" font-family="Sora,sans-serif" font-size="8.5" fill="#6e7681">doc gen</text>
+        <line x1="590" y1="179" x2="672" y2="179" stroke="#30363d" stroke-width="1"/>
+        <text x="592" y="197" font-family="JetBrains Mono,monospace" font-size="9" fill="#d2a8ff">jdb</text>
+        <text x="592" y="210" font-family="Sora,sans-serif" font-size="8.5" fill="#6e7681">debugger</text>
+        <line x1="590" y1="216" x2="672" y2="216" stroke="#30363d" stroke-width="1"/>
+        <text x="592" y="234" font-family="JetBrains Mono,monospace" font-size="9" fill="#d2a8ff">jar</text>
+        <text x="592" y="247" font-family="Sora,sans-serif" font-size="8.5" fill="#6e7681">packager</text>
+
+        <!-- legend -->
+        <circle cx="40" cy="308" r="5" fill="#f0a500" fill-opacity="0.5"/>
+        <text x="52" y="313" font-family="Sora,sans-serif" font-size="10" fill="#8b949e">JDK — Install this</text>
+        <circle cx="160" cy="308" r="5" fill="#58a6ff" fill-opacity="0.5"/>
+        <text x="172" y="313" font-family="Sora,sans-serif" font-size="10" fill="#8b949e">JRE — included</text>
+        <circle cx="260" cy="308" r="5" fill="#3fb950" fill-opacity="0.5"/>
+        <text x="272" y="313" font-family="Sora,sans-serif" font-size="10" fill="#8b949e">JVM — included</text>
+      </svg>
+    </div>
+
+    <h3>Plain English Explanation</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Term</th><th>Full Form</th><th>What It Does</th><th>Who Needs It</th></tr></thead>
+        <tbody>
+          <tr><td>JDK</td><td>Java Development Kit</td><td>Full toolkit — write, compile, debug, package Java code</td><td>You (developer/QA)</td></tr>
+          <tr><td>JRE</td><td>Java Runtime Environment</td><td>Runs compiled Java programs (no coding tools)</td><td>End users running apps</td></tr>
+          <tr><td>JVM</td><td>Java Virtual Machine</td><td>Abstract machine that executes bytecode on any OS</td><td>Nobody installs separately</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout tip">
+      <span class="callout-icon">✅</span>
+      <div class="callout-body">
+        <div class="callout-title">The One Rule</div>
+        <p>You only need to install the <strong>JDK</strong>. JRE and JVM come bundled inside it. Don't overthink this.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ──────────────────────────────────────────────────────── -->
+  <!-- SECTION 3: COMPILE TO EXECUTE                            -->
+  <!-- ──────────────────────────────────────────────────────── -->
+  <div class="section" id="s3">
+    <div class="section-header">
+      <div class="section-num">03</div>
+      <h2>How Java Code Runs — Compile to Execute</h2>
+    </div>
+
+    <p>This is Java's famous <strong>"Write Once, Run Anywhere"</strong> feature. Here's exactly what happens from the time you write code to the time you see output.</p>
+
+    <!-- SVG DIAGRAM: Compile Flow -->
+    <div class="diagram-wrap">
+      <div class="diagram-title">// Java Code Execution Flow</div>
+      <svg viewBox="0 0 720 160" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:720px;display:block;margin:0 auto">
+        <!-- Step boxes -->
+        <!-- 1. Source Code -->
+        <rect x="10" y="40" width="130" height="80" rx="8" fill="#1e2530" stroke="#58a6ff" stroke-width="1.5"/>
+        <text x="75" y="70" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" font-weight="700" fill="#58a6ff">Source Code</text>
+        <text x="75" y="85" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#d2a8ff">Hello.java</text>
+        <text x="75" y="102" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#6e7681">You write this</text>
+        <text x="75" y="114" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#6e7681">in IntelliJ</text>
+
+        <!-- Arrow 1 -->
+        <line x1="140" y1="80" x2="175" y2="80" stroke="#f0a500" stroke-width="1.5" marker-end="url(#arrow)"/>
+        <defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#f0a500"/></marker></defs>
+        <text x="157" y="74" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8" fill="#f0a500">javac</text>
+
+        <!-- 2. Bytecode -->
+        <rect x="175" y="40" width="130" height="80" rx="8" fill="#1e2530" stroke="#f0a500" stroke-width="1.5"/>
+        <text x="240" y="70" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" font-weight="700" fill="#f0a500">Bytecode</text>
+        <text x="240" y="85" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#d2a8ff">Hello.class</text>
+        <text x="240" y="102" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#6e7681">Platform-neutral</text>
+        <text x="240" y="114" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#6e7681">binary format</text>
+
+        <!-- Arrow 2 -->
+        <line x1="305" y1="80" x2="340" y2="80" stroke="#f0a500" stroke-width="1.5" marker-end="url(#arrow)"/>
+        <text x="322" y="74" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8" fill="#f0a500">JVM</text>
+
+        <!-- 3. JVM -->
+        <rect x="340" y="40" width="130" height="80" rx="8" fill="#1e2530" stroke="#3fb950" stroke-width="1.5"/>
+        <text x="405" y="70" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" font-weight="700" fill="#3fb950">JVM</text>
+        <text x="405" y="85" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#d2a8ff">Interprets</text>
+        <text x="405" y="102" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#6e7681">Runs on any</text>
+        <text x="405" y="114" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#6e7681">OS / Platform</text>
+
+        <!-- Arrow 3 -->
+        <line x1="470" y1="80" x2="505" y2="80" stroke="#f0a500" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+        <!-- 4. Output -->
+        <rect x="505" y="40" width="200" height="80" rx="8" fill="#1e2530" stroke="#3fb950" stroke-width="1.5"/>
+        <text x="605" y="65" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" font-weight="700" fill="#3fb950">Program Output</text>
+        <text x="605" y="83" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#a5d6ff">"Hello, Sagar!"</text>
+        <text x="605" y="100" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#6e7681">Runs on Windows /</text>
+        <text x="605" y="113" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#6e7681">Mac / Linux same way</text>
+
+        <!-- bottom labels -->
+        <text x="75" y="148" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#6e7681">STEP 1</text>
+        <text x="240" y="148" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#6e7681">STEP 2</text>
+        <text x="405" y="148" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#6e7681">STEP 3</text>
+        <text x="605" y="148" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#6e7681">STEP 4</text>
+      </svg>
+    </div>
+
+    <div class="callout note">
+      <span class="callout-icon">📌</span>
+      <div class="callout-body">
+        <div class="callout-title">Why does this matter?</div>
+        <p>The same <code>.class</code> file runs on Windows, Mac, and Linux without change. That is why Java is used in enterprise automation — your test suite runs on any OS, any CI server (like GitHub Actions) without modification.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ──────────────────────────────────────────────────────── -->
+  <!-- SECTION 4: SETUP                                         -->
+  <!-- ──────────────────────────────────────────────────────── -->
+  <div class="section" id="s4">
+    <div class="section-header">
+      <div class="section-num">04</div>
+      <h2>Environment Setup — JDK + IntelliJ</h2>
+    </div>
+
+    <div class="hour-badge">⏱ Hour 1 — Setup (45 mins)</div>
+
+    <h3>Step 1: Install JDK 17</h3>
+    <p>Use <strong>Temurin (Adoptium)</strong> — it's the free, open-source, most widely used JDK build in industry.</p>
+    <ul class="step-list">
+      <li>
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <strong>Go to: <a href="https://adoptium.net" style="color:var(--accent2)">https://adoptium.net</a></strong>
+          <span>Click "Latest LTS Release" → Select Temurin 17 → Download for your OS (Windows x64)</span>
+        </div>
+      </li>
+      <li>
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <strong>Run the installer</strong>
+          <span>Accept defaults. IMPORTANT: Check "Set JAVA_HOME variable" and "Add to PATH" during install — these boxes must be checked.</span>
+        </div>
+      </li>
+      <li>
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <strong>Verify in terminal/CMD</strong>
+          <span>Open Command Prompt or Windows Terminal and run the commands below.</span>
+        </div>
+      </li>
+    </ul>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">CMD / Terminal</span>
+        <span class="code-file">Verification Commands</span>
+      </div>
+      <pre><span class="cm"># Check Java version (should print something like: openjdk 17.x.x)</span>
+java -version
+
+<span class="cm"># Check compiler version (must also work)</span>
+javac -version
+
+<span class="cm"># Check where Java is installed</span>
+where java</pre>
+    </div>
+
+    <div class="callout error">
+      <span class="callout-icon">⚠️</span>
+      <div class="callout-body">
+        <div class="callout-title">If 'java' is not recognized as a command</div>
+        <p>You need to manually add Java to PATH. Go to: System Properties → Environment Variables → PATH → Add the path to your JDK's <code>bin</code> folder (e.g. <code>C:\Program Files\Eclipse Adoptium\jdk-17\bin</code>). Restart CMD after.</p>
+      </div>
+    </div>
+
+    <h3>Step 2: Install IntelliJ IDEA Community</h3>
+    <ul class="step-list">
+      <li>
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <strong>Download from: <a href="https://www.jetbrains.com/idea/download" style="color:var(--accent2)">jetbrains.com/idea/download</a></strong>
+          <span>Scroll down to "Community Edition" — it's completely FREE forever. Do NOT pay for Ultimate.</span>
+        </div>
+      </li>
+      <li>
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <strong>Install and open IntelliJ</strong>
+          <span>Accept all defaults. Choose dark theme (Darcula) when prompted — easier on eyes during long study sessions.</span>
+        </div>
+      </li>
+      <li>
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <strong>Create your first project</strong>
+          <span>File → New Project → Java → SDK: select the JDK 17 you installed → Project name: <code>JavaSeleniumPrep</code> → Finish</span>
+        </div>
+      </li>
+      <li>
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <strong>Create your first class</strong>
+          <span>Right-click <code>src</code> → New → Java Class → name it <code>Day1Practice</code></span>
+        </div>
+      </li>
+    </ul>
+
+    <div class="callout tip">
+      <span class="callout-icon">🔥</span>
+      <div class="callout-body">
+        <div class="callout-title">IntelliJ Keyboard Shortcut You Must Learn Today</div>
+        <p><strong>Shift + F10</strong> → Run your program. <strong>Ctrl + /</strong> → Comment/uncomment line. <strong>psvm + Tab</strong> → auto-generates the main method. <strong>sout + Tab</strong> → auto-generates System.out.println().</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ──────────────────────────────────────────────────────── -->
+  <!-- SECTION 5: ANATOMY OF A JAVA PROGRAM                     -->
+  <!-- ──────────────────────────────────────────────────────── -->
+  <div class="section" id="s5">
+    <div class="section-header">
+      <div class="section-num">05</div>
+      <h2>Anatomy of a Java Program</h2>
+    </div>
+
+    <p>Every Java program has a fixed structure. You must know <em>exactly</em> what each part is before writing your first real code.</p>
+
+    <!-- SVG Annotated Code Diagram -->
+    <div class="diagram-wrap">
+      <div class="diagram-title">// Anatomy of a Java Program — Every Part Labelled</div>
+      <svg viewBox="0 0 720 360" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:720px;display:block;margin:0 auto">
+        <!-- code background -->
+        <rect x="20" y="20" width="430" height="320" rx="8" fill="#010409" stroke="#30363d"/>
+
+        <!-- line numbers -->
+        <text x="36" y="56" font-family="JetBrains Mono,monospace" font-size="11" fill="#6e7681">1</text>
+        <text x="36" y="80" font-family="JetBrains Mono,monospace" font-size="11" fill="#6e7681">2</text>
+        <text x="36" y="104" font-family="JetBrains Mono,monospace" font-size="11" fill="#6e7681">3</text>
+        <text x="36" y="128" font-family="JetBrains Mono,monospace" font-size="11" fill="#6e7681">4</text>
+        <text x="36" y="152" font-family="JetBrains Mono,monospace" font-size="11" fill="#6e7681">5</text>
+        <text x="36" y="176" font-family="JetBrains Mono,monospace" font-size="11" fill="#6e7681">6</text>
+        <text x="36" y="200" font-family="JetBrains Mono,monospace" font-size="11" fill="#6e7681">7</text>
+        <text x="36" y="224" font-family="JetBrains Mono,monospace" font-size="11" fill="#6e7681">8</text>
+        <text x="36" y="248" font-family="JetBrains Mono,monospace" font-size="11" fill="#6e7681">9</text>
+        <text x="36" y="272" font-family="JetBrains Mono,monospace" font-size="11" fill="#6e7681">10</text>
+        <text x="36" y="296" font-family="JetBrains Mono,monospace" font-size="11" fill="#6e7681">11</text>
+        <text x="36" y="320" font-family="JetBrains Mono,monospace" font-size="11" fill="#6e7681">12</text>
+
+        <!-- divider line -->
+        <line x1="56" y1="28" x2="56" y2="332" stroke="#30363d" stroke-width="1"/>
+
+        <!-- code text -->
+        <text x="66" y="56" font-family="JetBrains Mono,monospace" font-size="12">
+          <tspan fill="#ff7b72">public class </tspan>
+          <tspan fill="#79c0ff">Day1Practice </tspan>
+          <tspan fill="#e6edf3">{</tspan>
+        </text>
+        <text x="66" y="80" font-family="JetBrains Mono,monospace" font-size="12" fill="#e6edf3"> </text>
+        <text x="66" y="104" font-family="JetBrains Mono,monospace" font-size="12">
+          <tspan fill="#6e7681" x="66">    </tspan>
+          <tspan fill="#ff7b72">public static void </tspan>
+          <tspan fill="#d2a8ff">main</tspan>
+          <tspan fill="#e6edf3">(</tspan>
+          <tspan fill="#ffa657">String</tspan>
+          <tspan fill="#e6edf3">[] args) {</tspan>
+        </text>
+        <text x="66" y="128" font-family="JetBrains Mono,monospace" font-size="12">
+          <tspan fill="#6e7681">        </tspan>
+          <tspan fill="#6e7681">// Your code goes here</tspan>
+        </text>
+        <text x="66" y="152" font-family="JetBrains Mono,monospace" font-size="12">
+          <tspan fill="#79c0ff" x="86">        String </tspan>
+          <tspan fill="#e6edf3">name </tspan>
+          <tspan fill="#ff7b72">= </tspan>
+          <tspan fill="#a5d6ff">"Sagar"</tspan>
+          <tspan fill="#e6edf3">;</tspan>
+        </text>
+        <text x="66" y="176" font-family="JetBrains Mono,monospace" font-size="12">
+          <tspan fill="#79c0ff" x="86">        int </tspan>
+          <tspan fill="#e6edf3">age </tspan>
+          <tspan fill="#ff7b72">= </tspan>
+          <tspan fill="#79c0ff">22</tspan>
+          <tspan fill="#e6edf3">;</tspan>
+        </text>
+        <text x="66" y="200" font-family="JetBrains Mono,monospace" font-size="12" fill="#e6edf3"> </text>
+        <text x="66" y="224" font-family="JetBrains Mono,monospace" font-size="12">
+          <tspan x="86" fill="#d2a8ff">        System.out.println</tspan>
+          <tspan fill="#e6edf3">(</tspan>
+          <tspan fill="#a5d6ff">"Hi: "</tspan>
+          <tspan fill="#ff7b72"> + </tspan>
+          <tspan fill="#e6edf3">name);</tspan>
+        </text>
+        <text x="66" y="248" font-family="JetBrains Mono,monospace" font-size="12">
+          <tspan x="86" fill="#d2a8ff">        System.out.println</tspan>
+          <tspan fill="#e6edf3">(</tspan>
+          <tspan fill="#a5d6ff">"Age: "</tspan>
+          <tspan fill="#ff7b72"> + </tspan>
+          <tspan fill="#e6edf3">age);</tspan>
+        </text>
+        <text x="66" y="272" font-family="JetBrains Mono,monospace" font-size="12">
+          <tspan x="66" fill="#e6edf3">    }</tspan>
+        </text>
+        <text x="66" y="296" font-family="JetBrains Mono,monospace" font-size="12" fill="#e6edf3"> </text>
+        <text x="66" y="320" font-family="JetBrains Mono,monospace" font-size="12" fill="#e6edf3">}</text>
+
+        <!-- annotations -->
+        <!-- class annotation -->
+        <line x1="200" y1="56" x2="470" y2="56" stroke="#f0a500" stroke-width="1" stroke-dasharray="3,2"/>
+        <rect x="470" y="42" width="210" height="30" rx="5" fill="#1a1f0a" stroke="#f0a500" stroke-width="1"/>
+        <text x="480" y="57" font-family="Sora,sans-serif" font-size="10" fill="#f0a500" font-weight="600">Class Declaration</text>
+        <text x="480" y="68" font-family="Sora,sans-serif" font-size="9" fill="#8b949e">Must match filename exactly</text>
+
+        <!-- main method annotation -->
+        <line x1="200" y1="104" x2="470" y2="104" stroke="#58a6ff" stroke-width="1" stroke-dasharray="3,2"/>
+        <rect x="470" y="90" width="210" height="30" rx="5" fill="#0d1522" stroke="#58a6ff" stroke-width="1"/>
+        <text x="480" y="105" font-family="Sora,sans-serif" font-size="10" fill="#58a6ff" font-weight="600">main() Method</text>
+        <text x="480" y="116" font-family="Sora,sans-serif" font-size="9" fill="#8b949e">Entry point — JVM starts here</text>
+
+        <!-- variable annotations -->
+        <line x1="200" y1="152" x2="470" y2="145" stroke="#3fb950" stroke-width="1" stroke-dasharray="3,2"/>
+        <line x1="200" y1="176" x2="470" y2="175" stroke="#3fb950" stroke-width="1" stroke-dasharray="3,2"/>
+        <rect x="470" y="134" width="210" height="52" rx="5" fill="#0a1a0d" stroke="#3fb950" stroke-width="1"/>
+        <text x="480" y="150" font-family="Sora,sans-serif" font-size="10" fill="#3fb950" font-weight="600">Variable Declarations</text>
+        <text x="480" y="163" font-family="Sora,sans-serif" font-size="9" fill="#8b949e">type name = value;</text>
+        <text x="480" y="177" font-family="Sora,sans-serif" font-size="9" fill="#8b949e">Semicolon ends every statement</text>
+
+        <!-- print annotation -->
+        <line x1="280" y1="224" x2="470" y2="224" stroke="#d2a8ff" stroke-width="1" stroke-dasharray="3,2"/>
+        <rect x="470" y="210" width="210" height="30" rx="5" fill="#15091f" stroke="#d2a8ff" stroke-width="1"/>
+        <text x="480" y="225" font-family="Sora,sans-serif" font-size="10" fill="#d2a8ff" font-weight="600">Print to Console</text>
+        <text x="480" y="237" font-family="Sora,sans-serif" font-size="9" fill="#8b949e">+ concatenates String + variable</text>
+
+        <!-- closing brace annotation -->
+        <line x1="100" y1="272" x2="470" y2="272" stroke="#ff7b72" stroke-width="1" stroke-dasharray="3,2"/>
+        <rect x="470" y="260" width="210" height="24" rx="5" fill="#1a0a0a" stroke="#ff7b72" stroke-width="1"/>
+        <text x="480" y="276" font-family="Sora,sans-serif" font-size="10" fill="#ff7b72" font-weight="600">Every { must have a closing }</text>
+      </svg>
+    </div>
+
+    <h3>Rules You Must Never Break</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Rule</th><th>Example</th><th>Consequence if broken</th></tr></thead>
+        <tbody>
+          <tr><td>Class name = filename</td><td>Class <code>Day1Practice</code> must be in <code>Day1Practice.java</code></td><td>Compile error</td></tr>
+          <tr><td>main() signature is fixed</td><td>Must be exactly <code>public static void main(String[] args)</code></td><td>JVM won't start program</td></tr>
+          <tr><td>Every statement ends with ;</td><td><code>int x = 5;</code></td><td>Compile error</td></tr>
+          <tr><td>Every { needs a }</td><td>Open brace for class, method, if, loop — all need closing brace</td><td>Compile error</td></tr>
+          <tr><td>Java is case-sensitive</td><td><code>String</code> ≠ <code>string</code></td><td>Compile error</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ──────────────────────────────────────────────────────── -->
+  <!-- SECTION 6: VARIABLES                                     -->
+  <!-- ──────────────────────────────────────────────────────── -->
+  <div class="section" id="s6">
+    <div class="section-header">
+      <div class="section-num">06</div>
+      <h2>Variables — What They Are &amp; How Memory Works</h2>
+    </div>
+
+    <div class="hour-badge">⏱ Hour 2 — Variables &amp; Data Types (75 mins)</div>
+
+    <p>A <strong>variable</strong> is a named box in memory that holds a value. When you declare a variable, Java reserves a slot in memory and gives it the name you specified.</p>
+
+    <!-- Memory Diagram -->
+    <div class="diagram-wrap">
+      <div class="diagram-title">// Variables in Memory (Stack)</div>
+      <svg viewBox="0 0 720 220" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:720px;display:block;margin:0 auto">
+        <!-- Stack label -->
+        <rect x="20" y="20" width="120" height="180" rx="6" fill="#0d1117" stroke="#30363d"/>
+        <text x="80" y="45" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#8b949e" font-weight="700">STACK</text>
+        <text x="80" y="60" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#6e7681">Memory area</text>
+        <text x="80" y="73" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#6e7681">for primitives</text>
+
+        <!-- variable cells in stack -->
+        <rect x="30" y="88" width="100" height="32" rx="4" fill="#1e2530" stroke="#3fb950" stroke-width="1.5"/>
+        <text x="80" y="101" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#79c0ff">name</text>
+        <text x="80" y="114" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#8b949e">→ Heap ref</text>
+
+        <rect x="30" y="126" width="100" height="32" rx="4" fill="#1e2530" stroke="#3fb950" stroke-width="1.5"/>
+        <text x="80" y="139" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#79c0ff">age</text>
+        <text x="80" y="152" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#3fb950">22</text>
+
+        <rect x="30" y="164" width="100" height="28" rx="4" fill="#1e2530" stroke="#3fb950" stroke-width="1.5"/>
+        <text x="80" y="176" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#79c0ff">isStudent</text>
+        <text x="80" y="187" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#3fb950">true</text>
+
+        <!-- arrows for name to heap -->
+        <line x1="130" y1="104" x2="200" y2="104" stroke="#f0a500" stroke-width="1.5" marker-end="url(#arrow2)"/>
+        <defs><marker id="arrow2" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#f0a500"/></marker></defs>
+
+        <!-- Heap label -->
+        <rect x="200" y="20" width="200" height="180" rx="6" fill="#0d1117" stroke="#30363d"/>
+        <text x="300" y="45" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#8b949e" font-weight="700">HEAP</text>
+        <text x="300" y="60" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#6e7681">Memory area for objects</text>
+
+        <!-- String object in heap -->
+        <rect x="210" y="82" width="180" height="50" rx="6" fill="#1e2530" stroke="#58a6ff" stroke-width="1.5"/>
+        <text x="300" y="100" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#58a6ff" font-weight="700">String Object</text>
+        <text x="300" y="116" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#a5d6ff">"Sagar"</text>
+        <text x="300" y="127" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#6e7681">addr: 0x4f2a</text>
+
+        <!-- explanation boxes -->
+        <rect x="430" y="82" width="270" height="130" rx="8" fill="#161b22" stroke="#30363d"/>
+        <text x="445" y="102" font-family="JetBrains Mono,monospace" font-size="10" font-weight="700" fill="#f0a500">Key Point:</text>
+        <text x="445" y="120" font-family="Sora,sans-serif" font-size="10" fill="#8b949e">• Primitives (int, boolean)</text>
+        <text x="445" y="135" font-family="Sora,sans-serif" font-size="10" fill="#8b949e">  stored directly in Stack</text>
+        <text x="445" y="153" font-family="Sora,sans-serif" font-size="10" fill="#8b949e">• Objects (String, arrays)</text>
+        <text x="445" y="168" font-family="Sora,sans-serif" font-size="10" fill="#8b949e">  stored in Heap, Stack holds</text>
+        <text x="445" y="183" font-family="Sora,sans-serif" font-size="10" fill="#8b949e">  a reference (pointer) to it</text>
+        <text x="445" y="200" font-family="Sora,sans-serif" font-size="9" fill="#6e7681">You don't manage this manually</text>
+      </svg>
+    </div>
+
+    <h3>Declaring Variables — Full Syntax</h3>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Java</span><span class="code-file">Variable Declaration Syntax</span></div>
+      <pre><span class="cm">// Syntax:</span>
+<span class="cm">// dataType variableName = value;</span>
+<span class="cm">//    ↑           ↑          ↑</span>
+<span class="cm">// what type  your name  initial value</span>
+
+<span class="cm">// Declaration without value (value assigned later)</span>
+<span class="ty">int</span> <span class="nm">score</span>;
+<span class="nm">score</span> <span class="op">=</span> <span class="nu">95</span>;
+
+<span class="cm">// Declaration with value (most common)</span>
+<span class="ty">int</span> <span class="nm">age</span> <span class="op">=</span> <span class="nu">22</span>;
+<span class="ty">String</span> <span class="nm">username</span> <span class="op">=</span> <span class="st">"sagar_qa"</span>;
+<span class="ty">boolean</span> <span class="nm">isLoggedIn</span> <span class="op">=</span> <span class="kw">false</span>;
+<span class="ty">double</span> <span class="nm">salary</span> <span class="op">=</span> <span class="nu">25000.50</span>;
+
+<span class="cm">// Multiple declarations of same type (one line)</span>
+<span class="ty">int</span> <span class="nm">x</span> <span class="op">=</span> <span class="nu">5</span>, <span class="nm">y</span> <span class="op">=</span> <span class="nu">10</span>, <span class="nm">z</span> <span class="op">=</span> <span class="nu">15</span>;</pre>
+    </div>
+  </div>
+
+  <!-- ──────────────────────────────────────────────────────── -->
+  <!-- SECTION 7: ALL 8 PRIMITIVE DATA TYPES                    -->
+  <!-- ──────────────────────────────────────────────────────── -->
+  <div class="section" id="s7">
+    <div class="section-header">
+      <div class="section-num">07</div>
+      <h2>All 8 Primitive Data Types</h2>
+    </div>
+
+    <p>Java has exactly <strong>8 primitive types</strong>. These are the building blocks. Everything else is built from these. For Selenium automation, you will use 4 of them regularly.</p>
+
+    <!-- Visual grid of data types -->
+    <div class="diagram-wrap">
+      <div class="diagram-title">// 8 Primitive Data Types — Visual Reference</div>
+      <svg viewBox="0 0 720 320" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:720px;display:block;margin:0 auto">
+        <!-- Row 1: int, double, boolean, char -->
+        <!-- int -->
+        <rect x="10" y="20" width="160" height="120" rx="10" fill="#1e2530" stroke="#f0a500" stroke-width="1.5"/>
+        <rect x="10" y="20" width="160" height="36" rx="10" fill="#f0a500" fill-opacity="0.15"/>
+        <rect x="10" y="44" width="160" height="12" fill="#f0a500" fill-opacity="0.15"/>
+        <text x="90" y="43" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="16" font-weight="700" fill="#f0a500">int</text>
+        <text x="90" y="65" text-anchor="middle" font-family="Sora,sans-serif" font-size="10" fill="#8b949e">Whole numbers</text>
+        <text x="90" y="82" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#6e7681">-2,147,483,648</text>
+        <text x="90" y="95" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#6e7681">to 2,147,483,647</text>
+        <text x="90" y="110" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#3fb950">int age = 22;</text>
+        <text x="90" y="127" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#f0a500">★ USE IN SELENIUM</text>
+
+        <!-- double -->
+        <rect x="185" y="20" width="160" height="120" rx="10" fill="#1e2530" stroke="#58a6ff" stroke-width="1.5"/>
+        <rect x="185" y="20" width="160" height="36" rx="10" fill="#58a6ff" fill-opacity="0.12"/>
+        <rect x="185" y="44" width="160" height="12" fill="#58a6ff" fill-opacity="0.12"/>
+        <text x="265" y="43" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="16" font-weight="700" fill="#58a6ff">double</text>
+        <text x="265" y="65" text-anchor="middle" font-family="Sora,sans-serif" font-size="10" fill="#8b949e">Decimal numbers</text>
+        <text x="265" y="82" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#6e7681">15-16 decimal digits</text>
+        <text x="265" y="95" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#6e7681">of precision</text>
+        <text x="265" y="110" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#3fb950">double pi = 3.14;</text>
+        <text x="265" y="127" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#58a6ff">Use for decimals</text>
+
+        <!-- boolean -->
+        <rect x="360" y="20" width="160" height="120" rx="10" fill="#1e2530" stroke="#3fb950" stroke-width="1.5"/>
+        <rect x="360" y="20" width="160" height="36" rx="10" fill="#3fb950" fill-opacity="0.12"/>
+        <rect x="360" y="44" width="160" height="12" fill="#3fb950" fill-opacity="0.12"/>
+        <text x="440" y="43" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="16" font-weight="700" fill="#3fb950">boolean</text>
+        <text x="440" y="65" text-anchor="middle" font-family="Sora,sans-serif" font-size="10" fill="#8b949e">true or false only</text>
+        <text x="440" y="82" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#6e7681">Only 2 possible values:</text>
+        <text x="440" y="95" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#6e7681">true | false</text>
+        <text x="440" y="110" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#3fb950">boolean pass = true;</text>
+        <text x="440" y="127" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#f0a500">★ USE IN SELENIUM</text>
+
+        <!-- char -->
+        <rect x="535" y="20" width="175" height="120" rx="10" fill="#1e2530" stroke="#d2a8ff" stroke-width="1.5"/>
+        <rect x="535" y="20" width="175" height="36" rx="10" fill="#d2a8ff" fill-opacity="0.12"/>
+        <rect x="535" y="44" width="175" height="12" fill="#d2a8ff" fill-opacity="0.12"/>
+        <text x="622" y="43" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="16" font-weight="700" fill="#d2a8ff">char</text>
+        <text x="622" y="65" text-anchor="middle" font-family="Sora,sans-serif" font-size="10" fill="#8b949e">Single character</text>
+        <text x="622" y="82" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#6e7681">Uses single quotes: 'A'</text>
+        <text x="622" y="95" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#6e7681">Unicode character</text>
+        <text x="622" y="110" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#3fb950">char grade = 'A';</text>
+        <text x="622" y="127" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#8b949e">Rarely used in testing</text>
+
+        <!-- Row 2: long, float, byte, short -->
+        <!-- long -->
+        <rect x="10" y="160" width="160" height="120" rx="10" fill="#1e2530" stroke="#ff7b72" stroke-width="1.5"/>
+        <rect x="10" y="160" width="160" height="36" rx="10" fill="#ff7b72" fill-opacity="0.12"/>
+        <rect x="10" y="184" width="160" height="12" fill="#ff7b72" fill-opacity="0.12"/>
+        <text x="90" y="183" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="16" font-weight="700" fill="#ff7b72">long</text>
+        <text x="90" y="205" text-anchor="middle" font-family="Sora,sans-serif" font-size="10" fill="#8b949e">Big whole numbers</text>
+        <text x="90" y="222" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#6e7681">Larger range than int</text>
+        <text x="90" y="235" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#6e7681">up to 9.2 × 10¹⁸</text>
+        <text x="90" y="250" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#3fb950">long id = 123456L;</text>
+        <text x="90" y="267" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#6e7681">Note the L suffix</text>
+
+        <!-- float -->
+        <rect x="185" y="160" width="160" height="120" rx="10" fill="#1e2530" stroke="#ffa657" stroke-width="1.5"/>
+        <rect x="185" y="160" width="160" height="36" rx="10" fill="#ffa657" fill-opacity="0.12"/>
+        <rect x="185" y="184" width="160" height="12" fill="#ffa657" fill-opacity="0.12"/>
+        <text x="265" y="183" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="16" font-weight="700" fill="#ffa657">float</text>
+        <text x="265" y="205" text-anchor="middle" font-family="Sora,sans-serif" font-size="10" fill="#8b949e">Less precise decimal</text>
+        <text x="265" y="222" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#6e7681">6-7 decimal digits</text>
+        <text x="265" y="235" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#6e7681">of precision</text>
+        <text x="265" y="250" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#3fb950">float f = 3.14f;</text>
+        <text x="265" y="267" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#6e7681">Note the f suffix</text>
+
+        <!-- byte -->
+        <rect x="360" y="160" width="160" height="120" rx="10" fill="#1e2530" stroke="#6e7681" stroke-width="1.5"/>
+        <rect x="360" y="160" width="160" height="36" rx="10" fill="#6e7681" fill-opacity="0.12"/>
+        <rect x="360" y="184" width="160" height="12" fill="#6e7681" fill-opacity="0.12"/>
+        <text x="440" y="183" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="16" font-weight="700" fill="#8b949e">byte</text>
+        <text x="440" y="205" text-anchor="middle" font-family="Sora,sans-serif" font-size="10" fill="#8b949e">Tiny whole number</text>
+        <text x="440" y="222" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#6e7681">Range: -128 to 127</text>
+        <text x="440" y="235" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#6e7681">only 8 bits</text>
+        <text x="440" y="250" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#3fb950">byte b = 100;</text>
+        <text x="440" y="267" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#6e7681">Rarely used in QA</text>
+
+        <!-- short -->
+        <rect x="535" y="160" width="175" height="120" rx="10" fill="#1e2530" stroke="#6e7681" stroke-width="1.5"/>
+        <rect x="535" y="160" width="175" height="36" rx="10" fill="#6e7681" fill-opacity="0.12"/>
+        <rect x="535" y="184" width="175" height="12" fill="#6e7681" fill-opacity="0.12"/>
+        <text x="622" y="183" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="16" font-weight="700" fill="#8b949e">short</text>
+        <text x="622" y="205" text-anchor="middle" font-family="Sora,sans-serif" font-size="10" fill="#8b949e">Medium whole number</text>
+        <text x="622" y="222" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#6e7681">Range: -32,768</text>
+        <text x="622" y="235" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#6e7681">to 32,767</text>
+        <text x="622" y="250" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#3fb950">short s = 1000;</text>
+        <text x="622" y="267" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#6e7681">Rarely used in QA</text>
+
+        <!-- star legend -->
+        <text x="10" y="310" font-family="Sora,sans-serif" font-size="10" fill="#f0a500">★ = Used regularly in Selenium automation</text>
+        <text x="310" y="310" font-family="Sora,sans-serif" font-size="10" fill="#6e7681">Faded border = less common in QA work</text>
+      </svg>
+    </div>
+
+    <h3>The 4 You'll Actually Use (Focus Here)</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Java</span><span class="code-file">SeleniumEssentials.java</span></div>
+      <pre><span class="cm">// 1. int — counting elements, indexes, timeouts</span>
+<span class="ty">int</span> <span class="nm">elementCount</span> <span class="op">=</span> <span class="nu">5</span>;
+<span class="ty">int</span> <span class="nm">waitSeconds</span> <span class="op">=</span> <span class="nu">10</span>;
+<span class="ty">int</span> <span class="nm">retryCount</span> <span class="op">=</span> <span class="nu">3</span>;
+
+<span class="cm">// 2. String — locators, URLs, usernames, expected text</span>
+<span class="ty">String</span> <span class="nm">url</span> <span class="op">=</span> <span class="st">"https://orangehrm.com/login"</span>;
+<span class="ty">String</span> <span class="nm">username</span> <span class="op">=</span> <span class="st">"Admin"</span>;
+<span class="ty">String</span> <span class="nm">expectedTitle</span> <span class="op">=</span> <span class="st">"OrangeHRM"</span>;
+
+<span class="cm">// 3. boolean — test pass/fail conditions</span>
+<span class="ty">boolean</span> <span class="nm">isDisplayed</span> <span class="op">=</span> <span class="kw">true</span>;
+<span class="ty">boolean</span> <span class="nm">isEnabled</span> <span class="op">=</span> <span class="kw">false</span>;
+<span class="ty">boolean</span> <span class="nm">testPassed</span> <span class="op">=</span> <span class="kw">false</span>;
+
+<span class="cm">// 4. double — response time comparisons, percentages</span>
+<span class="ty">double</span> <span class="nm">loadTime</span> <span class="op">=</span> <span class="nu">2.5</span>;
+<span class="ty">double</span> <span class="nm">passRate</span> <span class="op">=</span> <span class="nu">98.6</span>;</pre>
+    </div>
+  </div>
+
+  <!-- ──────────────────────────────────────────────────────── -->
+  <!-- SECTION 8: STRING                                        -->
+  <!-- ──────────────────────────────────────────────────────── -->
+  <div class="section" id="s8">
+    <div class="section-header">
+      <div class="section-num">08</div>
+      <h2>String — The Non-Primitive You Must Know</h2>
+    </div>
+
+    <p><code>String</code> is technically a <strong>class</strong> (not a primitive), but it behaves like one in everyday use. It represents a sequence of characters. In Selenium, <strong>String is the most-used data type</strong> — URLs, button text, locators, assertions — all use String.</p>
+
+    <div class="callout warn">
+      <span class="callout-icon">⚡</span>
+      <div class="callout-body">
+        <div class="callout-title">Critical: String uses double quotes. char uses single quotes.</div>
+        <p><code>String name = "Sagar";</code> ← double quotes ✅<br>
+        <code>char initial = 'S';</code> ← single quotes ✅<br>
+        <code>String name = 'Sagar';</code> ← WRONG, compile error ❌</p>
+      </div>
+    </div>
+
+    <h3>Essential String Methods for Selenium</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Java</span><span class="code-file">StringMethods.java</span></div>
+      <pre><span class="ty">String</span> <span class="nm">text</span> <span class="op">=</span> <span class="st">"  OrangeHRM Login  "</span>;
+
+<span class="cm">// length — how many characters</span>
+<span class="fn">System.out.println</span>(text.<span class="fn">length</span>());          <span class="cm">// 19</span>
+
+<span class="cm">// trim — remove spaces from start and end</span>
+<span class="fn">System.out.println</span>(text.<span class="fn">trim</span>());            <span class="cm">// "OrangeHRM Login"</span>
+
+<span class="cm">// toLowerCase / toUpperCase</span>
+<span class="fn">System.out.println</span>(text.<span class="fn">toLowerCase</span>());     <span class="cm">// "  orangehrm login  "</span>
+<span class="fn">System.out.println</span>(text.<span class="fn">toUpperCase</span>());     <span class="cm">// "  ORANGEHRM LOGIN  "</span>
+
+<span class="cm">// contains — check if text has a substring</span>
+<span class="fn">System.out.println</span>(text.<span class="fn">contains</span>(<span class="st">"Login"</span>)); <span class="cm">// true</span>
+
+<span class="cm">// equals — compare two strings (NEVER use ==)</span>
+<span class="ty">String</span> <span class="nm">a</span> <span class="op">=</span> <span class="st">"Admin"</span>;
+<span class="ty">String</span> <span class="nm">b</span> <span class="op">=</span> <span class="st">"Admin"</span>;
+<span class="fn">System.out.println</span>(a.<span class="fn">equals</span>(b));           <span class="cm">// true ✅</span>
+<span class="fn">System.out.println</span>(a <span class="op">==</span> b);                 <span class="cm">// may be false! ❌</span>
+
+<span class="cm">// replace — replace part of string</span>
+<span class="ty">String</span> <span class="nm">url</span> <span class="op">=</span> <span class="st">"https://test.site.com"</span>;
+<span class="fn">System.out.println</span>(url.<span class="fn">replace</span>(<span class="st">"test"</span>, <span class="st">"prod"</span>)); <span class="cm">// https://prod.site.com</span>
+
+<span class="cm">// split — break string into array</span>
+<span class="ty">String</span> <span class="nm">csv</span> <span class="op">=</span> <span class="st">"login,logout,register"</span>;
+<span class="ty">String</span>[] <span class="nm">tests</span> <span class="op">=</span> csv.<span class="fn">split</span>(<span class="st">","</span>);            <span class="cm">// ["login","logout","register"]</span>
+
+<span class="cm">// isEmpty — check if string is empty</span>
+<span class="ty">String</span> <span class="nm">empty</span> <span class="op">=</span> <span class="st">""</span>;
+<span class="fn">System.out.println</span>(empty.<span class="fn">isEmpty</span>());        <span class="cm">// true</span></pre>
+    </div>
+
+    <div class="callout error">
+      <span class="callout-icon">🚨</span>
+      <div class="callout-body">
+        <div class="callout-title">NEVER use == to compare Strings</div>
+        <p><code>==</code> checks if they are the <em>same object in memory</em>, not if they have the same value. <code>.equals()</code> checks the actual content. In Selenium assertions, wrong String comparison is a top cause of false-passing tests.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ──────────────────────────────────────────────────────── -->
+  <!-- SECTION 9: TYPE CASTING                                  -->
+  <!-- ──────────────────────────────────────────────────────── -->
+  <div class="section" id="s9">
+    <div class="section-header">
+      <div class="section-num">09</div>
+      <h2>Type Casting — Implicit &amp; Explicit</h2>
+    </div>
+
+    <p>Type casting means converting one data type to another. This happens often in Selenium when reading text from web pages (always String) and comparing it to numbers.</p>
+
+    <div class="diagram-wrap">
+      <div class="diagram-title">// Widening vs Narrowing Casting</div>
+      <svg viewBox="0 0 720 130" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:720px;display:block;margin:0 auto">
+        <!-- widening (automatic) -->
+        <text x="20" y="28" font-family="JetBrains Mono,monospace" font-size="11" fill="#3fb950" font-weight="700">WIDENING (automatic — no data loss)</text>
+        <rect x="20" y="38" width="60" height="30" rx="4" fill="#1e2530" stroke="#3fb950"/>
+        <text x="50" y="58" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#3fb950">byte</text>
+        <line x1="80" y1="53" x2="105" y2="53" stroke="#3fb950" stroke-width="1.5" marker-end="url(#arrowGreen)"/>
+        <defs><marker id="arrowGreen" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#3fb950"/></marker></defs>
+        <rect x="105" y="38" width="60" height="30" rx="4" fill="#1e2530" stroke="#3fb950"/>
+        <text x="135" y="58" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#3fb950">short</text>
+        <line x1="165" y1="53" x2="190" y2="53" stroke="#3fb950" stroke-width="1.5" marker-end="url(#arrowGreen)"/>
+        <rect x="190" y="38" width="60" height="30" rx="4" fill="#1e2530" stroke="#3fb950"/>
+        <text x="220" y="58" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#3fb950">int</text>
+        <line x1="250" y1="53" x2="275" y2="53" stroke="#3fb950" stroke-width="1.5" marker-end="url(#arrowGreen)"/>
+        <rect x="275" y="38" width="60" height="30" rx="4" fill="#1e2530" stroke="#3fb950"/>
+        <text x="305" y="58" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#3fb950">long</text>
+        <line x1="335" y1="53" x2="360" y2="53" stroke="#3fb950" stroke-width="1.5" marker-end="url(#arrowGreen)"/>
+        <rect x="360" y="38" width="60" height="30" rx="4" fill="#1e2530" stroke="#3fb950"/>
+        <text x="390" y="58" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#3fb950">float</text>
+        <line x1="420" y1="53" x2="445" y2="53" stroke="#3fb950" stroke-width="1.5" marker-end="url(#arrowGreen)"/>
+        <rect x="445" y="38" width="70" height="30" rx="4" fill="#1e2530" stroke="#3fb950"/>
+        <text x="480" y="58" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#3fb950">double</text>
+
+        <!-- narrowing (manual) -->
+        <text x="20" y="103" font-family="JetBrains Mono,monospace" font-size="11" fill="#ff7b72" font-weight="700">NARROWING (manual — possible data loss)</text>
+        <text x="20" y="122" font-family="Sora,sans-serif" font-size="10" fill="#8b949e">double → float → long → int → short → byte  (you write the cast: </text>
+        <text x="435" y="122" font-family="JetBrains Mono,monospace" font-size="10" fill="#ff7b72">int x = (int) 9.99;</text>
+        <text x="570" y="122" font-family="Sora,sans-serif" font-size="10" fill="#8b949e"> → gives 9)</text>
+      </svg>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Java</span><span class="code-file">TypeCasting.java</span></div>
+      <pre><span class="cm">// WIDENING — automatic (smaller → larger type)</span>
+<span class="ty">int</span> <span class="nm">myInt</span> <span class="op">=</span> <span class="nu">10</span>;
+<span class="ty">double</span> <span class="nm">myDouble</span> <span class="op">=</span> myInt;   <span class="cm">// auto-converts: 10 → 10.0</span>
+<span class="fn">System.out.println</span>(myDouble); <span class="cm">// 10.0</span>
+
+<span class="cm">// NARROWING — manual (larger → smaller, use with care)</span>
+<span class="ty">double</span> <span class="nm">price</span> <span class="op">=</span> <span class="nu">9.99</span>;
+<span class="ty">int</span> <span class="nm">rounded</span> <span class="op">=</span> (<span class="ty">int</span>) price;   <span class="cm">// 9 — decimal CHOPPED off (not rounded!)</span>
+<span class="fn">System.out.println</span>(rounded);  <span class="cm">// 9</span>
+
+<span class="cm">// STRING ↔ INT conversion (very common in Selenium)</span>
+<span class="cm">// String to int</span>
+<span class="ty">String</span> <span class="nm">numStr</span> <span class="op">=</span> <span class="st">"42"</span>;
+<span class="ty">int</span> <span class="nm">num</span> <span class="op">=</span> <span class="ty">Integer</span>.<span class="fn">parseInt</span>(numStr);   <span class="cm">// 42</span>
+
+<span class="cm">// int to String</span>
+<span class="ty">int</span> <span class="nm">count</span> <span class="op">=</span> <span class="nu">5</span>;
+<span class="ty">String</span> <span class="nm">countStr</span> <span class="op">=</span> <span class="ty">String</span>.<span class="fn">valueOf</span>(count); <span class="cm">// "5"</span>
+<span class="ty">String</span> <span class="nm">countStr2</span> <span class="op">=</span> <span class="st">""</span> <span class="op">+</span> count;         <span class="cm">// "5" (shorthand)</span>
+
+<span class="cm">// Selenium example: getText() returns String,</span>
+<span class="cm">// but you need to compare the number:</span>
+<span class="ty">String</span> <span class="nm">pageText</span> <span class="op">=</span> <span class="st">"Total Items: 25"</span>;
+<span class="ty">String</span> <span class="nm">countText</span> <span class="op">=</span> pageText.<span class="fn">split</span>(<span class="st">":"</span>)[<span class="nu">1</span>].<span class="fn">trim</span>(); <span class="cm">// "25"</span>
+<span class="ty">int</span> <span class="nm">totalItems</span> <span class="op">=</span> <span class="ty">Integer</span>.<span class="fn">parseInt</span>(countText);     <span class="cm">// 25</span></pre>
+    </div>
+  </div>
+
+  <!-- ──────────────────────────────────────────────────────── -->
+  <!-- SECTION 10: NAMING CONVENTIONS                           -->
+  <!-- ──────────────────────────────────────────────────────── -->
+  <div class="section" id="s10">
+    <div class="section-header">
+      <div class="section-num">10</div>
+      <h2>Naming Conventions &amp; Best Practices</h2>
+    </div>
+
+    <p>Java has strict naming conventions. Interviewers will notice instantly if your code breaks these. Follow them from Day 1 so they become muscle memory.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>What</th><th>Convention</th><th>Example</th><th>❌ Wrong</th></tr></thead>
+        <tbody>
+          <tr><td>Variables</td><td>camelCase — starts lowercase</td><td><code>firstName</code>, <code>isLoggedIn</code></td><td><code>FirstName</code>, <code>first_name</code></td></tr>
+          <tr><td>Methods</td><td>camelCase — starts lowercase, verb</td><td><code>getUser()</code>, <code>clickLogin()</code></td><td><code>GetUser()</code>, <code>get_user()</code></td></tr>
+          <tr><td>Classes</td><td>PascalCase — every word capitalized</td><td><code>LoginPage</code>, <code>UserTest</code></td><td><code>loginPage</code>, <code>login_page</code></td></tr>
+          <tr><td>Constants</td><td>ALL_CAPS with underscores</td><td><code>MAX_TIMEOUT</code>, <code>BASE_URL</code></td><td><code>maxTimeout</code>, <code>baseUrl</code></td></tr>
+          <tr><td>Packages</td><td>all lowercase, dot-separated</td><td><code>com.company.tests</code></td><td><code>Com.Company.Tests</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Rules for Variable Names</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Java</span><span class="code-file">NamingRules.java</span></div>
+      <pre><span class="cm">// ✅ VALID names</span>
+<span class="ty">int</span> <span class="nm">age</span> <span class="op">=</span> <span class="nu">22</span>;
+<span class="ty">String</span> <span class="nm">firstName</span> <span class="op">=</span> <span class="st">"Sagar"</span>;
+<span class="ty">boolean</span> <span class="nm">isTestPassed</span> <span class="op">=</span> <span class="kw">true</span>;
+<span class="ty">int</span> <span class="nm">_count</span> <span class="op">=</span> <span class="nu">5</span>;       <span class="cm">// underscore allowed at start</span>
+<span class="ty">int</span> <span class="nm">$value</span> <span class="op">=</span> <span class="nu">10</span>;      <span class="cm">// $ allowed (but avoid in practice)</span>
+
+<span class="cm">// ❌ INVALID names (compile error)</span>
+<span class="cm">// int 2count = 5;      → cannot start with number</span>
+<span class="cm">// int my-value = 5;    → hyphen not allowed</span>
+<span class="cm">// int class = 5;       → 'class' is a reserved keyword</span>
+<span class="cm">// int int = 5;         → 'int' is a reserved keyword</span></pre>
+    </div>
+  </div>
+
+  <!-- ──────────────────────────────────────────────────────── -->
+  <!-- SECTION 11: CONSTANTS                                    -->
+  <!-- ──────────────────────────────────────────────────────── -->
+  <div class="section" id="s11">
+    <div class="section-header">
+      <div class="section-num">11</div>
+      <h2>Constants — The <code>final</code> Keyword</h2>
+    </div>
+
+    <p>A <strong>constant</strong> is a variable whose value cannot be changed after it's assigned. Use the <code>final</code> keyword. In Selenium frameworks, constants are used for base URLs, timeouts, and credentials.</p>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Java</span><span class="code-file">Constants.java</span></div>
+      <pre><span class="cm">// Declaring a constant</span>
+<span class="kw">final</span> <span class="ty">int</span> <span class="nm">MAX_TIMEOUT</span> <span class="op">=</span> <span class="nu">30</span>;
+<span class="kw">final</span> <span class="ty">String</span> <span class="nm">BASE_URL</span> <span class="op">=</span> <span class="st">"https://opensource-demo.orangehrmlive.com"</span>;
+<span class="kw">final</span> <span class="ty">String</span> <span class="nm">ADMIN_USER</span> <span class="op">=</span> <span class="st">"Admin"</span>;
+
+<span class="cm">// Trying to change a constant → compile error</span>
+<span class="cm">// MAX_TIMEOUT = 60;  → ERROR: cannot assign a value to final variable</span>
+
+<span class="cm">// In Selenium, you'll see this often:</span>
+<span class="kw">public class</span> <span class="nm">Config</span> {
+    <span class="kw">public static final</span> <span class="ty">String</span> <span class="nm">BASE_URL</span> <span class="op">=</span> <span class="st">"https://site.com"</span>;
+    <span class="kw">public static final</span> <span class="ty">int</span> <span class="nm">IMPLICIT_WAIT</span> <span class="op">=</span> <span class="nu">10</span>;
+    <span class="kw">public static final</span> <span class="ty">String</span> <span class="nm">BROWSER</span> <span class="op">=</span> <span class="st">"chrome"</span>;
+}</pre>
+    </div>
+  </div>
+
+  <!-- ──────────────────────────────────────────────────────── -->
+  <!-- SECTION 12: COMMENTS                                     -->
+  <!-- ──────────────────────────────────────────────────────── -->
+  <div class="section" id="s12">
+    <div class="section-header">
+      <div class="section-num">12</div>
+      <h2>Comments in Java</h2>
+    </div>
+
+    <p>Comments are notes in your code that Java ignores during compilation. They explain <em>why</em> something is done, not <em>what</em> is done (the code itself shows what).</p>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Java</span><span class="code-file">CommentsDemo.java</span></div>
+      <pre><span class="cm">// 1. Single-line comment — use for quick notes</span>
+<span class="ty">int</span> <span class="nm">timeout</span> <span class="op">=</span> <span class="nu">30</span>; <span class="cm">// seconds — industry standard for explicit wait</span>
+
+<span class="cm">/*
+ * 2. Multi-line comment — use for longer explanations
+ * This method opens a browser and navigates to the login page.
+ * Call this at the start of every test that needs authentication.
+ */</span>
+<span class="kw">public static void</span> <span class="fn">openLoginPage</span>() {
+    <span class="cm">// implementation here</span>
+}
+
+<span class="cm">/**
+ * 3. JavaDoc comment — use above classes and methods
+ * Generates automatic documentation.
+ *
+ * @param username  the admin username
+ * @param password  the admin password
+ * @return          true if login succeeds, false otherwise
+ */</span>
+<span class="kw">public boolean</span> <span class="fn">login</span>(<span class="ty">String</span> <span class="nm">username</span>, <span class="ty">String</span> <span class="nm">password</span>) {
+    <span class="kw">return</span> <span class="kw">true</span>;
+}</pre>
+    </div>
+
+    <div class="callout tip">
+      <span class="callout-icon">💡</span>
+      <div class="callout-body">
+        <div class="callout-title">When to comment and when NOT to</div>
+        <p><strong>Comment WHY:</strong> <code>// Using bcryptjs instead of bcrypt for cross-platform support</code><br>
+        <strong>Don't comment WHAT:</strong> <code>// adding 1 to i</code> above <code>i++</code> — the code is self-explanatory.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ──────────────────────────────────────────────────────── -->
+  <!-- SECTION 13: PRINT STATEMENTS                             -->
+  <!-- ──────────────────────────────────────────────────────── -->
+  <div class="section" id="s13">
+    <div class="section-header">
+      <div class="section-num">13</div>
+      <h2>Print Statements &amp; String Formatting</h2>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Java</span><span class="code-file">PrintStatements.java</span></div>
+      <pre><span class="ty">String</span> <span class="nm">name</span> <span class="op">=</span> <span class="st">"Sagar"</span>;
+<span class="ty">int</span> <span class="nm">age</span> <span class="op">=</span> <span class="nu">22</span>;
+<span class="ty">double</span> <span class="nm">score</span> <span class="op">=</span> <span class="nu">98.5</span>;
+
+<span class="cm">// println — prints then moves to new line</span>
+<span class="fn">System.out.println</span>(<span class="st">"Hello World"</span>);
+
+<span class="cm">// print — prints WITHOUT moving to new line</span>
+<span class="fn">System.out.print</span>(<span class="st">"Hello "</span>);
+<span class="fn">System.out.print</span>(<span class="st">"Sagar"</span>);   <span class="cm">// Output: Hello Sagar (same line)</span>
+
+<span class="cm">// String concatenation with + operator</span>
+<span class="fn">System.out.println</span>(<span class="st">"Name: "</span> <span class="op">+</span> name <span class="op">+</span> <span class="st">", Age: "</span> <span class="op">+</span> age);
+
+<span class="cm">// printf — formatted output (like C-style)</span>
+<span class="fn">System.out.printf</span>(<span class="st">"Name: %s, Age: %d, Score: %.1f%n"</span>, name, age, score);
+<span class="cm">// Output: Name: Sagar, Age: 22, Score: 98.5</span>
+
+<span class="cm">// String.format — build formatted string (preferred in Selenium)</span>
+<span class="ty">String</span> <span class="nm">message</span> <span class="op">=</span> <span class="ty">String</span>.<span class="fn">format</span>(<span class="st">"Test FAILED for user: %s"</span>, name);
+<span class="fn">System.out.println</span>(message);
+
+<span class="cm">// Format specifiers:</span>
+<span class="cm">// %s = String     %d = int/long    %f = float/double</span>
+<span class="cm">// %b = boolean    %n = newline     %.2f = 2 decimal places</span></pre>
+    </div>
+  </div>
+
+  <!-- ──────────────────────────────────────────────────────── -->
+  <!-- SECTION 14: PRACTICE TASK                                -->
+  <!-- ──────────────────────────────────────────────────────── -->
+  <div class="section" id="s14">
+    <div class="section-header">
+      <div class="section-num">14</div>
+      <h2>Practice Task + Expected Output</h2>
+    </div>
+
+    <p>Type this from scratch. Do NOT copy-paste. Every character you type builds muscle memory. This simulates real Selenium test data you'll work with starting Day 9.</p>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Java</span><span class="code-file">Day1Practice.java</span></div>
+      <pre><span class="kw">public class</span> <span class="nm">Day1Practice</span> {
+
+    <span class="kw">public static void</span> <span class="fn">main</span>(<span class="ty">String</span>[] args) {
+
+        <span class="cm">// ── Tester Profile ──────────────────────────────────────</span>
+        <span class="ty">String</span> <span class="nm">testerName</span>   <span class="op">=</span> <span class="st">"Sagar Thapa"</span>;
+        <span class="ty">int</span> <span class="nm">experience</span>     <span class="op">=</span> <span class="nu">1</span>;          <span class="cm">// years</span>
+        <span class="ty">double</span> <span class="nm">passRate</span>    <span class="op">=</span> <span class="nu">97.5</span>;       <span class="cm">// percentage</span>
+        <span class="ty">boolean</span> <span class="nm">isAutomation</span> <span class="op">=</span> <span class="kw">false</span>;   <span class="cm">// currently manual</span>
+
+        <span class="cm">// ── Project Info ────────────────────────────────────────</span>
+        <span class="ty">String</span> <span class="nm">projectName</span>  <span class="op">=</span> <span class="st">"OrangeHRM"</span>;
+        <span class="ty">String</span> <span class="nm">baseUrl</span>      <span class="op">=</span> <span class="st">"https://opensource-demo.orangehrmlive.com"</span>;
+        <span class="ty">int</span> <span class="nm">totalTestCases</span>  <span class="op">=</span> <span class="nu">50</span>;
+        <span class="ty">int</span> <span class="nm">passedTests</span>     <span class="op">=</span> <span class="nu">48</span>;
+        <span class="ty">int</span> <span class="nm">failedTests</span>     <span class="op">=</span> totalTestCases <span class="op">-</span> passedTests;
+
+        <span class="cm">// ── Constants ────────────────────────────────────────────</span>
+        <span class="kw">final</span> <span class="ty">int</span> <span class="nm">MAX_WAIT</span>  <span class="op">=</span> <span class="nu">30</span>;
+        <span class="kw">final</span> <span class="ty">String</span> <span class="nm">BROWSER</span> <span class="op">=</span> <span class="st">"Chrome"</span>;
+
+        <span class="cm">// ── Print Report ─────────────────────────────────────────</span>
+        <span class="fn">System.out.println</span>(<span class="st">"======================================"</span>);
+        <span class="fn">System.out.println</span>(<span class="st">"  AUTOMATION JOURNEY — DAY 1 PROFILE"</span>);
+        <span class="fn">System.out.println</span>(<span class="st">"======================================"</span>);
+        <span class="fn">System.out.println</span>(<span class="st">"Tester      : "</span> <span class="op">+</span> testerName);
+        <span class="fn">System.out.println</span>(<span class="st">"Experience  : "</span> <span class="op">+</span> experience <span class="op">+</span> <span class="st">" year(s)"</span>);
+        <span class="fn">System.out.println</span>(<span class="st">"Pass Rate   : "</span> <span class="op">+</span> passRate <span class="op">+</span> <span class="st">"%"</span>);
+        <span class="fn">System.out.println</span>(<span class="st">"Automation  : "</span> <span class="op">+</span> isAutomation);
+        <span class="fn">System.out.println</span>(<span class="st">"--------------------------------------"</span>);
+        <span class="fn">System.out.println</span>(<span class="st">"Project     : "</span> <span class="op">+</span> projectName);
+        <span class="fn">System.out.println</span>(<span class="st">"URL         : "</span> <span class="op">+</span> baseUrl);
+        <span class="fn">System.out.println</span>(<span class="st">"Total Tests : "</span> <span class="op">+</span> totalTestCases);
+        <span class="fn">System.out.println</span>(<span class="st">"Passed      : "</span> <span class="op">+</span> passedTests);
+        <span class="fn">System.out.println</span>(<span class="st">"Failed      : "</span> <span class="op">+</span> failedTests);
+        <span class="fn">System.out.println</span>(<span class="st">"--------------------------------------"</span>);
+        <span class="fn">System.out.println</span>(<span class="st">"Browser     : "</span> <span class="op">+</span> BROWSER);
+        <span class="fn">System.out.println</span>(<span class="st">"Max Wait    : "</span> <span class="op">+</span> MAX_WAIT <span class="op">+</span> <span class="st">"s"</span>);
+        <span class="fn">System.out.println</span>(<span class="st">"======================================"</span>);
+
+        <span class="cm">// ── String Operations ───────────────────────────────────</span>
+        <span class="fn">System.out.println</span>(<span class="st">"\nName uppercase : "</span> <span class="op">+</span> testerName.<span class="fn">toUpperCase</span>());
+        <span class="fn">System.out.println</span>(<span class="st">"Name length    : "</span> <span class="op">+</span> testerName.<span class="fn">length</span>());
+        <span class="fn">System.out.println</span>(<span class="st">"Contains 'QA'  : "</span> <span class="op">+</span> testerName.<span class="fn">contains</span>(<span class="st">"QA"</span>));
+
+        <span class="cm">// ── Type conversion ─────────────────────────────────────</span>
+        <span class="ty">String</span> <span class="nm">passedStr</span> <span class="op">=</span> <span class="ty">String</span>.<span class="fn">valueOf</span>(passedTests);
+        <span class="fn">System.out.println</span>(<span class="st">"\nPassed (String): "</span> <span class="op">+</span> passedStr);
+        <span class="fn">System.out.println</span>(<span class="st">"Parsed back    : "</span> <span class="op">+</span> <span class="ty">Integer</span>.<span class="fn">parseInt</span>(passedStr));
+    }
+}</pre>
+    </div>
+
+    <h3>Expected Output</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Output</span><span class="code-file">Console</span></div>
+      <pre>======================================
+  AUTOMATION JOURNEY — DAY 1 PROFILE
+======================================
+Tester      : Sagar Thapa
+Experience  : 1 year(s)
+Pass Rate   : 97.5%
+Automation  : false
+--------------------------------------
+Project     : OrangeHRM
+URL         : https://opensource-demo.orangehrmlive.com
+Total Tests : 50
+Passed      : 48
+Failed      : 2
+--------------------------------------
+Browser     : Chrome
+Max Wait    : 30s
+======================================
+
+Name uppercase : SAGAR THAPA
+Name length    : 11
+Contains 'QA'  : false
+
+Passed (String): 48
+Parsed back    : 48</pre>
+    </div>
+
+    <div class="callout purple">
+      <span class="callout-icon">🎯</span>
+      <div class="callout-body">
+        <div class="callout-title">Extension Task (if you finish early)</div>
+        <p>Add a <code>double successRate</code> variable that calculates <code>(passedTests / totalTestCases) * 100</code> and prints it. Expected value: 96.0. Hint: you'll need to cast one variable to double first — figure out why.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ──────────────────────────────────────────────────────── -->
+  <!-- SECTION 15: COMMON MISTAKES                              -->
+  <!-- ──────────────────────────────────────────────────────── -->
+  <div class="section" id="s15">
+    <div class="section-header">
+      <div class="section-num">15</div>
+      <h2>Common Mistakes — Day 1</h2>
+    </div>
+
+    <div class="mistake-grid">
+      <div class="mistake-card">
+        <div class="mistake-title">❌ Lowercase 'string'</div>
+        <p><code>string name = "x";</code> → Error. Java's String class is capital S. Always <code>String</code>.</p>
+      </div>
+      <div class="mistake-card">
+        <div class="mistake-title">❌ Missing semicolons</div>
+        <p><code>int x = 5</code> → Compile error. Every statement in Java ends with <code>;</code>. No exceptions.</p>
+      </div>
+      <div class="mistake-card">
+        <div class="mistake-title">❌ == to compare Strings</div>
+        <p><code>if (a == b)</code> on Strings compares object references, not content. Always use <code>.equals()</code>.</p>
+      </div>
+      <div class="mistake-card">
+        <div class="mistake-title">❌ Class name ≠ filename</div>
+        <p>If your class is <code>Day1Practice</code> but file is <code>day1.java</code> — compile error. Must match exactly.</p>
+      </div>
+      <div class="mistake-card">
+        <div class="mistake-title">❌ Integer division bug</div>
+        <p><code>int result = 48 / 50;</code> gives <code>0</code>, not <code>0.96</code>. Both are int so decimal is chopped. Cast first: <code>(double) 48 / 50</code>.</p>
+      </div>
+      <div class="mistake-card">
+        <div class="mistake-title">❌ Unmatched braces</div>
+        <p>Every <code>{</code> needs a closing <code>}</code>. IntelliJ shows red underline. Count your braces carefully in early days.</p>
+      </div>
+      <div class="mistake-card">
+        <div class="mistake-title">❌ Variable before declaration</div>
+        <p>Using a variable before declaring it: <code>System.out.println(x); int x = 5;</code> → Error. Declare first, use after.</p>
+      </div>
+      <div class="mistake-card">
+        <div class="mistake-title">❌ Single quotes for String</div>
+        <p><code>String name = 'Sagar';</code> → Error. Single quotes are for <code>char</code> only. Strings need double quotes.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ──────────────────────────────────────────────────────── -->
+  <!-- SECTION 16: CHECKLIST + RESOURCES                        -->
+  <!-- ──────────────────────────────────────────────────────── -->
+  <div class="section" id="s16">
+    <div class="section-header">
+      <div class="section-num">16</div>
+      <h2>End of Day Checklist + Resources</h2>
+    </div>
+
+    <div class="checklist">
+      <div class="checklist-title">✦ End of Day 1 Checklist</div>
+      <div class="check-item"><div class="check-box"></div>JDK 17 installed — <code>java -version</code> works in CMD</div>
+      <div class="check-item"><div class="check-box"></div>IntelliJ IDEA Community installed and a project created</div>
+      <div class="check-item"><div class="check-box"></div>I can explain the difference between JDK, JRE, and JVM</div>
+      <div class="check-item"><div class="check-box"></div>I can describe how Java code goes from .java → .class → output</div>
+      <div class="check-item"><div class="check-box"></div>I know all 8 primitive types (especially int, double, boolean, char)</div>
+      <div class="check-item"><div class="check-box"></div>I understand String uses double quotes, char uses single quotes</div>
+      <div class="check-item"><div class="check-box"></div>I know to use <code>.equals()</code> NOT <code>==</code> for String comparison</div>
+      <div class="check-item"><div class="check-box"></div>I understand widening vs narrowing type casting</div>
+      <div class="check-item"><div class="check-box"></div>I know <code>final</code> keyword creates constants</div>
+      <div class="check-item"><div class="check-box"></div>Practice task runs with correct output (verified line by line)</div>
+      <div class="check-item"><div class="check-box"></div>I know camelCase for variables, PascalCase for classes, ALL_CAPS for constants</div>
+    </div>
+
+    <h3>Resources for Today</h3>
+    <ul class="resource-list">
+      <li><span class="res-icon">🎥</span><strong>YouTube:&nbsp;</strong><a href="https://youtube.com/@KunalKushwaha" target="_blank">Kunal Kushwaha — Java + DSA Bootcamp</a> &nbsp;<span style="color:var(--textmuted);font-size:12px">Episodes 1–3 cover exactly today's content. Free, extremely clear.</span></li>
+      <li><span class="res-icon">🎥</span><strong>YouTube:&nbsp;</strong><a href="https://youtube.com/@Amigoscode" target="_blank">Amigoscode — Java for Beginners</a> &nbsp;<span style="color:var(--textmuted);font-size:12px">Good alternative with clean examples.</span></li>
+      <li><span class="res-icon">📖</span><strong>Docs:&nbsp;</strong><a href="https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html" target="_blank">Oracle Java Docs — Primitive Data Types</a> &nbsp;<span style="color:var(--textmuted);font-size:12px">Official reference — bookmark this.</span></li>
+      <li><span class="res-icon">⚡</span><strong>Reference:&nbsp;</strong><a href="https://www.w3schools.com/java" target="_blank">W3Schools Java</a> &nbsp;<span style="color:var(--textmuted);font-size:12px">Quick syntax lookup when you forget something.</span></li>
+      <li><span class="res-icon">🏋️</span><strong>Practice:&nbsp;</strong><a href="https://exercism.org/tracks/java" target="_blank">Exercism.io — Java Track</a> &nbsp;<span style="color:var(--textmuted);font-size:12px">Do exercises 1–3 if you have extra time.</span></li>
+    </ul>
+
+    <div class="callout tip">
+      <span class="callout-icon">🚀</span>
+      <div class="callout-body">
+        <div class="callout-title">What's Coming Tomorrow — Day 2 Preview</div>
+        <p>Tomorrow you'll learn <strong>Conditions (if/else) and Loops (for/while)</strong>. These are used in every Selenium script — looping through web elements, checking conditions before clicking, waiting for elements to appear. Show up. Two hours, Day 2.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--  FOOTER                                                      -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="footer">
+  <span>Day 1 of 65</span> &nbsp;·&nbsp; Selenium + Java Automation Roadmap &nbsp;·&nbsp; Phase 1 — Foundation &nbsp;·&nbsp; <span>Next: Day 2 — Conditions &amp; Loops</span>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 11 — First Full Selenium Script</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Sora:wght@400;600;700;800&display=swap');
+:root{--bg:#0d1117;--bg2:#161b22;--bg3:#1e2530;--border:#30363d;--accent:#f0a500;--accent2:#58a6ff;--accent3:#3fb950;--accent4:#ff7b72;--accent5:#d2a8ff;--text:#e6edf3;--muted:#8b949e;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);line-height:1.75;font-size:15px;}
+.hero{background:linear-gradient(135deg,#0d1117,#161b22,#0d1a0d);border-bottom:2px solid var(--accent3);padding:48px 40px 36px;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:0;right:0;width:400px;height:400px;background:radial-gradient(circle,rgba(63,185,80,0.07),transparent 70%);pointer-events:none;}
+.hero-tag{display:inline-block;background:rgba(63,185,80,0.12);border:1px solid rgba(63,185,80,0.3);color:var(--accent3);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;padding:4px 12px;border-radius:20px;margin-bottom:16px;}
+.hero h1{font-size:34px;font-weight:800;line-height:1.2;margin-bottom:10px;}
+.hero h1 span{color:var(--accent3);}
+.hero-sub{color:var(--muted);font-size:14px;display:flex;gap:24px;flex-wrap:wrap;margin-top:16px;}
+.hero-sub span{display:flex;align-items:center;gap:6px;}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--accent3);display:inline-block;}
+.container{max-width:980px;margin:0 auto;padding:40px 32px 80px;}
+.toc{background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--accent3);border-radius:8px;padding:24px 28px;margin-bottom:48px;}
+.toc-title{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--accent3);margin-bottom:14px;}
+.toc ol{padding-left:20px;}.toc li{margin-bottom:6px;}
+.toc a{color:var(--muted);text-decoration:none;font-size:14px;}.toc a:hover{color:var(--accent3);}
+.section{margin-bottom:56px;}
+.section-header{display:flex;align-items:center;gap:14px;margin-bottom:24px;padding-bottom:14px;border-bottom:1px solid var(--border);}
+.section-num{background:var(--accent3);color:#000;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:12px;width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.section h2{font-size:22px;font-weight:700;}
+h3{font-size:16px;font-weight:600;color:var(--accent3);margin:28px 0 12px;display:flex;align-items:center;gap:8px;}
+h3::before{content:'▸';color:var(--accent);font-size:12px;}
+p{color:var(--muted);margin-bottom:14px;line-height:1.8;}strong{color:var(--text);font-weight:600;}
+.code-block{background:#010409;border:1px solid var(--border);border-radius:10px;margin:20px 0;overflow:hidden;}
+.code-header{background:var(--bg2);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
+.code-lang{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent3);letter-spacing:1px;text-transform:uppercase;font-weight:600;}
+.code-file{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);}
+pre{font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.85;padding:20px;overflow-x:auto;color:#e6edf3;}
+.kw{color:#ff7b72;font-weight:500;}.ty{color:#ffa657;}.st{color:#a5d6ff;}.cm{color:#6e7681;font-style:italic;}
+.nm{color:#79c0ff;}.nu{color:#79c0ff;}.fn{color:#d2a8ff;}.op{color:#ff7b72;}.bool{color:#3fb950;}
+code{font-family:'JetBrains Mono',monospace;font-size:12.5px;background:rgba(63,185,80,0.1);border:1px solid rgba(63,185,80,0.2);color:var(--accent3);padding:1px 7px;border-radius:4px;}
+.callout{border-radius:8px;padding:16px 20px;margin:20px 0;display:flex;gap:14px;align-items:flex-start;}
+.callout-icon{font-size:18px;flex-shrink:0;margin-top:1px;}.callout-body{flex:1;}
+.callout-title{font-weight:700;font-size:13px;margin-bottom:4px;}.callout p{margin-bottom:0;font-size:13.5px;}
+.note{background:rgba(88,166,255,0.07);border-left:3px solid var(--accent2);}.note .callout-title{color:var(--accent2);}
+.tip{background:rgba(63,185,80,0.07);border-left:3px solid var(--accent3);}.tip .callout-title{color:var(--accent3);}
+.warn{background:rgba(240,165,0,0.07);border-left:3px solid var(--accent);}.warn .callout-title{color:var(--accent);}
+.error{background:rgba(255,123,114,0.07);border-left:3px solid var(--accent4);}.error .callout-title{color:var(--accent4);}
+.purple{background:rgba(210,168,255,0.07);border-left:3px solid var(--accent5);}.purple .callout-title{color:var(--accent5);}
+.table-wrap{overflow-x:auto;margin:20px 0;}
+table{width:100%;border-collapse:collapse;font-size:13.5px;}
+thead tr{background:var(--bg2);border-bottom:2px solid var(--accent3);}
+th{padding:12px 16px;text-align:left;font-weight:700;font-size:12px;letter-spacing:0.5px;text-transform:uppercase;color:var(--accent3);}
+td{padding:11px 16px;border-bottom:1px solid var(--border);color:var(--muted);}
+tr:hover td{background:rgba(255,255,255,0.02);}
+td:first-child{font-family:'JetBrains Mono',monospace;color:var(--accent2);font-size:13px;}
+.diagram-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:28px 24px;margin:24px 0;overflow:hidden;}
+.diagram-title{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:20px;text-align:center;}
+.hour-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(63,185,80,0.1);border:1px solid rgba(63,185,80,0.25);color:var(--accent3);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:1px;padding:5px 14px;border-radius:20px;margin-bottom:18px;margin-top:30px;}
+.mistake-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:20px 0;}
+.mistake-card{background:rgba(255,123,114,0.05);border:1px solid rgba(255,123,114,0.2);border-radius:8px;padding:16px;}
+.mistake-card .mt{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent4);font-weight:700;margin-bottom:8px;}
+.mistake-card p{font-size:13px;margin:0;}
+.checklist{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:24px 28px;margin:24px 0;}
+.checklist-title{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent3);letter-spacing:1.5px;text-transform:uppercase;font-weight:700;margin-bottom:16px;}
+.check-item{display:flex;align-items:flex-start;gap:12px;padding:9px 0;border-bottom:1px solid rgba(48,54,61,0.5);font-size:14px;color:var(--muted);}
+.check-item:last-child{border-bottom:none;}
+.check-box{width:18px;height:18px;border:2px solid var(--accent3);border-radius:4px;flex-shrink:0;margin-top:2px;}
+.resource-list{list-style:none;padding:0;margin:12px 0;}
+.resource-list li{padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;margin-bottom:8px;font-size:13.5px;display:flex;gap:10px;align-items:center;}
+.resource-list li a{color:var(--accent2);text-decoration:none;}
+.footer{background:var(--bg2);border-top:1px solid var(--border);padding:24px 40px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);}
+.footer span{color:var(--accent3);}
+::-webkit-scrollbar{width:6px;height:6px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+@media(max-width:640px){.hero{padding:32px 20px 24px;}.hero h1{font-size:24px;}.container{padding:24px 16px 60px;}}
+</style>
+</head>
+<body>
+<div class="hero">
+  <div class="hero-tag">Phase 2 &middot; Day 11 of 65</div>
+  <h1>First Full <span>Selenium Script</span></h1>
+  <div class="hero-sub">
+    <span><span class="dot"></span>2 Hours</span>
+    <span><span class="dot"></span>findElement &middot; sendKeys &middot; click &middot; getText &middot; isDisplayed &middot; OrangeHRM Login</span>
+  </div>
+</div>
+<div class="container">
+
+<div class="toc">
+  <div class="toc-title">// Table of Contents</div>
+  <ol>
+    <li><a href="#s1">What You're Doing Today</a></li>
+    <li><a href="#s2">findElement() vs findElements()</a></li>
+    <li><a href="#s3">By Locators — Quick Overview</a></li>
+    <li><a href="#s4">WebElement Core Methods</a></li>
+    <li><a href="#s5">How to Inspect Elements in Chrome DevTools</a></li>
+    <li><a href="#s6">First Full Script — OrangeHRM Login</a></li>
+    <li><a href="#s7">Assertions — Verifying Test Results</a></li>
+    <li><a href="#s8">Thread.sleep vs Proper Waits</a></li>
+    <li><a href="#s9">Logout Script</a></li>
+    <li><a href="#s10">Complete Login + Logout Script</a></li>
+    <li><a href="#s11">Practice Task + Expected Output</a></li>
+    <li><a href="#s12">Common Mistakes</a></li>
+    <li><a href="#s13">End of Day Checklist + Resources</a></li>
+  </ol>
+</div>
+
+<!-- S1 -->
+<div class="section" id="s1">
+  <div class="section-header"><div class="section-num">01</div><h2>What You're Doing Today</h2></div>
+  <div class="hour-badge">&#9200; Hour 1 — findElement &amp; WebElement (60 mins)</div>
+  <p>Today you write your <strong>first real end-to-end test</strong>: open OrangeHRM, find the username field, type "Admin", find the password field, type "admin123", click Login, verify the dashboard loaded. This is automation. Every concept you've learned culminates in this script.</p>
+  <div class="callout note">
+    <span class="callout-icon">&#128204;</span>
+    <div class="callout-body">
+      <div class="callout-title">OrangeHRM Demo Credentials</div>
+      <p><strong>URL:</strong> https://opensource-demo.orangehrmlive.com<br>
+      <strong>Username:</strong> Admin<br>
+      <strong>Password:</strong> admin123<br>
+      These credentials work on the demo site. Sometimes the site resets — if login fails, check the demo page for updated credentials.</p>
+    </div>
+  </div>
+</div>
+
+<!-- S2 -->
+<div class="section" id="s2">
+  <div class="section-header"><div class="section-num">02</div><h2>findElement() vs findElements()</h2></div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Method</th><th>Returns</th><th>If Nothing Found</th><th>Use When</th></tr></thead>
+      <tbody>
+        <tr><td>driver.findElement(By)</td><td>Single WebElement (first match)</td><td>Throws NoSuchElementException</td><td>You expect exactly one element</td></tr>
+        <tr><td>driver.findElements(By)</td><td>List&lt;WebElement&gt; (all matches)</td><td>Returns empty List (no exception)</td><td>Multiple elements possible (links, rows)</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">FindElement.java</span></div>
+    <pre><span class="kw">import</span> org.openqa.selenium.By;
+<span class="kw">import</span> org.openqa.selenium.WebElement;
+<span class="kw">import</span> java.util.List;
+
+<span class="cm">// findElement — throws if not found</span>
+WebElement <span class="nm">username</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">name</span>(<span class="st">"username"</span>));
+
+<span class="cm">// findElements — returns empty list if not found (safe)</span>
+List&lt;WebElement&gt; <span class="nm">links</span> <span class="op">=</span> driver.<span class="fn">findElements</span>(By.<span class="fn">tagName</span>(<span class="st">"a"</span>));
+<span class="fn">System.out.println</span>(<span class="st">"Total links: "</span> <span class="op">+</span> links.<span class="fn">size</span>());
+
+<span class="cm">// Check if element exists without exception</span>
+<span class="ty">boolean</span> <span class="nm">exists</span> <span class="op">=</span> !driver.<span class="fn">findElements</span>(By.<span class="fn">id</span>(<span class="st">"submitBtn"</span>)).<span class="fn">isEmpty</span>();
+<span class="fn">System.out.println</span>(<span class="st">"Button exists: "</span> <span class="op">+</span> exists);</pre>
+  </div>
+</div>
+
+<!-- S3 -->
+<div class="section" id="s3">
+  <div class="section-header"><div class="section-num">03</div><h2>By Locators — Quick Overview</h2></div>
+  <p>The <code>By</code> class tells Selenium HOW to find an element. Full deep-dive is Days 14–16. For today, these 4 are enough to write real scripts:</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Locator</th><th>Syntax</th><th>Finds Element By</th><th>Best For</th></tr></thead>
+      <tbody>
+        <tr><td>By.id</td><td><code>By.id("username")</code></td><td>HTML id attribute</td><td>Most reliable — IDs should be unique</td></tr>
+        <tr><td>By.name</td><td><code>By.name("username")</code></td><td>HTML name attribute</td><td>Form fields (input, select)</td></tr>
+        <tr><td>By.xpath</td><td><code>By.xpath("//input[@name='username']")</code></td><td>XML path expression</td><td>Complex elements, no id/name</td></tr>
+        <tr><td>By.cssSelector</td><td><code>By.cssSelector(".oxd-input")</code></td><td>CSS selector</td><td>Class-based, modern alternative to XPath</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout tip">
+    <span class="callout-icon">&#9989;</span>
+    <div class="callout-body">
+      <div class="callout-title">OrangeHRM uses name attribute for login fields</div>
+      <p>The username field has <code>name="username"</code> and password has <code>name="password"</code>. So <code>By.name("username")</code> is the cleanest locator for today. You'll learn all locator strategies on Day 14–16.</p>
+    </div>
+  </div>
+</div>
+
+<!-- S4 -->
+<div class="section" id="s4">
+  <div class="section-header"><div class="section-num">04</div><h2>WebElement Core Methods</h2></div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Method</th><th>What It Does</th><th>Returns</th></tr></thead>
+      <tbody>
+        <tr><td>element.click()</td><td>Click the element (buttons, links, checkboxes)</td><td>void</td></tr>
+        <tr><td>element.sendKeys("text")</td><td>Type text into an input field</td><td>void</td></tr>
+        <tr><td>element.clear()</td><td>Clear existing text from input field</td><td>void</td></tr>
+        <tr><td>element.getText()</td><td>Get visible text content of element</td><td>String</td></tr>
+        <tr><td>element.getAttribute("name")</td><td>Get value of any HTML attribute</td><td>String</td></tr>
+        <tr><td>element.isDisplayed()</td><td>Is element visible on screen?</td><td>boolean</td></tr>
+        <tr><td>element.isEnabled()</td><td>Is element interactable (not disabled)?</td><td>boolean</td></tr>
+        <tr><td>element.isSelected()</td><td>Is checkbox/radio selected?</td><td>boolean</td></tr>
+        <tr><td>element.getTagName()</td><td>Get HTML tag name (input, button, div)</td><td>String</td></tr>
+        <tr><td>element.getCssValue("color")</td><td>Get computed CSS property value</td><td>String</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">WebElementMethods.java</span></div>
+    <pre><span class="cm">// Find an input field and interact with it</span>
+WebElement <span class="nm">usernameField</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">name</span>(<span class="st">"username"</span>));
+
+<span class="cm">// Type into it</span>
+usernameField.<span class="fn">sendKeys</span>(<span class="st">"Admin"</span>);
+
+<span class="cm">// Clear and retype</span>
+usernameField.<span class="fn">clear</span>();
+usernameField.<span class="fn">sendKeys</span>(<span class="st">"NewAdmin"</span>);
+
+<span class="cm">// Read back what's in the field</span>
+<span class="ty">String</span> <span class="nm">value</span> <span class="op">=</span> usernameField.<span class="fn">getAttribute</span>(<span class="st">"value"</span>); <span class="cm">// "NewAdmin"</span>
+<span class="fn">System.out.println</span>(<span class="st">"Field value: "</span> <span class="op">+</span> value);
+
+<span class="cm">// State checks before interacting</span>
+<span class="fn">System.out.println</span>(<span class="st">"Displayed: "</span> <span class="op">+</span> usernameField.<span class="fn">isDisplayed</span>()); <span class="cm">// true</span>
+<span class="fn">System.out.println</span>(<span class="st">"Enabled  : "</span> <span class="op">+</span> usernameField.<span class="fn">isEnabled</span>());   <span class="cm">// true</span>
+<span class="fn">System.out.println</span>(<span class="st">"Tag name : "</span> <span class="op">+</span> usernameField.<span class="fn">getTagName</span>());  <span class="cm">// input</span>
+
+<span class="cm">// Click a button</span>
+WebElement <span class="nm">loginBtn</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">cssSelector</span>(<span class="st">"button[type='submit']"</span>));
+loginBtn.<span class="fn">click</span>();
+
+<span class="cm">// Get text from an element</span>
+WebElement <span class="nm">heading</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">xpath</span>(<span class="st">"//h6[@class='oxd-text']"</span>));
+<span class="fn">System.out.println</span>(<span class="st">"Heading: "</span> <span class="op">+</span> heading.<span class="fn">getText</span>());</pre>
+  </div>
+</div>
+
+<!-- S5 -->
+<div class="section" id="s5">
+  <div class="section-header"><div class="section-num">05</div><h2>How to Inspect Elements in Chrome DevTools</h2></div>
+  <p>To write locators you need to find the correct HTML attributes of elements. Chrome DevTools is your tool for this — you'll use it every day from now on.</p>
+  <div class="diagram-wrap">
+    <div class="diagram-title">// How to Find Locators — DevTools Workflow</div>
+    <svg viewBox="0 0 700 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:700px;display:block;margin:0 auto">
+      <defs><marker id="st" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0L0,6L8,3z" fill="#8b949e"/></marker></defs>
+      <!-- Steps -->
+      <rect x="10" y="30" width="110" height="60" rx="8" fill="#1e2530" stroke="#3fb950" stroke-width="1.5"/>
+      <text x="65" y="55" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#3fb950" font-weight="700">STEP 1</text>
+      <text x="65" y="70" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#8b949e">Right-click element</text>
+      <text x="65" y="83" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#8b949e">→ Inspect</text>
+
+      <line x1="120" y1="60" x2="145" y2="60" stroke="#8b949e" stroke-width="1.5" marker-end="url(#st)"/>
+
+      <rect x="145" y="30" width="110" height="60" rx="8" fill="#1e2530" stroke="#f0a500" stroke-width="1.5"/>
+      <text x="200" y="55" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#f0a500" font-weight="700">STEP 2</text>
+      <text x="200" y="70" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#8b949e">HTML panel opens</text>
+      <text x="200" y="83" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#8b949e">Element highlighted</text>
+
+      <line x1="255" y1="60" x2="280" y2="60" stroke="#8b949e" stroke-width="1.5" marker-end="url(#st)"/>
+
+      <rect x="280" y="30" width="130" height="60" rx="8" fill="#1e2530" stroke="#58a6ff" stroke-width="1.5"/>
+      <text x="345" y="55" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#58a6ff" font-weight="700">STEP 3</text>
+      <text x="345" y="70" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#8b949e">Check: id, name,</text>
+      <text x="345" y="83" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#8b949e">class, type, xpath</text>
+
+      <line x1="410" y1="60" x2="435" y2="60" stroke="#8b949e" stroke-width="1.5" marker-end="url(#st)"/>
+
+      <rect x="435" y="30" width="130" height="60" rx="8" fill="#1e2530" stroke="#d2a8ff" stroke-width="1.5"/>
+      <text x="500" y="50" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#d2a8ff" font-weight="700">STEP 4</text>
+      <text x="500" y="65" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#8b949e">Ctrl+F to search</text>
+      <text x="500" y="78" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#8b949e">HTML panel. Test</text>
+      <text x="500" y="91" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#8b949e">your XPath/CSS</text>
+
+      <!-- OrangeHRM HTML example -->
+      <rect x="10" y="115" width="680" height="75" rx="8" fill="#010409" stroke="#30363d"/>
+      <text x="26" y="137" font-family="JetBrains Mono,monospace" font-size="11"><tspan fill="#6e7681">&lt;</tspan><tspan fill="#ff7b72">input</tspan><tspan fill="#f0a500"> name</tspan><tspan fill="#e6edf3">=</tspan><tspan fill="#a5d6ff">"username"</tspan><tspan fill="#f0a500"> autocomplete</tspan><tspan fill="#e6edf3">=</tspan><tspan fill="#a5d6ff">"username"</tspan></text>
+      <text x="26" y="155" font-family="JetBrains Mono,monospace" font-size="11"><tspan fill="#f0a500">        placeholder</tspan><tspan fill="#e6edf3">=</tspan><tspan fill="#a5d6ff">"Username"</tspan><tspan fill="#f0a500"> class</tspan><tspan fill="#e6edf3">=</tspan><tspan fill="#a5d6ff">"oxd-input oxd-input--active"</tspan><tspan fill="#6e7681">/&gt;</tspan></text>
+      <text x="26" y="180" font-family="Sora,sans-serif" font-size="10" fill="#6e7681">Locators you can use: &nbsp; By.name("username") &nbsp; By.cssSelector(".oxd-input") &nbsp; By.xpath("//input[@name='username']")</text>
+    </svg>
+  </div>
+
+  <h3>Keyboard Shortcuts You Need Daily</h3>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Shortcut</th><th>Action</th></tr></thead>
+      <tbody>
+        <tr><td>F12</td><td>Open/close DevTools</td></tr>
+        <tr><td>Ctrl + Shift + C</td><td>Open element picker (click any element to inspect it)</td></tr>
+        <tr><td>Ctrl + F (in HTML panel)</td><td>Search for text / test XPath or CSS selector</td></tr>
+        <tr><td>Right-click element → Copy → Copy XPath</td><td>Get full XPath of any element</td></tr>
+        <tr><td>Right-click element → Copy → Copy selector</td><td>Get CSS selector of any element</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- S6 -->
+<div class="section" id="s6">
+  <div class="section-header"><div class="section-num">06</div><h2>First Full Script — OrangeHRM Login</h2></div>
+  <p>This is it. Your first real end-to-end automated test. Read every line and understand what it does before running it.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">OrangeHRM_LoginTest.java — Line by line</span></div>
+    <pre><span class="kw">package</span> com.qaautomation.tests;
+
+<span class="kw">import</span> com.qaautomation.utils.DriverFactory;
+<span class="kw">import</span> org.openqa.selenium.By;
+<span class="kw">import</span> org.openqa.selenium.WebDriver;
+<span class="kw">import</span> org.openqa.selenium.WebElement;
+<span class="kw">import</span> java.time.Duration;
+
+<span class="kw">public class</span> <span class="nm">OrangeHRM_LoginTest</span> {
+
+    <span class="kw">private static final</span> <span class="ty">String</span> <span class="nm">BASE_URL</span>  <span class="op">=</span> <span class="st">"https://opensource-demo.orangehrmlive.com"</span>;
+    <span class="kw">private static final</span> <span class="ty">String</span> <span class="nm">USERNAME</span>  <span class="op">=</span> <span class="st">"Admin"</span>;
+    <span class="kw">private static final</span> <span class="ty">String</span> <span class="nm">PASSWORD</span>  <span class="op">=</span> <span class="st">"admin123"</span>;
+
+    <span class="kw">public static void</span> <span class="fn">main</span>(<span class="ty">String</span>[] args) {
+
+        WebDriver <span class="nm">driver</span> <span class="op">=</span> DriverFactory.<span class="fn">getDriver</span>(<span class="st">"chrome"</span>);
+
+        <span class="kw">try</span> {
+            <span class="cm">// ── STEP 1: Navigate to login page ───────────────────</span>
+            driver.<span class="fn">get</span>(BASE_URL);
+            <span class="fn">System.out.println</span>(<span class="st">"[1] Navigated to: "</span> <span class="op">+</span> driver.<span class="fn">getTitle</span>());
+
+            <span class="cm">// ── STEP 2: Find &amp; fill username field ───────────────</span>
+            WebElement <span class="nm">usernameField</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">name</span>(<span class="st">"username"</span>));
+            <span class="fn">System.out.println</span>(<span class="st">"[2] Username field found: "</span> <span class="op">+</span> usernameField.<span class="fn">isDisplayed</span>());
+            usernameField.<span class="fn">clear</span>();
+            usernameField.<span class="fn">sendKeys</span>(USERNAME);
+            <span class="fn">System.out.println</span>(<span class="st">"[3] Entered username: "</span> <span class="op">+</span> usernameField.<span class="fn">getAttribute</span>(<span class="st">"value"</span>));
+
+            <span class="cm">// ── STEP 3: Find &amp; fill password field ───────────────</span>
+            WebElement <span class="nm">passwordField</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">name</span>(<span class="st">"password"</span>));
+            passwordField.<span class="fn">clear</span>();
+            passwordField.<span class="fn">sendKeys</span>(PASSWORD);
+            <span class="fn">System.out.println</span>(<span class="st">"[4] Password entered (length): "</span>
+                <span class="op">+</span> passwordField.<span class="fn">getAttribute</span>(<span class="st">"value"</span>).<span class="fn">length</span>());
+
+            <span class="cm">// ── STEP 4: Click Login button ────────────────────────</span>
+            WebElement <span class="nm">loginBtn</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(
+                By.<span class="fn">cssSelector</span>(<span class="st">"button[type='submit']"</span>)
+            );
+            <span class="fn">System.out.println</span>(<span class="st">"[5] Login button enabled: "</span> <span class="op">+</span> loginBtn.<span class="fn">isEnabled</span>());
+            loginBtn.<span class="fn">click</span>();
+            <span class="fn">System.out.println</span>(<span class="st">"[6] Clicked Login button"</span>);
+
+            <span class="cm">// ── STEP 5: Wait and verify dashboard loaded ──────────</span>
+            <span class="cm">// Simple wait — Day 20 we replace this with proper explicit wait</span>
+            Thread.<span class="fn">sleep</span>(<span class="nu">2000</span>);
+
+            <span class="ty">String</span> <span class="nm">currentUrl</span> <span class="op">=</span> driver.<span class="fn">getCurrentUrl</span>();
+            <span class="ty">String</span> <span class="nm">title</span>      <span class="op">=</span> driver.<span class="fn">getTitle</span>();
+            <span class="fn">System.out.println</span>(<span class="st">"[7] Current URL  : "</span> <span class="op">+</span> currentUrl);
+            <span class="fn">System.out.println</span>(<span class="st">"[8] Current Title: "</span> <span class="op">+</span> title);
+
+            <span class="cm">// ── STEP 6: Assert login was successful ───────────────</span>
+            <span class="ty">boolean</span> <span class="nm">urlPassed</span>   <span class="op">=</span> currentUrl.<span class="fn">contains</span>(<span class="st">"dashboard"</span>);
+            <span class="ty">boolean</span> <span class="nm">titlePassed</span> <span class="op">=</span> title.<span class="fn">equals</span>(<span class="st">"OrangeHRM"</span>);
+
+            <span class="fn">System.out.println</span>(<span class="st">"[9] URL has 'dashboard': "</span>  <span class="op">+</span> urlPassed);
+            <span class="fn">System.out.println</span>(<span class="st">"[10] Title is 'OrangeHRM': "</span> <span class="op">+</span> titlePassed);
+
+            <span class="kw">if</span> (urlPassed <span class="op">&amp;&amp;</span> titlePassed) {
+                <span class="fn">System.out.println</span>(<span class="st">"\n✓ LOGIN TEST PASSED"</span>);
+            } <span class="kw">else</span> {
+                <span class="fn">System.out.println</span>(<span class="st">"\n✗ LOGIN TEST FAILED"</span>);
+            }
+
+            <span class="cm">// ── STEP 7: Verify dashboard element ─────────────────</span>
+            WebElement <span class="nm">userDropdown</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(
+                By.<span class="fn">cssSelector</span>(<span class="st">".oxd-userdropdown-name"</span>)
+            );
+            <span class="fn">System.out.println</span>(<span class="st">"[11] Logged in as: "</span> <span class="op">+</span> userDropdown.<span class="fn">getText</span>());
+
+        } <span class="kw">catch</span> (InterruptedException <span class="nm">e</span>) {
+            Thread.<span class="fn">currentThread</span>().<span class="fn">interrupt</span>();
+        } <span class="kw">catch</span> (Exception <span class="nm">e</span>) {
+            <span class="fn">System.out.println</span>(<span class="st">"✗ Test error: "</span> <span class="op">+</span> e.<span class="fn">getMessage</span>());
+            e.<span class="fn">printStackTrace</span>();
+        } <span class="kw">finally</span> {
+            driver.<span class="fn">quit</span>();
+            <span class="fn">System.out.println</span>(<span class="st">"[QUIT] Browser closed"</span>);
+        }
+    }
+}</pre>
+  </div>
+
+  <h3>Expected Console Output</h3>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Output</span><span class="code-file">Console</span></div>
+    <pre>[SETUP] chrome started
+[1] Navigated to: OrangeHRM
+[2] Username field found: true
+[3] Entered username: Admin
+[4] Password entered (length): 8
+[5] Login button enabled: true
+[6] Clicked Login button
+[7] Current URL  : https://opensource-demo.orangehrmlive.com/web/index.php/dashboard/index
+[8] Current Title: OrangeHRM
+[9] URL has 'dashboard': true
+[10] Title is 'OrangeHRM': true
+
+✓ LOGIN TEST PASSED
+[11] Logged in as: Admin
+[QUIT] Browser closed</pre>
+  </div>
+</div>
+
+<!-- S7 -->
+<div class="section" id="s7">
+  <div class="section-header"><div class="section-num">07</div><h2>Assertions — Verifying Test Results</h2></div>
+  <p>Right now we're using simple if/else. From Day 27 (TestNG), we'll use proper assertion libraries. But the logic is identical — compare actual vs expected.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">Assertions.java</span></div>
+    <pre><span class="cm">// Manual assertion (what we're doing now)</span>
+<span class="ty">String</span> <span class="nm">expected</span> <span class="op">=</span> <span class="st">"OrangeHRM"</span>;
+<span class="ty">String</span> <span class="nm">actual</span>   <span class="op">=</span> driver.<span class="fn">getTitle</span>();
+
+<span class="kw">if</span> (actual.<span class="fn">equals</span>(expected)) {
+    <span class="fn">System.out.println</span>(<span class="st">"PASS: Title matched"</span>);
+} <span class="kw">else</span> {
+    <span class="fn">System.out.println</span>(<span class="st">"FAIL: Expected='"</span> <span class="op">+</span> expected <span class="op">+</span> <span class="st">"' Got='"</span> <span class="op">+</span> actual <span class="op">+</span> <span class="st">"'"</span>);
+}
+
+<span class="cm">// URL contains check</span>
+<span class="ty">boolean</span> <span class="nm">onDashboard</span> <span class="op">=</span> driver.<span class="fn">getCurrentUrl</span>().<span class="fn">contains</span>(<span class="st">"dashboard"</span>);
+
+<span class="cm">// Element exists check</span>
+<span class="ty">boolean</span> <span class="nm">errorMsgShown</span> <span class="op">=</span> !driver.<span class="fn">findElements</span>(
+    By.<span class="fn">cssSelector</span>(<span class="st">".oxd-alert-content"</span>)).<span class="fn">isEmpty</span>();
+
+<span class="cm">// Day 27 — TestNG assertions look like this:</span>
+<span class="cm">// Assert.assertEquals(actual, expected, "Title mismatch");</span>
+<span class="cm">// Assert.assertTrue(onDashboard, "Not on dashboard after login");</span>
+<span class="cm">// Assert.assertFalse(errorMsgShown, "Error message shown after login");</span></pre>
+  </div>
+</div>
+
+<!-- S8 -->
+<div class="section" id="s8">
+  <div class="section-header"><div class="section-num">08</div><h2>Thread.sleep vs Proper Waits</h2></div>
+  <div class="callout error">
+    <span class="callout-icon">&#128680;</span>
+    <div class="callout-body">
+      <div class="callout-title">Thread.sleep is a code smell — use it only temporarily</div>
+      <p><code>Thread.sleep(2000)</code> always waits 2 full seconds, even if the page loaded in 200ms. This makes your test suite slow. On a slow network it may still not be enough — test becomes flaky. We use it TODAY only as a placeholder until you learn explicit waits on Day 20. After Day 20, remove all Thread.sleep calls from your scripts.</p>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Wait Type</th><th>How It Works</th><th>Use When</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td>Thread.sleep(ms)</td><td>Hard pause — always waits the full time regardless</td><td>Only as temp placeholder during learning</td><td>&#10060; Remove after Day 20</td></tr>
+        <tr><td>Implicit Wait</td><td>Global setting — waits up to X seconds for findElement()</td><td>Set once in DriverFactory as safety net</td><td>&#9989; Use now (Days 9–19)</td></tr>
+        <tr><td>Explicit Wait (WebDriverWait)</td><td>Waits for a specific condition to be true, polls every 500ms</td><td>Waiting for specific element or state</td><td>&#9989; Day 20 onwards — best practice</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- S9 -->
+<div class="section" id="s9">
+  <div class="section-header"><div class="section-num">09</div><h2>Logout Script</h2></div>
+  <div class="hour-badge">&#9200; Hour 2 — Complete Script (60 mins)</div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">OrangeHRM_Logout.java</span></div>
+    <pre><span class="cm">// After login — perform logout</span>
+<span class="cm">// Logout in OrangeHRM:</span>
+<span class="cm">// 1. Click user name dropdown (top right)</span>
+<span class="cm">// 2. Click "Logout" from the dropdown menu</span>
+
+<span class="cm">// ── Click user dropdown ────────────────────────────────────────</span>
+WebElement <span class="nm">userDropdown</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(
+    By.<span class="fn">cssSelector</span>(<span class="st">".oxd-userdropdown-tab"</span>)
+);
+userDropdown.<span class="fn">click</span>();
+<span class="fn">System.out.println</span>(<span class="st">"[12] Clicked user dropdown"</span>);
+
+<span class="cm">// Short wait for dropdown to appear</span>
+Thread.<span class="fn">sleep</span>(<span class="nu">1000</span>);
+
+<span class="cm">// ── Click Logout ───────────────────────────────────────────────</span>
+WebElement <span class="nm">logoutBtn</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(
+    By.<span class="fn">xpath</span>(<span class="st">"//a[text()='Logout']"</span>)
+);
+logoutBtn.<span class="fn">click</span>();
+<span class="fn">System.out.println</span>(<span class="st">"[13] Clicked Logout"</span>);
+
+Thread.<span class="fn">sleep</span>(<span class="nu">1500</span>);
+
+<span class="cm">// ── Verify back on login page ──────────────────────────────────</span>
+<span class="ty">String</span> <span class="nm">logoutUrl</span> <span class="op">=</span> driver.<span class="fn">getCurrentUrl</span>();
+<span class="ty">boolean</span> <span class="nm">loggedOut</span> <span class="op">=</span> logoutUrl.<span class="fn">contains</span>(<span class="st">"login"</span>) <span class="op">||</span> logoutUrl.<span class="fn">contains</span>(<span class="st">"auth"</span>);
+<span class="fn">System.out.println</span>(<span class="st">"[14] After logout URL: "</span> <span class="op">+</span> logoutUrl);
+<span class="fn">System.out.println</span>(loggedOut <span class="op">?</span> <span class="st">"✓ LOGOUT TEST PASSED"</span> <span class="op">:</span> <span class="st">"✗ LOGOUT TEST FAILED"</span>);</pre>
+  </div>
+</div>
+
+<!-- S10 -->
+<div class="section" id="s10">
+  <div class="section-header"><div class="section-num">10</div><h2>Complete Login + Logout Script</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">OrangeHRM_LoginLogoutTest.java — Full script</span></div>
+    <pre><span class="kw">package</span> com.qaautomation.tests;
+
+<span class="kw">import</span> com.qaautomation.utils.DriverFactory;
+<span class="kw">import</span> org.openqa.selenium.By;
+<span class="kw">import</span> org.openqa.selenium.WebDriver;
+<span class="kw">import</span> org.openqa.selenium.WebElement;
+
+<span class="kw">public class</span> <span class="nm">OrangeHRM_LoginLogoutTest</span> {
+
+    <span class="kw">static final</span> <span class="ty">String</span> <span class="nm">URL</span>  <span class="op">=</span> <span class="st">"https://opensource-demo.orangehrmlive.com"</span>;
+    <span class="kw">static final</span> <span class="ty">String</span> <span class="nm">USER</span> <span class="op">=</span> <span class="st">"Admin"</span>;
+    <span class="kw">static final</span> <span class="ty">String</span> <span class="nm">PASS</span> <span class="op">=</span> <span class="st">"admin123"</span>;
+
+    <span class="kw">static</span> WebDriver <span class="nm">driver</span>;
+
+    <span class="kw">public static void</span> <span class="fn">main</span>(<span class="ty">String</span>[] args) <span class="kw">throws</span> InterruptedException {
+        driver <span class="op">=</span> DriverFactory.<span class="fn">getDriver</span>(<span class="st">"chrome"</span>);
+        <span class="kw">try</span> {
+            <span class="fn">testLogin</span>();
+            <span class="fn">testLogout</span>();
+        } <span class="kw">catch</span> (Exception <span class="nm">e</span>) {
+            <span class="fn">System.out.println</span>(<span class="st">"FATAL: "</span> <span class="op">+</span> e.<span class="fn">getMessage</span>());
+        } <span class="kw">finally</span> {
+            driver.<span class="fn">quit</span>();
+        }
+    }
+
+    <span class="kw">static void</span> <span class="fn">testLogin</span>() <span class="kw">throws</span> InterruptedException {
+        <span class="fn">System.out.println</span>(<span class="st">"\n====== LOGIN TEST ======"</span>);
+
+        driver.<span class="fn">get</span>(URL);
+        <span class="fn">System.out.println</span>(<span class="st">"  Page    : "</span> <span class="op">+</span> driver.<span class="fn">getTitle</span>());
+
+        driver.<span class="fn">findElement</span>(By.<span class="fn">name</span>(<span class="st">"username"</span>)).<span class="fn">sendKeys</span>(USER);
+        driver.<span class="fn">findElement</span>(By.<span class="fn">name</span>(<span class="st">"password"</span>)).<span class="fn">sendKeys</span>(PASS);
+        driver.<span class="fn">findElement</span>(By.<span class="fn">cssSelector</span>(<span class="st">"button[type='submit']"</span>)).<span class="fn">click</span>();
+
+        Thread.<span class="fn">sleep</span>(<span class="nu">2000</span>);
+
+        <span class="ty">boolean</span> <span class="nm">passed</span> <span class="op">=</span> driver.<span class="fn">getCurrentUrl</span>().<span class="fn">contains</span>(<span class="st">"dashboard"</span>);
+        <span class="fn">System.out.println</span>(<span class="st">"  URL     : "</span> <span class="op">+</span> driver.<span class="fn">getCurrentUrl</span>());
+        <span class="fn">System.out.println</span>(<span class="st">"  Logged in as: "</span>
+            <span class="op">+</span> driver.<span class="fn">findElement</span>(By.<span class="fn">cssSelector</span>(<span class="st">".oxd-userdropdown-name"</span>)).<span class="fn">getText</span>());
+        <span class="fn">System.out.println</span>(passed <span class="op">?</span> <span class="st">"  ✓ PASS"</span> <span class="op">:</span> <span class="st">"  ✗ FAIL"</span>);
+    }
+
+    <span class="kw">static void</span> <span class="fn">testLogout</span>() <span class="kw">throws</span> InterruptedException {
+        <span class="fn">System.out.println</span>(<span class="st">"\n====== LOGOUT TEST ======"</span>);
+
+        driver.<span class="fn">findElement</span>(By.<span class="fn">cssSelector</span>(<span class="st">".oxd-userdropdown-tab"</span>)).<span class="fn">click</span>();
+        Thread.<span class="fn">sleep</span>(<span class="nu">800</span>);
+        driver.<span class="fn">findElement</span>(By.<span class="fn">xpath</span>(<span class="st">"//a[text()='Logout']"</span>)).<span class="fn">click</span>();
+        Thread.<span class="fn">sleep</span>(<span class="nu">1500</span>);
+
+        <span class="ty">String</span> <span class="nm">url</span>    <span class="op">=</span> driver.<span class="fn">getCurrentUrl</span>();
+        <span class="ty">boolean</span> <span class="nm">passed</span> <span class="op">=</span> url.<span class="fn">contains</span>(<span class="st">"login"</span>) <span class="op">||</span> url.<span class="fn">contains</span>(<span class="st">"auth"</span>);
+
+        <span class="cm">// Verify login form visible again</span>
+        <span class="ty">boolean</span> <span class="nm">loginFormShown</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(
+            By.<span class="fn">name</span>(<span class="st">"username"</span>)).<span class="fn">isDisplayed</span>();
+
+        <span class="fn">System.out.println</span>(<span class="st">"  URL         : "</span> <span class="op">+</span> url);
+        <span class="fn">System.out.println</span>(<span class="st">"  Login form  : "</span> <span class="op">+</span> loginFormShown);
+        <span class="fn">System.out.println</span>(passed <span class="op">&amp;&amp;</span> loginFormShown <span class="op">?</span> <span class="st">"  ✓ PASS"</span> <span class="op">:</span> <span class="st">"  ✗ FAIL"</span>);
+    }
+}</pre>
+  </div>
+  <h3>Expected Output</h3>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Output</span><span class="code-file">Console</span></div>
+    <pre>====== LOGIN TEST ======
+  Page    : OrangeHRM
+  URL     : https://opensource-demo.orangehrmlive.com/web/index.php/dashboard/index
+  Logged in as: Admin
+  ✓ PASS
+
+====== LOGOUT TEST ======
+  URL         : https://opensource-demo.orangehrmlive.com/web/index.php/auth/login
+  Login form  : true
+  ✓ PASS</pre>
+  </div>
+</div>
+
+<!-- S11 -->
+<div class="section" id="s11">
+  <div class="section-header"><div class="section-num">11</div><h2>Practice Task + Expected Output</h2></div>
+  <p>Write this from scratch — do not copy from above. This is a slightly extended version that also tests invalid login.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">Day11Practice.java</span></div>
+    <pre><span class="kw">package</span> com.qaautomation.tests;
+
+<span class="kw">import</span> com.qaautomation.utils.DriverFactory;
+<span class="kw">import</span> org.openqa.selenium.*;
+
+<span class="kw">public class</span> <span class="nm">Day11Practice</span> {
+
+    <span class="kw">static</span> WebDriver <span class="nm">driver</span>;
+    <span class="kw">static final</span> <span class="ty">String</span> <span class="nm">URL</span> <span class="op">=</span> <span class="st">"https://opensource-demo.orangehrmlive.com"</span>;
+
+    <span class="kw">static void</span> <span class="fn">tryLogin</span>(<span class="ty">String</span> <span class="nm">user</span>, <span class="ty">String</span> <span class="nm">pass</span>, <span class="ty">String</span> <span class="nm">testName</span>)
+        <span class="kw">throws</span> InterruptedException {
+
+        <span class="fn">System.out.println</span>(<span class="st">"\n====== "</span> <span class="op">+</span> testName <span class="op">+</span> <span class="st">" ======"</span>);
+        driver.<span class="fn">get</span>(URL);
+
+        <span class="cm">// Fill form</span>
+        WebElement <span class="nm">u</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">name</span>(<span class="st">"username"</span>));
+        WebElement <span class="nm">p</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">name</span>(<span class="st">"password"</span>));
+        u.<span class="fn">clear</span>(); u.<span class="fn">sendKeys</span>(user);
+        p.<span class="fn">clear</span>(); p.<span class="fn">sendKeys</span>(pass);
+        driver.<span class="fn">findElement</span>(By.<span class="fn">cssSelector</span>(<span class="st">"button[type='submit']"</span>)).<span class="fn">click</span>();
+
+        Thread.<span class="fn">sleep</span>(<span class="nu">2000</span>);
+
+        <span class="ty">String</span> <span class="nm">url</span> <span class="op">=</span> driver.<span class="fn">getCurrentUrl</span>();
+        <span class="ty">boolean</span> <span class="nm">loggedIn</span> <span class="op">=</span> url.<span class="fn">contains</span>(<span class="st">"dashboard"</span>);
+
+        <span class="kw">if</span> (loggedIn) {
+            <span class="ty">String</span> <span class="nm">who</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(
+                By.<span class="fn">cssSelector</span>(<span class="st">".oxd-userdropdown-name"</span>)).<span class="fn">getText</span>();
+            <span class="fn">System.out.println</span>(<span class="st">"  Result: LOGIN SUCCESS"</span>);
+            <span class="fn">System.out.println</span>(<span class="st">"  User  : "</span> <span class="op">+</span> who);
+        } <span class="kw">else</span> {
+            <span class="cm">// Check for error message</span>
+            <span class="nm">List</span>&lt;WebElement&gt; <span class="nm">errors</span> <span class="op">=</span> driver.<span class="fn">findElements</span>(
+                By.<span class="fn">cssSelector</span>(<span class="st">".oxd-alert-content"</span>));
+            <span class="ty">String</span> <span class="nm">errMsg</span> <span class="op">=</span> errors.<span class="fn">isEmpty</span>() <span class="op">?</span> <span class="st">"No error shown"</span> : errors.<span class="fn">get</span>(<span class="nu">0</span>).<span class="fn">getText</span>();
+            <span class="fn">System.out.println</span>(<span class="st">"  Result: LOGIN FAILED"</span>);
+            <span class="fn">System.out.println</span>(<span class="st">"  Error : "</span> <span class="op">+</span> errMsg);
+        }
+    }
+
+    <span class="kw">public static void</span> <span class="fn">main</span>(<span class="ty">String</span>[] args) <span class="kw">throws</span> InterruptedException {
+        driver <span class="op">=</span> DriverFactory.<span class="fn">getDriver</span>(<span class="st">"chrome"</span>);
+        <span class="kw">try</span> {
+            <span class="fn">tryLogin</span>(<span class="st">"Admin"</span>,   <span class="st">"admin123"</span>, <span class="st">"TC01: Valid Login"</span>);
+            <span class="fn">tryLogin</span>(<span class="st">"Admin"</span>,   <span class="st">"wrongpass"</span>, <span class="st">"TC02: Wrong Password"</span>);
+            <span class="fn">tryLogin</span>(<span class="st">"baduser"</span>, <span class="st">"admin123"</span>, <span class="st">"TC03: Wrong Username"</span>);
+        } <span class="kw">finally</span> {
+            driver.<span class="fn">quit</span>();
+            <span class="fn">System.out.println</span>(<span class="st">"\nAll tests done. Browser closed."</span>);
+        }
+    }
+}</pre>
+  </div>
+  <h3>Expected Output</h3>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Output</span><span class="code-file">Console</span></div>
+    <pre>====== TC01: Valid Login ======
+  Result: LOGIN SUCCESS
+  User  : Admin
+
+====== TC02: Wrong Password ======
+  Result: LOGIN FAILED
+  Error : Invalid credentials
+
+====== TC03: Wrong Username ======
+  Result: LOGIN FAILED
+  Error : Invalid credentials
+
+All tests done. Browser closed.</pre>
+  </div>
+</div>
+
+<!-- S12 -->
+<div class="section" id="s12">
+  <div class="section-header"><div class="section-num">12</div><h2>Common Mistakes</h2></div>
+  <div class="mistake-grid">
+    <div class="mistake-card"><div class="mt">&#10060; Not calling clear() before sendKeys()</div><p>If a field has pre-filled text, sendKeys() appends to it. Always call <code>clear()</code> first: <code>field.clear(); field.sendKeys("text");</code></p></div>
+    <div class="mistake-card"><div class="mt">&#10060; NoSuchElementException on slow pages</div><p>Element exists but page hasn't loaded it yet. Fix: increase implicit wait, or add Thread.sleep temporarily. Proper fix on Day 20: explicit wait.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; getText() vs getAttribute("value")</div><p><code>getText()</code> gets visible text inside an element. <code>getAttribute("value")</code> gets the value of an input field. For form fields use getAttribute, for buttons/labels use getText.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; Hardcoding Thread.sleep()</div><p>Using <code>Thread.sleep(10000)</code> "to be safe" makes your suite hours long. Use realistic waits (1-3 seconds) as temporary measure. Day 20 replaces all of these.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; Wrong locator for submit button</div><p>OrangeHRM's Login button is <code>button[type='submit']</code> not <code>By.id("loginBtn")</code>. Always inspect the actual element. Never guess locators.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; Not handling Thread.sleep InterruptedException</div><p>Thread.sleep() throws a checked exception. Either add <code>throws InterruptedException</code> to method signature or wrap in try-catch. Compiler won't let you forget.</p></div>
+  </div>
+</div>
+
+<!-- S13 -->
+<div class="section" id="s13">
+  <div class="section-header"><div class="section-num">13</div><h2>End of Day Checklist + Resources</h2></div>
+  <div class="checklist">
+    <div class="checklist-title">&#10022; End of Day 11 Checklist</div>
+    <div class="check-item"><div class="check-box"></div>I understand findElement() vs findElements() and when each throws/returns empty</div>
+    <div class="check-item"><div class="check-box"></div>I know the 4 basic locators: By.id, By.name, By.xpath, By.cssSelector</div>
+    <div class="check-item"><div class="check-box"></div>I can use Chrome DevTools to find element locators (right-click → Inspect)</div>
+    <div class="check-item"><div class="check-box"></div>I know all 10 WebElement methods: click, sendKeys, clear, getText, getAttribute, isDisplayed, isEnabled, isSelected, getTagName, getCssValue</div>
+    <div class="check-item"><div class="check-box"></div>Login script runs successfully — OrangeHRM opens, credentials entered, button clicked, dashboard verified</div>
+    <div class="check-item"><div class="check-box"></div>Logout script runs — user dropdown clicked, Logout clicked, login page verified</div>
+    <div class="check-item"><div class="check-box"></div>Practice task (3 login scenarios) produces correct output</div>
+    <div class="check-item"><div class="check-box"></div>I understand why Thread.sleep is temporary and will be replaced on Day 20</div>
+    <div class="check-item"><div class="check-box"></div>I always call clear() before sendKeys() on input fields</div>
+  </div>
+  <h3>Resources for Today</h3>
+  <ul class="resource-list">
+    <li><span>&#127747;</span><strong>Practice:&nbsp;</strong><a href="https://opensource-demo.orangehrmlive.com" target="_blank">OrangeHRM Demo</a> &nbsp;<span style="color:var(--muted);font-size:12px">Your primary practice site. Login: Admin / admin123. Explore the UI manually first.</span></li>
+    <li><span>&#128214;</span><strong>Selenium Docs:&nbsp;</strong><a href="https://www.selenium.dev/documentation/webdriver/elements/" target="_blank">Selenium — Web Elements</a> &nbsp;<span style="color:var(--muted);font-size:12px">Official reference for all WebElement methods.</span></li>
+    <li><span>&#128214;</span><strong>Selenium Docs:&nbsp;</strong><a href="https://www.selenium.dev/documentation/webdriver/elements/finders/" target="_blank">Selenium — Finding Elements</a> &nbsp;<span style="color:var(--muted);font-size:12px">findElement, findElements, and all By strategies.</span></li>
+    <li><span>&#127947;</span><strong>Practice:&nbsp;</strong><a href="https://demoqa.com" target="_blank">DemoQA</a> &nbsp;<span style="color:var(--muted);font-size:12px">Second practice site with rich elements — forms, drag-drop, alerts, frames. Use it from Day 19 onwards.</span></li>
+  </ul>
+  <div class="callout tip">
+    <span class="callout-icon">&#128640;</span>
+    <div class="callout-body">
+      <div class="callout-title">Day 12 Preview — Browser Commands &amp; Navigation</div>
+      <p>Tomorrow: deeper dive into <strong>browser commands</strong> — window handles (multiple tabs), browser logs, page load strategies, and building a <strong>reusable utility</strong> that every test class can call. Plus the <code>navigate()</code> method in full detail.</p>
+    </div>
+  </div>
+</div>
+
+</div>
+<div class="footer">
+  <span>Day 11 of 65</span> &nbsp;&middot;&nbsp; Selenium + Java Automation Roadmap &nbsp;&middot;&nbsp; Phase 2 &mdash; Core Selenium &nbsp;&middot;&nbsp; <span>Next: Day 12 &mdash; Browser Commands &amp; Navigation</span>
+</div>
+</body>
+</html>

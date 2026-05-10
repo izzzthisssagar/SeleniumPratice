@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 6 — Collections: List & HashMap</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Sora:wght@400;600;700;800&display=swap');
+:root{--bg:#0d1117;--bg2:#161b22;--bg3:#1e2530;--border:#30363d;--accent:#f0a500;--accent2:#58a6ff;--accent3:#3fb950;--accent4:#ff7b72;--accent5:#d2a8ff;--text:#e6edf3;--muted:#8b949e;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);line-height:1.75;font-size:15px;}
+.hero{background:linear-gradient(135deg,#0d1117,#161b22,#1a0d0d);border-bottom:2px solid var(--accent4);padding:48px 40px 36px;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:0;right:0;width:400px;height:400px;background:radial-gradient(circle,rgba(255,123,114,0.06),transparent 70%);pointer-events:none;}
+.hero-tag{display:inline-block;background:rgba(255,123,114,0.12);border:1px solid rgba(255,123,114,0.3);color:var(--accent4);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;padding:4px 12px;border-radius:20px;margin-bottom:16px;}
+.hero h1{font-size:34px;font-weight:800;line-height:1.2;margin-bottom:10px;}
+.hero h1 span{color:var(--accent4);}
+.hero-sub{color:var(--muted);font-size:14px;display:flex;gap:24px;flex-wrap:wrap;margin-top:16px;}
+.hero-sub span{display:flex;align-items:center;gap:6px;}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--accent4);display:inline-block;}
+.container{max-width:980px;margin:0 auto;padding:40px 32px 80px;}
+.toc{background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--accent4);border-radius:8px;padding:24px 28px;margin-bottom:48px;}
+.toc-title{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--accent4);margin-bottom:14px;}
+.toc ol{padding-left:20px;}.toc li{margin-bottom:6px;}
+.toc a{color:var(--muted);text-decoration:none;font-size:14px;}.toc a:hover{color:var(--accent4);}
+.section{margin-bottom:56px;}
+.section-header{display:flex;align-items:center;gap:14px;margin-bottom:24px;padding-bottom:14px;border-bottom:1px solid var(--border);}
+.section-num{background:var(--accent4);color:#000;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:12px;width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.section h2{font-size:22px;font-weight:700;}
+h3{font-size:16px;font-weight:600;color:var(--accent4);margin:28px 0 12px;display:flex;align-items:center;gap:8px;}
+h3::before{content:'▸';color:var(--accent);font-size:12px;}
+p{color:var(--muted);margin-bottom:14px;line-height:1.8;}strong{color:var(--text);font-weight:600;}
+.code-block{background:#010409;border:1px solid var(--border);border-radius:10px;margin:20px 0;overflow:hidden;}
+.code-header{background:var(--bg2);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
+.code-lang{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent4);letter-spacing:1px;text-transform:uppercase;font-weight:600;}
+.code-file{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);}
+pre{font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.85;padding:20px;overflow-x:auto;color:#e6edf3;}
+.kw{color:#ff7b72;font-weight:500;}.ty{color:#ffa657;}.st{color:#a5d6ff;}.cm{color:#6e7681;font-style:italic;}
+.nm{color:#79c0ff;}.nu{color:#79c0ff;}.fn{color:#d2a8ff;}.op{color:#ff7b72;}.bool{color:#3fb950;}
+code{font-family:'JetBrains Mono',monospace;font-size:12.5px;background:rgba(255,123,114,0.1);border:1px solid rgba(255,123,114,0.2);color:var(--accent4);padding:1px 7px;border-radius:4px;}
+.callout{border-radius:8px;padding:16px 20px;margin:20px 0;display:flex;gap:14px;align-items:flex-start;}
+.callout-icon{font-size:18px;flex-shrink:0;margin-top:1px;}.callout-body{flex:1;}
+.callout-title{font-weight:700;font-size:13px;margin-bottom:4px;}.callout p{margin-bottom:0;font-size:13.5px;}
+.note{background:rgba(88,166,255,0.07);border-left:3px solid var(--accent2);}.note .callout-title{color:var(--accent2);}
+.tip{background:rgba(63,185,80,0.07);border-left:3px solid var(--accent3);}.tip .callout-title{color:var(--accent3);}
+.warn{background:rgba(240,165,0,0.07);border-left:3px solid var(--accent);}.warn .callout-title{color:var(--accent);}
+.error{background:rgba(255,123,114,0.07);border-left:3px solid var(--accent4);}.error .callout-title{color:var(--accent4);}
+.purple{background:rgba(210,168,255,0.07);border-left:3px solid var(--accent5);}.purple .callout-title{color:var(--accent5);}
+.table-wrap{overflow-x:auto;margin:20px 0;}
+table{width:100%;border-collapse:collapse;font-size:13.5px;}
+thead tr{background:var(--bg2);border-bottom:2px solid var(--accent4);}
+th{padding:12px 16px;text-align:left;font-weight:700;font-size:12px;letter-spacing:0.5px;text-transform:uppercase;color:var(--accent4);}
+td{padding:11px 16px;border-bottom:1px solid var(--border);color:var(--muted);}
+tr:hover td{background:rgba(255,255,255,0.02);}
+td:first-child{font-family:'JetBrains Mono',monospace;color:var(--accent);font-size:13px;}
+.diagram-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:28px 24px;margin:24px 0;overflow:hidden;}
+.diagram-title{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:20px;text-align:center;}
+.hour-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,123,114,0.1);border:1px solid rgba(255,123,114,0.25);color:var(--accent4);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:1px;padding:5px 14px;border-radius:20px;margin-bottom:18px;margin-top:30px;}
+.mistake-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:20px 0;}
+.mistake-card{background:rgba(255,123,114,0.05);border:1px solid rgba(255,123,114,0.2);border-radius:8px;padding:16px;}
+.mistake-card .mt{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent4);font-weight:700;margin-bottom:8px;}
+.mistake-card p{font-size:13px;margin:0;}
+.checklist{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:24px 28px;margin:24px 0;}
+.checklist-title{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent3);letter-spacing:1.5px;text-transform:uppercase;font-weight:700;margin-bottom:16px;}
+.check-item{display:flex;align-items:flex-start;gap:12px;padding:9px 0;border-bottom:1px solid rgba(48,54,61,0.5);font-size:14px;color:var(--muted);}
+.check-item:last-child{border-bottom:none;}
+.check-box{width:18px;height:18px;border:2px solid var(--accent3);border-radius:4px;flex-shrink:0;margin-top:2px;}
+.resource-list{list-style:none;padding:0;margin:12px 0;}
+.resource-list li{padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;margin-bottom:8px;font-size:13.5px;display:flex;gap:10px;align-items:center;}
+.resource-list li a{color:var(--accent2);text-decoration:none;}
+.footer{background:var(--bg2);border-top:1px solid var(--border);padding:24px 40px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);}
+.footer span{color:var(--accent4);}
+::-webkit-scrollbar{width:6px;height:6px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+@media(max-width:640px){.hero{padding:32px 20px 24px;}.hero h1{font-size:24px;}.container{padding:24px 16px 60px;}}
+</style>
+</head>
+<body>
+<div class="hero">
+  <div class="hero-tag">Phase 1 &middot; Day 6 of 65</div>
+  <h1>Collections: <span>List &amp; HashMap</span></h1>
+  <div class="hero-sub">
+    <span><span class="dot"></span>2 Hours</span>
+    <span><span class="dot"></span>Selenium + Java Track</span>
+    <span><span class="dot"></span>ArrayList &middot; LinkedList &middot; HashMap &middot; HashSet &middot; Iterator &middot; Collections utility</span>
+  </div>
+</div>
+<div class="container">
+
+<div class="toc">
+  <div class="toc-title">// Table of Contents</div>
+  <ol>
+    <li><a href="#s1">Why Collections Matter More Than Arrays in Selenium</a></li>
+    <li><a href="#s2">Java Collections Framework — Big Picture</a></li>
+    <li><a href="#s3">ArrayList — Dynamic Array</a></li>
+    <li><a href="#s4">ArrayList Core Methods</a></li>
+    <li><a href="#s5">Iterating ArrayList — 4 Ways</a></li>
+    <li><a href="#s6">ArrayList with Objects</a></li>
+    <li><a href="#s7">LinkedList — When to Use</a></li>
+    <li><a href="#s8">List Interface — Coding to Interface</a></li>
+    <li><a href="#s9">HashMap — Key-Value Storage</a></li>
+    <li><a href="#s10">HashMap Core Methods</a></li>
+    <li><a href="#s11">Iterating HashMap — 3 Ways</a></li>
+    <li><a href="#s12">HashMap with Object Values</a></li>
+    <li><a href="#s13">HashSet — No Duplicates</a></li>
+    <li><a href="#s14">Collections Utility Class</a></li>
+    <li><a href="#s15">Generics — What &lt;String&gt; Means</a></li>
+    <li><a href="#s16">Array vs ArrayList — When to Use Which</a></li>
+    <li><a href="#s17">Selenium Real-World Usage</a></li>
+    <li><a href="#s18">Practice Task + Expected Output</a></li>
+    <li><a href="#s19">Common Mistakes</a></li>
+    <li><a href="#s20">End of Day Checklist + Resources</a></li>
+  </ol>
+</div>
+
+<!-- S1 -->
+<div class="section" id="s1">
+  <div class="section-header"><div class="section-num">01</div><h2>Why Collections Matter More Than Arrays in Selenium</h2></div>
+  <div class="hour-badge">&#9200; Hour 1 — List (60 mins)</div>
+  <p>Arrays have one fatal flaw for automation: <strong>fixed size</strong>. You don't know upfront how many elements a page will have. Selenium's <code>findElements()</code> returns a <code>List&lt;WebElement&gt;</code> — you need to know how to work with that from Day 14.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Collection</th><th>Selenium Usage</th></tr></thead>
+      <tbody>
+        <tr><td>List&lt;WebElement&gt;</td><td>All elements returned by <code>driver.findElements(By.tagName("a"))</code> — dynamic size</td></tr>
+        <tr><td>ArrayList&lt;String&gt;</td><td>Storing all link texts, dropdown options, table cell values for assertion</td></tr>
+        <tr><td>HashMap&lt;String,String&gt;</td><td>Test data: username→password pairs, config key→value, expected results map</td></tr>
+        <tr><td>HashSet&lt;String&gt;</td><td>Detecting duplicate links or text values on a page (Set removes duplicates)</td></tr>
+        <tr><td>List&lt;String&gt;</td><td>Storing browser names for cross-browser test loop</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- S2 -->
+<div class="section" id="s2">
+  <div class="section-header"><div class="section-num">02</div><h2>Java Collections Framework — Big Picture</h2></div>
+  <div class="diagram-wrap">
+    <div class="diagram-title">// Java Collections Framework Hierarchy</div>
+    <svg viewBox="0 0 700 280" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:700px;display:block;margin:0 auto">
+      <defs><marker id="ch" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0L0,6L8,3z" fill="#8b949e"/></marker></defs>
+      <!-- Collection interface -->
+      <rect x="250" y="10" width="200" height="34" rx="8" fill="#0d1117" stroke="#d2a8ff" stroke-width="2"/>
+      <text x="350" y="32" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#d2a8ff">&lt;&lt;Collection&gt;&gt;</text>
+
+      <!-- List branch -->
+      <line x1="280" y1="44" x2="130" y2="95" stroke="#8b949e" stroke-width="1.5" marker-end="url(#ch)"/>
+      <rect x="50" y="95" width="160" height="34" rx="8" fill="#0d1117" stroke="#ff7b72" stroke-width="1.5"/>
+      <text x="130" y="117" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#ff7b72">&lt;&lt;List&gt;&gt;</text>
+
+      <line x1="80" y1="129" x2="60" y2="170" stroke="#ff7b72" stroke-width="1.5" marker-end="url(#ch)"/>
+      <rect x="10" y="170" width="130" height="30" rx="6" fill="#1e2530" stroke="#ff7b72" stroke-width="1.5"/>
+      <text x="75" y="189" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#3fb950">ArrayList</text>
+
+      <line x1="140" y1="129" x2="160" y2="170" stroke="#ff7b72" stroke-width="1.5" marker-end="url(#ch)"/>
+      <rect x="150" y="170" width="130" height="30" rx="6" fill="#1e2530" stroke="#ff7b72" stroke-width="1.5"/>
+      <text x="215" y="189" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#3fb950">LinkedList</text>
+
+      <!-- Set branch -->
+      <line x1="350" y1="44" x2="350" y2="95" stroke="#8b949e" stroke-width="1.5" marker-end="url(#ch)"/>
+      <rect x="270" y="95" width="160" height="34" rx="8" fill="#0d1117" stroke="#f0a500" stroke-width="1.5"/>
+      <text x="350" y="117" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#f0a500">&lt;&lt;Set&gt;&gt;</text>
+
+      <line x1="300" y1="129" x2="280" y2="170" stroke="#f0a500" stroke-width="1.5" marker-end="url(#ch)"/>
+      <rect x="230" y="170" width="130" height="30" rx="6" fill="#1e2530" stroke="#f0a500" stroke-width="1.5"/>
+      <text x="295" y="189" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#3fb950">HashSet</text>
+
+      <line x1="400" y1="129" x2="420" y2="170" stroke="#f0a500" stroke-width="1.5" marker-end="url(#ch)"/>
+      <rect x="380" y="170" width="130" height="30" rx="6" fill="#1e2530" stroke="#f0a500" stroke-width="1.5"/>
+      <text x="445" y="189" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#3fb950">TreeSet</text>
+
+      <!-- Map branch (separate) -->
+      <line x1="420" y1="44" x2="560" y2="95" stroke="#8b949e" stroke-width="1.5" marker-end="url(#ch)"/>
+      <rect x="480" y="95" width="160" height="34" rx="8" fill="#0d1117" stroke="#58a6ff" stroke-width="1.5"/>
+      <text x="560" y="117" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#58a6ff">&lt;&lt;Map&gt;&gt;</text>
+
+      <line x1="510" y1="129" x2="490" y2="170" stroke="#58a6ff" stroke-width="1.5" marker-end="url(#ch)"/>
+      <rect x="450" y="170" width="130" height="30" rx="6" fill="#1e2530" stroke="#58a6ff" stroke-width="1.5"/>
+      <text x="515" y="189" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#3fb950">HashMap</text>
+
+      <line x1="610" y1="129" x2="630" y2="170" stroke="#58a6ff" stroke-width="1.5" marker-end="url(#ch)"/>
+      <rect x="590" y="170" width="100" height="30" rx="6" fill="#1e2530" stroke="#58a6ff" stroke-width="1.5"/>
+      <text x="640" y="189" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#3fb950">TreeMap</text>
+
+      <!-- Legend -->
+      <rect x="10" y="225" width="680" height="48" rx="8" fill="#161b22" stroke="#30363d"/>
+      <text x="30" y="245" font-family="JetBrains Mono,monospace" font-size="10" fill="#f0a500">Focus today: </text>
+      <rect x="100" y="232" width="80" height="20" rx="4" fill="rgba(255,123,114,0.15)" stroke="#ff7b72" stroke-width="1"/>
+      <text x="140" y="246" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#ff7b72">ArrayList</text>
+      <rect x="195" y="232" width="80" height="20" rx="4" fill="rgba(88,166,255,0.15)" stroke="#58a6ff" stroke-width="1"/>
+      <text x="235" y="246" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#58a6ff">HashMap</text>
+      <rect x="290" y="232" width="70" height="20" rx="4" fill="rgba(240,165,0,0.15)" stroke="#f0a500" stroke-width="1"/>
+      <text x="325" y="246" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#f0a500">HashSet</text>
+      <text x="380" y="246" font-family="Sora,sans-serif" font-size="10" fill="#6e7681">— these 3 are used in 95% of Selenium test code</text>
+      <text x="30" y="265" font-family="Sora,sans-serif" font-size="10" fill="#6e7681">Map is NOT a subtype of Collection — it's separate. But it's part of the Java Collections Framework.</text>
+    </svg>
+  </div>
+</div>
+
+<!-- S3 -->
+<div class="section" id="s3">
+  <div class="section-header"><div class="section-num">03</div><h2>ArrayList — Dynamic Array</h2></div>
+  <p><code>ArrayList</code> is like an array that <strong>grows and shrinks automatically</strong>. It maintains insertion order, allows duplicates, and gives fast access by index. It's backed by a regular array internally but resizes itself when needed.</p>
+  <div class="diagram-wrap">
+    <div class="diagram-title">// Array (fixed) vs ArrayList (dynamic)</div>
+    <svg viewBox="0 0 700 170" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:700px;display:block;margin:0 auto">
+      <!-- Array -->
+      <text x="10" y="24" font-family="JetBrains Mono,monospace" font-size="11" fill="#ff7b72" font-weight="700">Array — Fixed size</text>
+      <rect x="10" y="32" width="90" height="36" rx="5" fill="#1e2530" stroke="#30363d"/>
+      <text x="55" y="53" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#a5d6ff">"Chrome"</text>
+      <rect x="105" y="32" width="90" height="36" rx="5" fill="#1e2530" stroke="#30363d"/>
+      <text x="150" y="53" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#a5d6ff">"Firefox"</text>
+      <rect x="200" y="32" width="90" height="36" rx="5" fill="#1e2530" stroke="#30363d"/>
+      <text x="245" y="53" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#a5d6ff">"Edge"</text>
+      <rect x="295" y="32" width="90" height="36" rx="5" fill="#0d1117" stroke="#30363d" stroke-dasharray="4,2"/>
+      <text x="340" y="53" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#30363d">null</text>
+      <rect x="390" y="32" width="90" height="36" rx="5" fill="#0d1117" stroke="#30363d" stroke-dasharray="4,2"/>
+      <text x="435" y="53" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#30363d">null</text>
+      <text x="500" y="53" font-family="Sora,sans-serif" font-size="10" fill="#ff7b72">Wasted space — can't add more than allocated</text>
+      <text x="10" y="82" font-family="Sora,sans-serif" font-size="10" fill="#6e7681">new String[5] — stuck at 5 forever</text>
+
+      <!-- ArrayList -->
+      <text x="10" y="108" font-family="JetBrains Mono,monospace" font-size="11" fill="#3fb950" font-weight="700">ArrayList — Dynamic size</text>
+      <rect x="10" y="116" width="90" height="36" rx="5" fill="#1e2530" stroke="#3fb950" stroke-width="1.5"/>
+      <text x="55" y="137" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#a5d6ff">"Chrome"</text>
+      <rect x="105" y="116" width="90" height="36" rx="5" fill="#1e2530" stroke="#3fb950" stroke-width="1.5"/>
+      <text x="150" y="137" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#a5d6ff">"Firefox"</text>
+      <rect x="200" y="116" width="90" height="36" rx="5" fill="#1e2530" stroke="#3fb950" stroke-width="1.5"/>
+      <text x="245" y="137" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#a5d6ff">"Edge"</text>
+      <rect x="295" y="116" width="90" height="36" rx="5" fill="#1e2530" stroke="#3fb950" stroke-width="1.5" stroke-dasharray="5,3"/>
+      <text x="340" y="133" text-anchor="middle" font-family="Sora,sans-serif" font-size="10" fill="#3fb950">add more</text>
+      <text x="340" y="147" text-anchor="middle" font-family="Sora,sans-serif" font-size="10" fill="#3fb950">anytime!</text>
+      <text x="500" y="137" font-family="Sora,sans-serif" font-size="10" fill="#3fb950">Grows automatically when needed</text>
+      <text x="10" y="165" font-family="Sora,sans-serif" font-size="10" fill="#6e7681">new ArrayList&lt;&gt;() — starts empty, grows as you add</text>
+    </svg>
+  </div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">ArrayList_Basics.java</span></div>
+    <pre><span class="kw">import</span> java.util.ArrayList;
+<span class="kw">import</span> java.util.List;
+
+<span class="cm">// Declaration — always use List as the type (interface)</span>
+<span class="nm">List</span>&lt;<span class="ty">String</span>&gt; <span class="nm">browsers</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">ArrayList</span>&lt;&gt;();
+
+<span class="cm">// OR declare with initial values</span>
+<span class="nm">List</span>&lt;<span class="ty">String</span>&gt; <span class="nm">urls</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">ArrayList</span>&lt;&gt;(List.<span class="fn">of</span>(<span class="st">"https://a.com"</span>, <span class="st">"https://b.com"</span>));
+
+<span class="cm">// Size at creation</span>
+<span class="fn">System.out.println</span>(browsers.<span class="fn">size</span>()); <span class="cm">// 0 — starts empty!</span></pre>
+  </div>
+</div>
+
+<!-- S4 -->
+<div class="section" id="s4">
+  <div class="section-header"><div class="section-num">04</div><h2>ArrayList Core Methods</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">ArrayList_Methods.java</span></div>
+    <pre><span class="nm">List</span>&lt;<span class="ty">String</span>&gt; <span class="nm">tests</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">ArrayList</span>&lt;&gt;();
+
+<span class="cm">// ── ADD ──────────────────────────────────────────────────────</span>
+tests.<span class="fn">add</span>(<span class="st">"Login Test"</span>);         <span class="cm">// add to end</span>
+tests.<span class="fn">add</span>(<span class="st">"Logout Test"</span>);
+tests.<span class="fn">add</span>(<span class="st">"Register Test"</span>);
+tests.<span class="fn">add</span>(<span class="nu">0</span>, <span class="st">"Smoke Test"</span>);     <span class="cm">// add at index 0 (shifts others right)</span>
+<span class="cm">// ["Smoke Test", "Login Test", "Logout Test", "Register Test"]</span>
+
+<span class="cm">// ── ACCESS ───────────────────────────────────────────────────</span>
+<span class="fn">System.out.println</span>(tests.<span class="fn">get</span>(<span class="nu">0</span>));          <span class="cm">// Smoke Test</span>
+<span class="fn">System.out.println</span>(tests.<span class="fn">get</span>(tests.<span class="fn">size</span>()-<span class="nu">1</span>)); <span class="cm">// Register Test (last)</span>
+<span class="fn">System.out.println</span>(tests.<span class="fn">size</span>());          <span class="cm">// 4</span>
+
+<span class="cm">// ── SEARCH ───────────────────────────────────────────────────</span>
+<span class="fn">System.out.println</span>(tests.<span class="fn">contains</span>(<span class="st">"Login Test"</span>)); <span class="cm">// true</span>
+<span class="fn">System.out.println</span>(tests.<span class="fn">indexOf</span>(<span class="st">"Logout Test"</span>)); <span class="cm">// 2</span>
+<span class="fn">System.out.println</span>(tests.<span class="fn">isEmpty</span>());              <span class="cm">// false</span>
+
+<span class="cm">// ── MODIFY ───────────────────────────────────────────────────</span>
+tests.<span class="fn">set</span>(<span class="nu">1</span>, <span class="st">"Login Test — Updated"</span>); <span class="cm">// replace at index 1</span>
+
+<span class="cm">// ── REMOVE ───────────────────────────────────────────────────</span>
+tests.<span class="fn">remove</span>(<span class="st">"Logout Test"</span>);  <span class="cm">// by value</span>
+tests.<span class="fn">remove</span>(<span class="nu">0</span>);              <span class="cm">// by index — removes "Smoke Test"</span>
+
+<span class="cm">// ── CLEAR ALL ────────────────────────────────────────────────</span>
+<span class="nm">List</span>&lt;<span class="ty">String</span>&gt; <span class="nm">temp</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">ArrayList</span>&lt;&gt;(tests); <span class="cm">// copy before clearing</span>
+tests.<span class="fn">clear</span>();
+<span class="fn">System.out.println</span>(tests.<span class="fn">isEmpty</span>()); <span class="cm">// true</span>
+
+<span class="cm">// ── SUBLIST ──────────────────────────────────────────────────</span>
+<span class="nm">List</span>&lt;<span class="ty">String</span>&gt; <span class="nm">all</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">ArrayList</span>&lt;&gt;(List.<span class="fn">of</span>(<span class="st">"a"</span>,<span class="st">"b"</span>,<span class="st">"c"</span>,<span class="st">"d"</span>,<span class="st">"e"</span>));
+<span class="nm">List</span>&lt;<span class="ty">String</span>&gt; <span class="nm">sub</span> <span class="op">=</span> all.<span class="fn">subList</span>(<span class="nu">1</span>, <span class="nu">4</span>); <span class="cm">// [b, c, d] — from index 1 to 3</span>
+<span class="fn">System.out.println</span>(sub); <span class="cm">// [b, c, d]</span></pre>
+  </div>
+  <div class="callout warn">
+    <span class="callout-icon">&#9889;</span>
+    <div class="callout-body">
+      <div class="callout-title">size() not length — List uses size(), arrays use length</div>
+      <p>Arrays: <code>arr.length</code> (no parentheses). ArrayList: <code>list.size()</code> (with parentheses). Strings: <code>str.length()</code> (with parentheses). Mixing these up is a constant source of confusion — memorize all three right now.</p>
+    </div>
+  </div>
+</div>
+
+<!-- S5 -->
+<div class="section" id="s5">
+  <div class="section-header"><div class="section-num">05</div><h2>Iterating ArrayList — 4 Ways</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">ArrayList_Iteration.java</span></div>
+    <pre><span class="nm">List</span>&lt;<span class="ty">String</span>&gt; <span class="nm">browsers</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">ArrayList</span>&lt;&gt;(List.<span class="fn">of</span>(<span class="st">"Chrome"</span>,<span class="st">"Firefox"</span>,<span class="st">"Edge"</span>));
+
+<span class="cm">// Way 1: for-each (most common in Selenium)</span>
+<span class="kw">for</span> (<span class="ty">String</span> <span class="nm">b</span> : browsers) {
+    <span class="fn">System.out.println</span>(<span class="st">"Testing on: "</span> <span class="op">+</span> b);
+}
+
+<span class="cm">// Way 2: regular for with index (when you need position)</span>
+<span class="kw">for</span> (<span class="ty">int</span> <span class="nm">i</span> <span class="op">=</span> <span class="nu">0</span>; <span class="nm">i</span> <span class="op">&lt;</span> browsers.<span class="fn">size</span>(); <span class="nm">i</span>++) {
+    <span class="fn">System.out.println</span>(<span class="nm">i</span> <span class="op">+</span> <span class="st">": "</span> <span class="op">+</span> browsers.<span class="fn">get</span>(<span class="nm">i</span>));
+}
+
+<span class="cm">// Way 3: Iterator (safe removal during iteration)</span>
+<span class="kw">import</span> java.util.Iterator;
+<span class="nm">Iterator</span>&lt;<span class="ty">String</span>&gt; <span class="nm">it</span> <span class="op">=</span> browsers.<span class="fn">iterator</span>();
+<span class="kw">while</span> (it.<span class="fn">hasNext</span>()) {
+    <span class="ty">String</span> <span class="nm">b</span> <span class="op">=</span> it.<span class="fn">next</span>();
+    <span class="kw">if</span> (b.<span class="fn">equals</span>(<span class="st">"Edge"</span>)) {
+        it.<span class="fn">remove</span>(); <span class="cm">// safe removal during loop — never use list.remove() inside for-each!</span>
+    }
+}
+
+<span class="cm">// Way 4: forEach with lambda (Java 8+, clean and modern)</span>
+browsers.<span class="fn">forEach</span>(<span class="nm">b</span> -> <span class="fn">System.out.println</span>(<span class="st">"Browser: "</span> <span class="op">+</span> b));
+
+<span class="cm">// Selenium real usage:</span>
+<span class="cm">// List&lt;WebElement&gt; links = driver.findElements(By.tagName("a"));</span>
+<span class="cm">// for (WebElement link : links) {</span>
+<span class="cm">//     System.out.println(link.getText());  // print each link text</span>
+<span class="cm">// }</span></pre>
+  </div>
+</div>
+
+<!-- S6 -->
+<div class="section" id="s6">
+  <div class="section-header"><div class="section-num">06</div><h2>ArrayList with Objects</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">ArrayList_Objects.java</span></div>
+    <pre><span class="cm">// Storing your own objects in a List</span>
+<span class="kw">class</span> <span class="nm">TestCase</span> {
+    <span class="ty">String</span>  <span class="nm">name</span>;
+    <span class="ty">boolean</span> <span class="nm">passed</span>;
+    <span class="kw">public</span> <span class="fn">TestCase</span>(<span class="ty">String</span> <span class="nm">n</span>, <span class="ty">boolean</span> <span class="nm">p</span>) { name <span class="op">=</span> n; passed <span class="op">=</span> p; }
+}
+
+<span class="nm">List</span>&lt;<span class="nm">TestCase</span>&gt; <span class="nm">suite</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">ArrayList</span>&lt;&gt;();
+suite.<span class="fn">add</span>(<span class="kw">new</span> <span class="fn">TestCase</span>(<span class="st">"Login Test"</span>,   <span class="bool">true</span>));
+suite.<span class="fn">add</span>(<span class="kw">new</span> <span class="fn">TestCase</span>(<span class="st">"Logout Test"</span>,  <span class="bool">false</span>));
+suite.<span class="fn">add</span>(<span class="kw">new</span> <span class="fn">TestCase</span>(<span class="st">"Search Test"</span>,  <span class="bool">true</span>));
+suite.<span class="fn">add</span>(<span class="kw">new</span> <span class="fn">TestCase</span>(<span class="st">"Register Test"</span>,<span class="bool">true</span>));
+
+<span class="cm">// Count passing tests</span>
+<span class="ty">int</span> <span class="nm">passCount</span> <span class="op">=</span> <span class="nu">0</span>;
+<span class="kw">for</span> (<span class="nm">TestCase</span> <span class="nm">tc</span> : suite) {
+    <span class="ty">String</span> <span class="nm">s</span> <span class="op">=</span> tc.passed <span class="op">?</span> <span class="st">"PASS"</span> <span class="op">:</span> <span class="st">"FAIL"</span>;
+    <span class="fn">System.out.println</span>(<span class="st">"["</span><span class="op">+</span>s<span class="op">+</span><span class="st">"] "</span> <span class="op">+</span> tc.name);
+    <span class="kw">if</span> (tc.passed) passCount<span class="op">++</span>;
+}
+<span class="fn">System.out.println</span>(<span class="st">"Passed: "</span> <span class="op">+</span> passCount <span class="op">+</span> <span class="st">"/"</span> <span class="op">+</span> suite.<span class="fn">size</span>());</pre>
+  </div>
+</div>
+
+<!-- S7 -->
+<div class="section" id="s7">
+  <div class="section-header"><div class="section-num">07</div><h2>LinkedList — When to Use</h2></div>
+  <p><code>LinkedList</code> also implements <code>List</code> but stores elements as nodes linked together. Faster for frequent insertions/deletions at beginning or middle. Slower for random access by index. Use ArrayList for most cases.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Operation</th><th>ArrayList</th><th>LinkedList</th><th>Use In Selenium</th></tr></thead>
+      <tbody>
+        <tr><td>get(index)</td><td>Fast O(1)</td><td>Slow O(n)</td><td>ArrayList wins — frequent access by index</td></tr>
+        <tr><td>add to end</td><td>Fast</td><td>Fast</td><td>Equal</td></tr>
+        <tr><td>add to front/middle</td><td>Slow O(n)</td><td>Fast O(1)</td><td>LinkedList if building a queue</td></tr>
+        <tr><td>Memory</td><td>Less</td><td>More (pointer overhead)</td><td>ArrayList wins for large element lists</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout tip">
+    <span class="callout-icon">&#9989;</span>
+    <div class="callout-body">
+      <div class="callout-title">Just use ArrayList 95% of the time</div>
+      <p>In Selenium automation, you're mostly iterating lists of elements or test data. ArrayList is faster for that use case. Only switch to LinkedList if you have a specific performance reason after profiling.</p>
+    </div>
+  </div>
+</div>
+
+<!-- S8 -->
+<div class="section" id="s8">
+  <div class="section-header"><div class="section-num">08</div><h2>List Interface — Coding to Interface</h2></div>
+  <p>Always declare your variable as <code>List&lt;T&gt;</code> (the interface) rather than <code>ArrayList&lt;T&gt;</code> (the implementation). This lets you swap implementations without changing code everywhere — exactly how <code>WebDriver</code> works.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">ListInterface.java</span></div>
+    <pre><span class="kw">import</span> java.util.*;
+
+<span class="cm">// BAD: tied to ArrayList — hard to change later</span>
+<span class="nm">ArrayList</span>&lt;<span class="ty">String</span>&gt; <span class="nm">bad</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">ArrayList</span>&lt;&gt;();
+
+<span class="cm">// GOOD: coded to interface — can swap to LinkedList, etc.</span>
+<span class="nm">List</span>&lt;<span class="ty">String</span>&gt; <span class="nm">good</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">ArrayList</span>&lt;&gt;();
+
+<span class="cm">// Now easily swap without changing code that uses 'good':</span>
+<span class="nm">List</span>&lt;<span class="ty">String</span>&gt; <span class="nm">linked</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">LinkedList</span>&lt;&gt;();
+
+<span class="cm">// Same pattern as Selenium:</span>
+<span class="cm">// WebDriver driver = new ChromeDriver();   ← interface = WebDriver</span>
+<span class="cm">// List&lt;WebElement&gt; els = driver.findElements(By.tagName("a")); ← interface = List</span></pre>
+  </div>
+</div>
+
+<!-- S9 -->
+<div class="section" id="s9">
+  <div class="section-header"><div class="section-num">09</div><h2>HashMap — Key-Value Storage</h2></div>
+  <div class="hour-badge">&#9200; Hour 2 — HashMap &amp; HashSet (60 mins)</div>
+  <p>A <code>HashMap</code> stores data as <strong>key-value pairs</strong>. Think of it like a dictionary — you look up a value using its key. Keys are unique, values can repeat. Order is NOT guaranteed.</p>
+  <div class="diagram-wrap">
+    <div class="diagram-title">// HashMap — Key maps to Value</div>
+    <svg viewBox="0 0 700 160" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:700px;display:block;margin:0 auto">
+      <defs><marker id="hm" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0L0,6L8,3z" fill="#58a6ff"/></marker></defs>
+      <!-- Keys -->
+      <text x="10" y="24" font-family="JetBrains Mono,monospace" font-size="11" fill="#f0a500" font-weight="700">KEYS (unique)</text>
+      <rect x="10" y="32" width="130" height="32" rx="6" fill="#1a1400" stroke="#f0a500" stroke-width="1.5"/>
+      <text x="75" y="52" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#f0a500">"username"</text>
+      <rect x="10" y="72" width="130" height="32" rx="6" fill="#1a1400" stroke="#f0a500" stroke-width="1.5"/>
+      <text x="75" y="92" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#f0a500">"password"</text>
+      <rect x="10" y="112" width="130" height="32" rx="6" fill="#1a1400" stroke="#f0a500" stroke-width="1.5"/>
+      <text x="75" y="132" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#f0a500">"browser"</text>
+
+      <!-- Arrows -->
+      <line x1="140" y1="48" x2="190" y2="48" stroke="#58a6ff" stroke-width="1.5" marker-end="url(#hm)"/>
+      <line x1="140" y1="88" x2="190" y2="88" stroke="#58a6ff" stroke-width="1.5" marker-end="url(#hm)"/>
+      <line x1="140" y1="128" x2="190" y2="128" stroke="#58a6ff" stroke-width="1.5" marker-end="url(#hm)"/>
+
+      <!-- Values -->
+      <text x="190" y="24" font-family="JetBrains Mono,monospace" font-size="11" fill="#3fb950" font-weight="700">VALUES</text>
+      <rect x="190" y="32" width="130" height="32" rx="6" fill="#0a1a0d" stroke="#3fb950" stroke-width="1.5"/>
+      <text x="255" y="52" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#a5d6ff">"Admin"</text>
+      <rect x="190" y="72" width="130" height="32" rx="6" fill="#0a1a0d" stroke="#3fb950" stroke-width="1.5"/>
+      <text x="255" y="92" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#a5d6ff">"admin123"</text>
+      <rect x="190" y="112" width="130" height="32" rx="6" fill="#0a1a0d" stroke="#3fb950" stroke-width="1.5"/>
+      <text x="255" y="132" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#a5d6ff">"Chrome"</text>
+
+      <!-- Rules -->
+      <rect x="346" y="20" width="344" height="125" rx="8" fill="#161b22" stroke="#30363d"/>
+      <text x="362" y="42" font-family="JetBrains Mono,monospace" font-size="10" fill="#f0a500" font-weight="700">HashMap Rules:</text>
+      <text x="362" y="62" font-family="Sora,sans-serif" font-size="10" fill="#8b949e">&#10003; Keys are UNIQUE (duplicate key overwrites value)</text>
+      <text x="362" y="80" font-family="Sora,sans-serif" font-size="10" fill="#8b949e">&#10003; Values can be duplicated</text>
+      <text x="362" y="98" font-family="Sora,sans-serif" font-size="10" fill="#8b949e">&#10003; Order is NOT guaranteed</text>
+      <text x="362" y="116" font-family="Sora,sans-serif" font-size="10" fill="#8b949e">&#10003; null key allowed (once), null values allowed</text>
+      <text x="362" y="134" font-family="Sora,sans-serif" font-size="10" fill="#8b949e">&#10003; O(1) average time for get/put</text>
+    </svg>
+  </div>
+</div>
+
+<!-- S10 -->
+<div class="section" id="s10">
+  <div class="section-header"><div class="section-num">10</div><h2>HashMap Core Methods</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">HashMap_Methods.java</span></div>
+    <pre><span class="kw">import</span> java.util.HashMap;
+<span class="kw">import</span> java.util.Map;
+
+<span class="cm">// Declaration — always use Map as type (interface)</span>
+<span class="nm">Map</span>&lt;<span class="ty">String</span>, <span class="ty">String</span>&gt; <span class="nm">credentials</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">HashMap</span>&lt;&gt;();
+
+<span class="cm">// ── PUT (add / update) ───────────────────────────────────────</span>
+credentials.<span class="fn">put</span>(<span class="st">"username"</span>, <span class="st">"Admin"</span>);
+credentials.<span class="fn">put</span>(<span class="st">"password"</span>, <span class="st">"admin123"</span>);
+credentials.<span class="fn">put</span>(<span class="st">"role"</span>,     <span class="st">"admin"</span>);
+
+<span class="cm">// Duplicate key OVERWRITES the value</span>
+credentials.<span class="fn">put</span>(<span class="st">"username"</span>, <span class="st">"NewAdmin"</span>);  <span class="cm">// "Admin" is gone, replaced</span>
+
+<span class="cm">// ── GET ──────────────────────────────────────────────────────</span>
+<span class="fn">System.out.println</span>(credentials.<span class="fn">get</span>(<span class="st">"username"</span>));    <span class="cm">// NewAdmin</span>
+<span class="fn">System.out.println</span>(credentials.<span class="fn">get</span>(<span class="st">"nonexistent"</span>)); <span class="cm">// null (key not found)</span>
+
+<span class="cm">// getOrDefault — safe fallback value</span>
+<span class="ty">String</span> <span class="nm">browser</span> <span class="op">=</span> credentials.<span class="fn">getOrDefault</span>(<span class="st">"browser"</span>, <span class="st">"chrome"</span>);
+<span class="fn">System.out.println</span>(browser);  <span class="cm">// chrome (key not found, uses default)</span>
+
+<span class="cm">// ── SEARCH ───────────────────────────────────────────────────</span>
+<span class="fn">System.out.println</span>(credentials.<span class="fn">containsKey</span>(<span class="st">"username"</span>));  <span class="cm">// true</span>
+<span class="fn">System.out.println</span>(credentials.<span class="fn">containsValue</span>(<span class="st">"admin"</span>));   <span class="cm">// true</span>
+
+<span class="cm">// ── SIZE & EMPTY ─────────────────────────────────────────────</span>
+<span class="fn">System.out.println</span>(credentials.<span class="fn">size</span>());     <span class="cm">// 3</span>
+<span class="fn">System.out.println</span>(credentials.<span class="fn">isEmpty</span>());  <span class="cm">// false</span>
+
+<span class="cm">// ── REMOVE ───────────────────────────────────────────────────</span>
+credentials.<span class="fn">remove</span>(<span class="st">"role"</span>);
+<span class="fn">System.out.println</span>(credentials.<span class="fn">size</span>());  <span class="cm">// 2</span>
+
+<span class="cm">// ── putIfAbsent — only adds if key doesn't exist ─────────────</span>
+credentials.<span class="fn">putIfAbsent</span>(<span class="st">"username"</span>, <span class="st">"WillNotReplace"</span>); <span class="cm">// ignored</span>
+credentials.<span class="fn">putIfAbsent</span>(<span class="st">"env"</span>, <span class="st">"staging"</span>);             <span class="cm">// added</span></pre>
+  </div>
+</div>
+
+<!-- S11 -->
+<div class="section" id="s11">
+  <div class="section-header"><div class="section-num">11</div><h2>Iterating HashMap — 3 Ways</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">HashMap_Iteration.java</span></div>
+    <pre><span class="nm">Map</span>&lt;<span class="ty">String</span>, <span class="ty">String</span>&gt; <span class="nm">config</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">HashMap</span>&lt;&gt;();
+config.<span class="fn">put</span>(<span class="st">"browser"</span>,  <span class="st">"chrome"</span>);
+config.<span class="fn">put</span>(<span class="st">"baseUrl"</span>,  <span class="st">"https://orangehrm.com"</span>);
+config.<span class="fn">put</span>(<span class="st">"timeout"</span>,  <span class="st">"30"</span>);
+config.<span class="fn">put</span>(<span class="st">"headless"</span>, <span class="st">"false"</span>);
+
+<span class="cm">// Way 1: entrySet — get both key and value (most common)</span>
+<span class="kw">for</span> (Map.Entry&lt;<span class="ty">String</span>, <span class="ty">String</span>&gt; <span class="nm">entry</span> : config.<span class="fn">entrySet</span>()) {
+    <span class="fn">System.out.println</span>(entry.<span class="fn">getKey</span>() <span class="op">+</span> <span class="st">" = "</span> <span class="op">+</span> entry.<span class="fn">getValue</span>());
+}
+
+<span class="cm">// Way 2: keySet — loop keys only</span>
+<span class="kw">for</span> (<span class="ty">String</span> <span class="nm">key</span> : config.<span class="fn">keySet</span>()) {
+    <span class="fn">System.out.println</span>(<span class="st">"Key: "</span> <span class="op">+</span> key);
+}
+
+<span class="cm">// Way 3: values — loop values only</span>
+<span class="kw">for</span> (<span class="ty">String</span> <span class="nm">val</span> : config.<span class="fn">values</span>()) {
+    <span class="fn">System.out.println</span>(<span class="st">"Value: "</span> <span class="op">+</span> val);
+}
+
+<span class="cm">// Way 4: forEach lambda (Java 8+, cleanest)</span>
+config.<span class="fn">forEach</span>((<span class="nm">k</span>, <span class="nm">v</span>) -> <span class="fn">System.out.println</span>(k <span class="op">+</span> <span class="st">" → "</span> <span class="op">+</span> v));</pre>
+  </div>
+</div>
+
+<!-- S12 -->
+<div class="section" id="s12">
+  <div class="section-header"><div class="section-num">12</div><h2>HashMap with Object Values</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">HashMap_Objects.java</span></div>
+    <pre><span class="cm">// Map&lt;String, Integer&gt; — String key, Integer value</span>
+<span class="nm">Map</span>&lt;<span class="ty">String</span>, <span class="ty">Integer</span>&gt; <span class="nm">testDurations</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">HashMap</span>&lt;&gt;();
+testDurations.<span class="fn">put</span>(<span class="st">"Login Test"</span>,   <span class="nu">3</span>);
+testDurations.<span class="fn">put</span>(<span class="st">"Logout Test"</span>,  <span class="nu">1</span>);
+testDurations.<span class="fn">put</span>(<span class="st">"Search Test"</span>,  <span class="nu">5</span>);
+testDurations.<span class="fn">put</span>(<span class="st">"Report Test"</span>,  <span class="nu">8</span>);
+
+<span class="cm">// Find slowest test</span>
+<span class="ty">String</span> <span class="nm">slowest</span>  <span class="op">=</span> <span class="st">""</span>;
+<span class="ty">int</span>    <span class="nm">maxTime</span>  <span class="op">=</span> <span class="nu">0</span>;
+<span class="kw">for</span> (Map.Entry&lt;<span class="ty">String</span>, <span class="ty">Integer</span>&gt; <span class="nm">e</span> : testDurations.<span class="fn">entrySet</span>()) {
+    <span class="kw">if</span> (e.<span class="fn">getValue</span>() <span class="op">&gt;</span> maxTime) {
+        maxTime <span class="op">=</span> e.<span class="fn">getValue</span>();
+        slowest <span class="op">=</span> e.<span class="fn">getKey</span>();
+    }
+}
+<span class="fn">System.out.println</span>(<span class="st">"Slowest: "</span> <span class="op">+</span> slowest <span class="op">+</span> <span class="st">" ("</span> <span class="op">+</span> maxTime <span class="op">+</span> <span class="st">"s)"</span>);
+<span class="cm">// Slowest: Report Test (8s)</span>
+
+<span class="cm">// Map&lt;String, List&lt;String&gt;&gt; — nested: key maps to a List of values</span>
+<span class="nm">Map</span>&lt;<span class="ty">String</span>, <span class="nm">List</span>&lt;<span class="ty">String</span>&gt;&gt; <span class="nm">testsByModule</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">HashMap</span>&lt;&gt;();
+testsByModule.<span class="fn">put</span>(<span class="st">"Login"</span>,  <span class="kw">new</span> <span class="fn">ArrayList</span>&lt;&gt;(List.<span class="fn">of</span>(<span class="st">"Valid login"</span>, <span class="st">"Invalid login"</span>)));
+testsByModule.<span class="fn">put</span>(<span class="st">"Search"</span>, <span class="kw">new</span> <span class="fn">ArrayList</span>&lt;&gt;(List.<span class="fn">of</span>(<span class="st">"By name"</span>, <span class="st">"By ID"</span>)));
+
+<span class="kw">for</span> (Map.Entry&lt;<span class="ty">String</span>, <span class="nm">List</span>&lt;<span class="ty">String</span>&gt;&gt; <span class="nm">e</span> : testsByModule.<span class="fn">entrySet</span>()) {
+    <span class="fn">System.out.println</span>(<span class="st">"Module: "</span> <span class="op">+</span> e.<span class="fn">getKey</span>() <span class="op">+</span> <span class="st">" → "</span> <span class="op">+</span> e.<span class="fn">getValue</span>());
+}</pre>
+  </div>
+</div>
+
+<!-- S13 -->
+<div class="section" id="s13">
+  <div class="section-header"><div class="section-num">13</div><h2>HashSet — No Duplicates</h2></div>
+  <p>A <code>HashSet</code> stores <strong>unique values only</strong> — duplicates are silently ignored. Order is NOT guaranteed. Use it when you need to detect duplicates or when uniqueness matters.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">HashSet.java</span></div>
+    <pre><span class="kw">import</span> java.util.HashSet;
+<span class="kw">import</span> java.util.Set;
+
+<span class="nm">Set</span>&lt;<span class="ty">String</span>&gt; <span class="nm">uniqueBrowsers</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">HashSet</span>&lt;&gt;();
+uniqueBrowsers.<span class="fn">add</span>(<span class="st">"Chrome"</span>);
+uniqueBrowsers.<span class="fn">add</span>(<span class="st">"Firefox"</span>);
+uniqueBrowsers.<span class="fn">add</span>(<span class="st">"Chrome"</span>);   <span class="cm">// duplicate — silently ignored</span>
+uniqueBrowsers.<span class="fn">add</span>(<span class="st">"Edge"</span>);
+uniqueBrowsers.<span class="fn">add</span>(<span class="st">"Firefox"</span>);  <span class="cm">// duplicate — silently ignored</span>
+
+<span class="fn">System.out.println</span>(uniqueBrowsers.<span class="fn">size</span>());  <span class="cm">// 3, not 5</span>
+<span class="fn">System.out.println</span>(uniqueBrowsers);           <span class="cm">// [Chrome, Firefox, Edge] (order varies)</span>
+
+<span class="cm">// Check membership</span>
+<span class="fn">System.out.println</span>(uniqueBrowsers.<span class="fn">contains</span>(<span class="st">"Chrome"</span>));  <span class="cm">// true</span>
+<span class="fn">System.out.println</span>(uniqueBrowsers.<span class="fn">contains</span>(<span class="st">"Safari"</span>));  <span class="cm">// false</span>
+
+<span class="cm">// Selenium use case: detect duplicate links on a page</span>
+<span class="nm">List</span>&lt;<span class="ty">String</span>&gt; <span class="nm">allLinks</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">ArrayList</span>&lt;&gt;(List.<span class="fn">of</span>(
+    <span class="st">"https://site.com/home"</span>, <span class="st">"https://site.com/about"</span>,
+    <span class="st">"https://site.com/home"</span>, <span class="st">"https://site.com/contact"</span>
+));
+
+<span class="nm">Set</span>&lt;<span class="ty">String</span>&gt; <span class="nm">seen</span>       <span class="op">=</span> <span class="kw">new</span> <span class="fn">HashSet</span>&lt;&gt;();
+<span class="nm">Set</span>&lt;<span class="ty">String</span>&gt; <span class="nm">duplicates</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">HashSet</span>&lt;&gt;();
+<span class="kw">for</span> (<span class="ty">String</span> <span class="nm">link</span> : allLinks) {
+    <span class="kw">if</span> (!seen.<span class="fn">add</span>(link)) {    <span class="cm">// add() returns false if already present</span>
+        duplicates.<span class="fn">add</span>(link);
+    }
+}
+<span class="fn">System.out.println</span>(<span class="st">"Duplicate links: "</span> <span class="op">+</span> duplicates);
+<span class="cm">// Duplicate links: [https://site.com/home]</span></pre>
+  </div>
+</div>
+
+<!-- S14 -->
+<div class="section" id="s14">
+  <div class="section-header"><div class="section-num">14</div><h2>Collections Utility Class</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">CollectionsUtil.java</span></div>
+    <pre><span class="kw">import</span> java.util.*;
+
+<span class="nm">List</span>&lt;<span class="ty">Integer</span>&gt; <span class="nm">scores</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">ArrayList</span>&lt;&gt;(List.<span class="fn">of</span>(<span class="nu">78</span>, <span class="nu">95</span>, <span class="nu">62</span>, <span class="nu">88</span>, <span class="nu">71</span>));
+
+<span class="cm">// Sort ascending</span>
+Collections.<span class="fn">sort</span>(scores);
+<span class="fn">System.out.println</span>(scores);  <span class="cm">// [62, 71, 78, 88, 95]</span>
+
+<span class="cm">// Sort descending</span>
+Collections.<span class="fn">sort</span>(scores, Collections.<span class="fn">reverseOrder</span>());
+<span class="fn">System.out.println</span>(scores);  <span class="cm">// [95, 88, 78, 71, 62]</span>
+
+<span class="cm">// Max and min</span>
+<span class="fn">System.out.println</span>(Collections.<span class="fn">max</span>(scores));  <span class="cm">// 95</span>
+<span class="fn">System.out.println</span>(Collections.<span class="fn">min</span>(scores));  <span class="cm">// 62</span>
+
+<span class="cm">// Shuffle — randomize order</span>
+Collections.<span class="fn">shuffle</span>(scores);
+<span class="fn">System.out.println</span>(scores);  <span class="cm">// random order</span>
+
+<span class="cm">// Frequency — count occurrences</span>
+<span class="nm">List</span>&lt;<span class="ty">String</span>&gt; <span class="nm">statuses</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">ArrayList</span>&lt;&gt;(List.<span class="fn">of</span>(<span class="st">"PASS"</span>,<span class="st">"FAIL"</span>,<span class="st">"PASS"</span>,<span class="st">"PASS"</span>,<span class="st">"FAIL"</span>));
+<span class="fn">System.out.println</span>(Collections.<span class="fn">frequency</span>(statuses, <span class="st">"PASS"</span>));  <span class="cm">// 3</span>
+<span class="fn">System.out.println</span>(Collections.<span class="fn">frequency</span>(statuses, <span class="st">"FAIL"</span>));  <span class="cm">// 2</span>
+
+<span class="cm">// Unmodifiable list — read-only, no add/remove allowed</span>
+<span class="nm">List</span>&lt;<span class="ty">String</span>&gt; <span class="nm">readOnly</span> <span class="op">=</span> Collections.<span class="fn">unmodifiableList</span>(statuses);
+<span class="cm">// readOnly.add("PASS"); ← UnsupportedOperationException at runtime</span></pre>
+  </div>
+</div>
+
+<!-- S15 -->
+<div class="section" id="s15">
+  <div class="section-header"><div class="section-num">15</div><h2>Generics — What &lt;String&gt; Means</h2></div>
+  <p>The <code>&lt;String&gt;</code> in <code>List&lt;String&gt;</code> is called a <strong>generic type parameter</strong>. It tells Java what type of objects the collection holds. This gives you compile-time safety — you can't accidentally add an <code>int</code> to a <code>List&lt;String&gt;</code>.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">Generics.java</span></div>
+    <pre><span class="cm">// Without generics (old way — avoid) — raw type</span>
+<span class="nm">List</span> <span class="nm">rawList</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">ArrayList</span>();
+rawList.<span class="fn">add</span>(<span class="st">"Chrome"</span>);
+rawList.<span class="fn">add</span>(<span class="nu">42</span>);          <span class="cm">// no error! but causes ClassCastException at runtime</span>
+
+<span class="cm">// With generics (correct way) — type-safe at compile time</span>
+<span class="nm">List</span>&lt;<span class="ty">String</span>&gt; <span class="nm">safeList</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">ArrayList</span>&lt;&gt;();
+safeList.<span class="fn">add</span>(<span class="st">"Chrome"</span>);
+<span class="cm">// safeList.add(42);   ← COMPILE ERROR — caught before runtime!</span>
+
+<span class="cm">// Common generic types you'll use in Selenium:</span>
+<span class="nm">List</span>&lt;<span class="ty">String</span>&gt;                 <span class="nm">stringList</span>  <span class="op">=</span> <span class="kw">new</span> <span class="fn">ArrayList</span>&lt;&gt;();
+<span class="nm">List</span>&lt;<span class="ty">Integer</span>&gt;                <span class="nm">intList</span>     <span class="op">=</span> <span class="kw">new</span> <span class="fn">ArrayList</span>&lt;&gt;();
+<span class="nm">Map</span>&lt;<span class="ty">String</span>, <span class="ty">String</span>&gt;         <span class="nm">strMap</span>      <span class="op">=</span> <span class="kw">new</span> <span class="fn">HashMap</span>&lt;&gt;();
+<span class="nm">Map</span>&lt;<span class="ty">String</span>, <span class="ty">Integer</span>&gt;        <span class="nm">countMap</span>    <span class="op">=</span> <span class="kw">new</span> <span class="fn">HashMap</span>&lt;&gt;();
+<span class="nm">Map</span>&lt;<span class="ty">String</span>, <span class="nm">List</span>&lt;<span class="ty">String</span>&gt;&gt; <span class="nm">nestedMap</span>   <span class="op">=</span> <span class="kw">new</span> <span class="fn">HashMap</span>&lt;&gt;();
+
+<span class="cm">// Note: can't use primitives in generics — use wrapper classes!</span>
+<span class="cm">// List&lt;int&gt;    ← WRONG (int is primitive)</span>
+<span class="cm">// List&lt;Integer&gt; ← CORRECT (Integer is wrapper class)</span>
+<span class="cm">// int ↔ Integer auto-boxing/unboxing happens automatically</span>
+<span class="nm">List</span>&lt;<span class="ty">Integer</span>&gt; <span class="nm">nums</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">ArrayList</span>&lt;&gt;();
+nums.<span class="fn">add</span>(<span class="nu">5</span>);          <span class="cm">// auto-boxing: int 5 → Integer 5</span>
+<span class="ty">int</span> <span class="nm">n</span> <span class="op">=</span> nums.<span class="fn">get</span>(<span class="nu">0</span>);  <span class="cm">// auto-unboxing: Integer 5 → int 5</span></pre>
+  </div>
+</div>
+
+<!-- S16 -->
+<div class="section" id="s16">
+  <div class="section-header"><div class="section-num">16</div><h2>Array vs ArrayList — When to Use Which</h2></div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Feature</th><th>Array</th><th>ArrayList</th></tr></thead>
+      <tbody>
+        <tr><td>Size</td><td>Fixed at creation</td><td>Dynamic, grows/shrinks</td></tr>
+        <tr><td>Syntax</td><td><code>String[] arr = new String[3]</code></td><td><code>List&lt;String&gt; list = new ArrayList&lt;&gt;()</code></td></tr>
+        <tr><td>Access</td><td><code>arr[0]</code></td><td><code>list.get(0)</code></td></tr>
+        <tr><td>Length</td><td><code>arr.length</code></td><td><code>list.size()</code></td></tr>
+        <tr><td>Primitives</td><td>int[], double[], boolean[]</td><td>Must use Integer, Double, Boolean</td></tr>
+        <tr><td>Search</td><td>Manual loop</td><td><code>contains()</code>, <code>indexOf()</code></td></tr>
+        <tr><td>Use when</td><td>Size known, never changes (config constants)</td><td>Size unknown, need add/remove (Selenium results)</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- S17 -->
+<div class="section" id="s17">
+  <div class="section-header"><div class="section-num">17</div><h2>Selenium Real-World Usage</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">SeleniumCollections.java — Phase 2+ preview</span></div>
+    <pre><span class="cm">// ── findElements returns List&lt;WebElement&gt; ────────────────────</span>
+<span class="cm">// List&lt;WebElement&gt; links = driver.findElements(By.tagName("a"));</span>
+<span class="cm">// System.out.println("Total links: " + links.size());</span>
+<span class="cm">// for (WebElement link : links) {</span>
+<span class="cm">//     System.out.println(link.getText());</span>
+<span class="cm">// }</span>
+
+<span class="cm">// ── Store all dropdown options ────────────────────────────────</span>
+<span class="cm">// Select dropdown = new Select(driver.findElement(By.id("country")));</span>
+<span class="cm">// List&lt;WebElement&gt; options = dropdown.getOptions();</span>
+<span class="cm">// List&lt;String&gt; optionTexts = new ArrayList&lt;&gt;();</span>
+<span class="cm">// for (WebElement opt : options) {</span>
+<span class="cm">//     optionTexts.add(opt.getText());</span>
+<span class="cm">// }</span>
+<span class="cm">// System.out.println(optionTexts.contains("Nepal")); // true?</span>
+
+<span class="cm">// ── HashMap for test data ─────────────────────────────────────</span>
+<span class="nm">Map</span>&lt;<span class="ty">String</span>, <span class="ty">String</span>&gt; <span class="nm">loginData</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">HashMap</span>&lt;&gt;();
+loginData.<span class="fn">put</span>(<span class="st">"Admin"</span>,  <span class="st">"admin123"</span>);
+loginData.<span class="fn">put</span>(<span class="st">"user1"</span>,  <span class="st">"pass1"</span>);
+loginData.<span class="fn">put</span>(<span class="st">"user2"</span>,  <span class="st">"pass2"</span>);
+
+<span class="kw">for</span> (Map.Entry&lt;<span class="ty">String</span>, <span class="ty">String</span>&gt; <span class="nm">entry</span> : loginData.<span class="fn">entrySet</span>()) {
+    <span class="fn">System.out.println</span>(<span class="st">"Testing login: "</span> <span class="op">+</span> entry.<span class="fn">getKey</span>());
+    <span class="cm">// loginPage.enterUsername(entry.getKey());</span>
+    <span class="cm">// loginPage.enterPassword(entry.getValue());</span>
+    <span class="cm">// loginPage.clickLogin();</span>
+}
+
+<span class="cm">// ── HashMap for expected vs actual ───────────────────────────</span>
+<span class="nm">Map</span>&lt;<span class="ty">String</span>, <span class="ty">String</span>&gt; <span class="nm">expected</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">HashMap</span>&lt;&gt;();
+expected.<span class="fn">put</span>(<span class="st">"title"</span>,   <span class="st">"OrangeHRM"</span>);
+expected.<span class="fn">put</span>(<span class="st">"heading"</span>, <span class="st">"Welcome"</span>);
+expected.<span class="fn">put</span>(<span class="st">"url"</span>,     <span class="st">"/dashboard"</span>);
+
+<span class="nm">Map</span>&lt;<span class="ty">String</span>, <span class="ty">String</span>&gt; <span class="nm">actual</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">HashMap</span>&lt;&gt;();
+actual.<span class="fn">put</span>(<span class="st">"title"</span>,   <span class="st">"OrangeHRM"</span>);  <span class="cm">// match</span>
+actual.<span class="fn">put</span>(<span class="st">"heading"</span>, <span class="st">"Welcome"</span>);    <span class="cm">// match</span>
+actual.<span class="fn">put</span>(<span class="st">"url"</span>,     <span class="st">"/login"</span>);     <span class="cm">// mismatch!</span>
+
+<span class="kw">for</span> (<span class="ty">String</span> <span class="nm">key</span> : expected.<span class="fn">keySet</span>()) {
+    <span class="ty">boolean</span> <span class="nm">match</span> <span class="op">=</span> expected.<span class="fn">get</span>(key).<span class="fn">equals</span>(actual.<span class="fn">get</span>(key));
+    <span class="fn">System.out.printf</span>(<span class="st">"%-10s: %s%n"</span>, key, match <span class="op">?</span> <span class="st">"PASS"</span> <span class="op">:</span> <span class="st">"FAIL"</span>);
+}
+<span class="cm">// title     : PASS</span>
+<span class="cm">// heading   : PASS</span>
+<span class="cm">// url       : FAIL</span></pre>
+  </div>
+</div>
+
+<!-- S18 -->
+<div class="section" id="s18">
+  <div class="section-header"><div class="section-num">18</div><h2>Practice Task + Expected Output</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">Day6Practice.java</span></div>
+    <pre><span class="kw">import</span> java.util.*;
+
+<span class="kw">public class</span> <span class="nm">Day6Practice</span> {
+
+    <span class="kw">public static void</span> <span class="fn">main</span>(<span class="ty">String</span>[] args) {
+
+        <span class="fn">System.out.println</span>(<span class="st">"====== TASK 1: Test Suite Manager ======"</span>);
+        <span class="nm">List</span>&lt;<span class="ty">String</span>&gt; <span class="nm">suite</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">ArrayList</span>&lt;&gt;();
+        suite.<span class="fn">add</span>(<span class="st">"Login Test"</span>);
+        suite.<span class="fn">add</span>(<span class="st">"Logout Test"</span>);
+        suite.<span class="fn">add</span>(<span class="st">"Search Test"</span>);
+        suite.<span class="fn">add</span>(<span class="st">"Register Test"</span>);
+        suite.<span class="fn">add</span>(<span class="st">"Logout Test"</span>);   <span class="cm">// duplicate</span>
+
+        <span class="fn">System.out.println</span>(<span class="st">"Total tests (with dupes): "</span> <span class="op">+</span> suite.<span class="fn">size</span>());
+        suite.<span class="fn">remove</span>(<span class="st">"Logout Test"</span>);  <span class="cm">// removes first occurrence only</span>
+        <span class="fn">System.out.println</span>(<span class="st">"After removing first 'Logout Test': "</span> <span class="op">+</span> suite.<span class="fn">size</span>());
+        Collections.<span class="fn">sort</span>(suite);
+        <span class="fn">System.out.println</span>(<span class="st">"Sorted: "</span> <span class="op">+</span> suite);
+        suite.<span class="fn">add</span>(<span class="nu">0</span>, <span class="st">"Smoke Test"</span>);
+        <span class="fn">System.out.println</span>(<span class="st">"After insert at 0: "</span> <span class="op">+</span> suite);
+
+        <span class="fn">System.out.println</span>(<span class="st">"\n====== TASK 2: Config HashMap ======"</span>);
+        <span class="nm">Map</span>&lt;<span class="ty">String</span>, <span class="ty">String</span>&gt; <span class="nm">config</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">HashMap</span>&lt;&gt;();
+        config.<span class="fn">put</span>(<span class="st">"browser"</span>,  <span class="st">"chrome"</span>);
+        config.<span class="fn">put</span>(<span class="st">"baseUrl"</span>,  <span class="st">"https://orangehrm.com"</span>);
+        config.<span class="fn">put</span>(<span class="st">"timeout"</span>,  <span class="st">"30"</span>);
+        config.<span class="fn">put</span>(<span class="st">"headless"</span>, <span class="st">"false"</span>);
+        config.<span class="fn">put</span>(<span class="st">"browser"</span>,  <span class="st">"firefox"</span>);  <span class="cm">// overwrites chrome</span>
+
+        <span class="fn">System.out.println</span>(<span class="st">"browser  = "</span> <span class="op">+</span> config.<span class="fn">get</span>(<span class="st">"browser"</span>));
+        <span class="fn">System.out.println</span>(<span class="st">"timeout  = "</span> <span class="op">+</span> config.<span class="fn">get</span>(<span class="st">"timeout"</span>));
+        <span class="fn">System.out.println</span>(<span class="st">"env      = "</span> <span class="op">+</span> config.<span class="fn">getOrDefault</span>(<span class="st">"env"</span>, <span class="st">"staging"</span>));
+        <span class="fn">System.out.println</span>(<span class="st">"Has 'baseUrl': "</span> <span class="op">+</span> config.<span class="fn">containsKey</span>(<span class="st">"baseUrl"</span>));
+
+        <span class="fn">System.out.println</span>(<span class="st">"\nAll config entries:"</span>);
+        <span class="nm">List</span>&lt;<span class="ty">String</span>&gt; <span class="nm">keys</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">ArrayList</span>&lt;&gt;(config.<span class="fn">keySet</span>());
+        Collections.<span class="fn">sort</span>(keys);
+        <span class="kw">for</span> (<span class="ty">String</span> <span class="nm">k</span> : keys) {
+            <span class="fn">System.out.println</span>(<span class="st">"  "</span> <span class="op">+</span> k <span class="op">+</span> <span class="st">" = "</span> <span class="op">+</span> config.<span class="fn">get</span>(k));
+        }
+
+        <span class="fn">System.out.println</span>(<span class="st">"\n====== TASK 3: Duplicate Link Detector ======"</span>);
+        <span class="nm">List</span>&lt;<span class="ty">String</span>&gt; <span class="nm">pageLinks</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">ArrayList</span>&lt;&gt;(List.<span class="fn">of</span>(
+            <span class="st">"https://site.com/home"</span>,
+            <span class="st">"https://site.com/about"</span>,
+            <span class="st">"https://site.com/home"</span>,
+            <span class="st">"https://site.com/contact"</span>,
+            <span class="st">"https://site.com/about"</span>
+        ));
+        <span class="nm">Set</span>&lt;<span class="ty">String</span>&gt; <span class="nm">seen</span>  <span class="op">=</span> <span class="kw">new</span> <span class="fn">HashSet</span>&lt;&gt;();
+        <span class="nm">Set</span>&lt;<span class="ty">String</span>&gt; <span class="nm">dupes</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">HashSet</span>&lt;&gt;();
+        <span class="kw">for</span> (<span class="ty">String</span> <span class="nm">link</span> : pageLinks) {
+            <span class="kw">if</span> (!seen.<span class="fn">add</span>(link)) dupes.<span class="fn">add</span>(link);
+        }
+        <span class="fn">System.out.println</span>(<span class="st">"Total links : "</span> <span class="op">+</span> pageLinks.<span class="fn">size</span>());
+        <span class="fn">System.out.println</span>(<span class="st">"Unique links: "</span> <span class="op">+</span> seen.<span class="fn">size</span>());
+        <span class="fn">System.out.println</span>(<span class="st">"Duplicates  : "</span> <span class="op">+</span> dupes);
+
+        <span class="fn">System.out.println</span>(<span class="st">"\n====== TASK 4: Test Result Map ======"</span>);
+        <span class="nm">Map</span>&lt;<span class="ty">String</span>, <span class="ty">Integer</span>&gt; <span class="nm">durations</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">HashMap</span>&lt;&gt;();
+        durations.<span class="fn">put</span>(<span class="st">"Login Test"</span>,   <span class="nu">3</span>);
+        durations.<span class="fn">put</span>(<span class="st">"Search Test"</span>,  <span class="nu">7</span>);
+        durations.<span class="fn">put</span>(<span class="st">"Report Test"</span>,  <span class="nu">12</span>);
+        durations.<span class="fn">put</span>(<span class="st">"Logout Test"</span>,  <span class="nu">2</span>);
+
+        <span class="ty">int</span>    <span class="nm">total</span>   <span class="op">=</span> <span class="nu">0</span>;
+        <span class="ty">String</span> <span class="nm">slowest</span> <span class="op">=</span> <span class="st">""</span>;
+        <span class="ty">int</span>    <span class="nm">maxT</span>    <span class="op">=</span> <span class="nu">0</span>;
+        <span class="kw">for</span> (Map.Entry&lt;<span class="ty">String</span>, <span class="ty">Integer</span>&gt; <span class="nm">e</span> : durations.<span class="fn">entrySet</span>()) {
+            total <span class="op">+=</span> e.<span class="fn">getValue</span>();
+            <span class="kw">if</span> (e.<span class="fn">getValue</span>() <span class="op">&gt;</span> maxT) { maxT <span class="op">=</span> e.<span class="fn">getValue</span>(); slowest <span class="op">=</span> e.<span class="fn">getKey</span>(); }
+        }
+        <span class="fn">System.out.println</span>(<span class="st">"Total duration : "</span> <span class="op">+</span> total <span class="op">+</span> <span class="st">"s"</span>);
+        <span class="fn">System.out.println</span>(<span class="st">"Slowest test   : "</span> <span class="op">+</span> slowest <span class="op">+</span> <span class="st">" ("</span> <span class="op">+</span> maxT <span class="op">+</span> <span class="st">"s)"</span>);
+        <span class="fn">System.out.println</span>(<span class="st">"Average        : "</span> <span class="op">+</span> ((double) total / durations.<span class="fn">size</span>()) <span class="op">+</span> <span class="st">"s"</span>);
+
+        <span class="fn">System.out.println</span>(<span class="st">"\n====== TASK 5: Cross-Browser List ======"</span>);
+        <span class="nm">List</span>&lt;<span class="ty">String</span>&gt; <span class="nm">cbBrowsers</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">ArrayList</span>&lt;&gt;(List.<span class="fn">of</span>(<span class="st">"Chrome"</span>,<span class="st">"Firefox"</span>,<span class="st">"Edge"</span>));
+        <span class="nm">List</span>&lt;<span class="ty">String</span>&gt; <span class="nm">cbTests</span>    <span class="op">=</span> <span class="kw">new</span> <span class="fn">ArrayList</span>&lt;&gt;(List.<span class="fn">of</span>(<span class="st">"Login"</span>, <span class="st">"Search"</span>));
+        <span class="kw">for</span> (<span class="ty">String</span> <span class="nm">b</span> : cbBrowsers) {
+            <span class="kw">for</span> (<span class="ty">String</span> <span class="nm">t</span> : cbTests) {
+                <span class="fn">System.out.println</span>(<span class="st">"  Run: ["</span> <span class="op">+</span> t <span class="op">+</span> <span class="st">"] on "</span> <span class="op">+</span> b);
+            }
+        }
+        <span class="fn">System.out.println</span>(<span class="st">"Total runs: "</span> <span class="op">+</span> (cbBrowsers.<span class="fn">size</span>() <span class="op">*</span> cbTests.<span class="fn">size</span>()));
+    }
+}</pre>
+  </div>
+  <h3>Expected Output</h3>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Output</span><span class="code-file">Console</span></div>
+    <pre>====== TASK 1: Test Suite Manager ======
+Total tests (with dupes): 5
+After removing first 'Logout Test': 4
+Sorted: [Login Test, Logout Test, Register Test, Search Test]
+After insert at 0: [Smoke Test, Login Test, Logout Test, Register Test, Search Test]
+
+====== TASK 2: Config HashMap ======
+browser  = firefox
+timeout  = 30
+env      = staging
+Has 'baseUrl': true
+
+All config entries:
+  baseUrl = https://orangehrm.com
+  browser = firefox
+  headless = false
+  timeout = 30
+
+====== TASK 3: Duplicate Link Detector ======
+Total links : 5
+Unique links: 3
+Duplicates  : [https://site.com/home, https://site.com/about]
+
+====== TASK 4: Test Result Map ======
+Total duration : 24s
+Slowest test   : Report Test (12s)
+Average        : 6.0s
+
+====== TASK 5: Cross-Browser List ======
+  Run: [Login] on Chrome
+  Run: [Search] on Chrome
+  Run: [Login] on Firefox
+  Run: [Search] on Firefox
+  Run: [Login] on Edge
+  Run: [Search] on Edge
+Total runs: 6</pre>
+  </div>
+  <div class="callout purple">
+    <span class="callout-icon">&#127919;</span>
+    <div class="callout-body">
+      <div class="callout-title">Extension Challenge</div>
+      <p>Add Task 6: create a <code>Map&lt;String, List&lt;String&gt;&gt;</code> where each key is a browser name and the value is a List of test names that failed on that browser. Add 2-3 failures per browser, then print the complete failure report grouped by browser.</p>
+    </div>
+  </div>
+</div>
+
+<!-- S19 -->
+<div class="section" id="s19">
+  <div class="section-header"><div class="section-num">19</div><h2>Common Mistakes</h2></div>
+  <div class="mistake-grid">
+    <div class="mistake-card"><div class="mt">&#10060; .length on ArrayList</div><p><code>list.length</code> doesn't exist. ArrayList uses <code>list.size()</code>. Arrays use <code>arr.length</code>. Strings use <code>str.length()</code>. All three different.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; remove(int) vs remove(Object)</div><p><code>list.remove(1)</code> removes by INDEX. <code>list.remove("Chrome")</code> removes by VALUE. Removing an Integer from <code>List&lt;Integer&gt;</code>: use <code>list.remove(Integer.valueOf(5))</code> not <code>list.remove(5)</code> (would remove index 5).</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; Modifying list inside for-each</div><p>Calling <code>list.remove()</code> inside a for-each loop throws ConcurrentModificationException. Use Iterator.remove() or loop backwards using a regular for loop.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; HashMap doesn't guarantee order</div><p>HashMap iteration order is not insertion order. If you need insertion order, use LinkedHashMap. If you need sorted order, use TreeMap.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; get() returns null for missing key</div><p><code>map.get("nonexistent")</code> returns null. Calling a method on null crashes. Use <code>containsKey()</code> first, or use <code>getOrDefault(key, defaultValue)</code>.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; Using primitives in generics</div><p><code>List&lt;int&gt;</code> doesn't compile. Use wrapper classes: <code>List&lt;Integer&gt;</code>, <code>List&lt;Double&gt;</code>, <code>List&lt;Boolean&gt;</code>. Auto-boxing handles the int↔Integer conversion.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; Iterating HashSet by index</div><p>Set has no get(index) method. You can only iterate with for-each or iterator. If you need indexed access, use a List instead.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; NullPointerException from unboxing</div><p><code>int x = map.get("key")</code> when key doesn't exist — map returns null, auto-unboxing null throws NullPointerException. Always check with getOrDefault or containsKey first.</p></div>
+  </div>
+</div>
+
+<!-- S20 -->
+<div class="section" id="s20">
+  <div class="section-header"><div class="section-num">20</div><h2>End of Day Checklist + Resources</h2></div>
+  <div class="checklist">
+    <div class="checklist-title">&#10022; End of Day 6 Checklist</div>
+    <div class="check-item"><div class="check-box"></div>I can create an ArrayList, add/remove/get elements, and check size()</div>
+    <div class="check-item"><div class="check-box"></div>I can iterate an ArrayList 4 ways (for-each, for, iterator, forEach lambda)</div>
+    <div class="check-item"><div class="check-box"></div>I know to declare as List&lt;T&gt; not ArrayList&lt;T&gt; (coding to interface)</div>
+    <div class="check-item"><div class="check-box"></div>I can create a HashMap, put/get/remove entries, and handle missing keys safely</div>
+    <div class="check-item"><div class="check-box"></div>I can iterate HashMap using entrySet() to get both key and value</div>
+    <div class="check-item"><div class="check-box"></div>I understand HashSet and can use it to detect duplicates</div>
+    <div class="check-item"><div class="check-box"></div>I know the difference between size() (List/Map/Set) and length (Array) and length() (String)</div>
+    <div class="check-item"><div class="check-box"></div>I understand generics — why List&lt;String&gt; is safer than raw List</div>
+    <div class="check-item"><div class="check-box"></div>I know primitives can't go in generics — must use Integer, Double, Boolean</div>
+    <div class="check-item"><div class="check-box"></div>I can explain how findElements() returns List&lt;WebElement&gt; in Selenium</div>
+    <div class="check-item"><div class="check-box"></div>Practice task completed — all 5 sections match expected output</div>
+  </div>
+  <h3>Resources for Today</h3>
+  <ul class="resource-list">
+    <li><span>&#127909;</span><strong>YouTube:&nbsp;</strong><a href="https://youtube.com/@KunalKushwaha" target="_blank">Kunal Kushwaha — Java Collections episodes</a> &nbsp;<span style="color:var(--muted);font-size:12px">Best free in-depth coverage of ArrayList, HashMap, and iterators.</span></li>
+    <li><span>&#128214;</span><strong>Docs:&nbsp;</strong><a href="https://docs.oracle.com/javase/tutorial/collections/index.html" target="_blank">Oracle Java — Collections Framework Trail</a> &nbsp;<span style="color:var(--muted);font-size:12px">Official tutorial — bookmark the ArrayList and HashMap sections.</span></li>
+    <li><span>&#127947;</span><strong>Practice:&nbsp;</strong><a href="https://www.hackerrank.com/domains/java" target="_blank">HackerRank Java — Java List and Java Map challenges</a> &nbsp;<span style="color:var(--muted);font-size:12px">Filter by Collections, do 3-4 exercises to reinforce.</span></li>
+  </ul>
+  <div class="callout tip">
+    <span class="callout-icon">&#128640;</span>
+    <div class="callout-body">
+      <div class="callout-title">Day 7 Preview — Exception Handling</div>
+      <p>Tomorrow: <strong>try-catch-finally, custom exceptions, and common Selenium exceptions</strong> (NoSuchElementException, TimeoutException, StaleElementReferenceException). The last Java concept before Selenium. After Day 7 comes Day 8 Mini Project, then <strong>Day 9 — Selenium setup begins.</strong> You're almost there.</p>
+    </div>
+  </div>
+</div>
+
+</div>
+<div class="footer">
+  <span>Day 6 of 65</span> &nbsp;&middot;&nbsp; Selenium + Java Automation Roadmap &nbsp;&middot;&nbsp; Phase 1 &mdash; Foundation &nbsp;&middot;&nbsp; <span>Next: Day 7 &mdash; Exception Handling</span>
+</div>
+</body>
+</html>

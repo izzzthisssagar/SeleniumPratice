@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 10 — WebDriver Interface & Browser Drivers</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Sora:wght@400;600;700;800&display=swap');
+:root{--bg:#0d1117;--bg2:#161b22;--bg3:#1e2530;--border:#30363d;--accent:#f0a500;--accent2:#58a6ff;--accent3:#3fb950;--accent4:#ff7b72;--accent5:#d2a8ff;--text:#e6edf3;--muted:#8b949e;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);line-height:1.75;font-size:15px;}
+.hero{background:linear-gradient(135deg,#0d1117,#161b22,#0d1522);border-bottom:2px solid var(--accent2);padding:48px 40px 36px;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:0;right:0;width:400px;height:400px;background:radial-gradient(circle,rgba(88,166,255,0.07),transparent 70%);pointer-events:none;}
+.hero-tag{display:inline-block;background:rgba(88,166,255,0.12);border:1px solid rgba(88,166,255,0.3);color:var(--accent2);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;padding:4px 12px;border-radius:20px;margin-bottom:16px;}
+.hero h1{font-size:34px;font-weight:800;line-height:1.2;margin-bottom:10px;}
+.hero h1 span{color:var(--accent2);}
+.hero-sub{color:var(--muted);font-size:14px;display:flex;gap:24px;flex-wrap:wrap;margin-top:16px;}
+.hero-sub span{display:flex;align-items:center;gap:6px;}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--accent2);display:inline-block;}
+.container{max-width:980px;margin:0 auto;padding:40px 32px 80px;}
+.toc{background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--accent2);border-radius:8px;padding:24px 28px;margin-bottom:48px;}
+.toc-title{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--accent2);margin-bottom:14px;}
+.toc ol{padding-left:20px;}.toc li{margin-bottom:6px;}
+.toc a{color:var(--muted);text-decoration:none;font-size:14px;}.toc a:hover{color:var(--accent2);}
+.section{margin-bottom:56px;}
+.section-header{display:flex;align-items:center;gap:14px;margin-bottom:24px;padding-bottom:14px;border-bottom:1px solid var(--border);}
+.section-num{background:var(--accent2);color:#000;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:12px;width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.section h2{font-size:22px;font-weight:700;}
+h3{font-size:16px;font-weight:600;color:var(--accent2);margin:28px 0 12px;display:flex;align-items:center;gap:8px;}
+h3::before{content:'▸';color:var(--accent);font-size:12px;}
+p{color:var(--muted);margin-bottom:14px;line-height:1.8;}strong{color:var(--text);font-weight:600;}
+.code-block{background:#010409;border:1px solid var(--border);border-radius:10px;margin:20px 0;overflow:hidden;}
+.code-header{background:var(--bg2);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
+.code-lang{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent2);letter-spacing:1px;text-transform:uppercase;font-weight:600;}
+.code-file{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);}
+pre{font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.85;padding:20px;overflow-x:auto;color:#e6edf3;}
+.kw{color:#ff7b72;font-weight:500;}.ty{color:#ffa657;}.st{color:#a5d6ff;}.cm{color:#6e7681;font-style:italic;}
+.nm{color:#79c0ff;}.nu{color:#79c0ff;}.fn{color:#d2a8ff;}.op{color:#ff7b72;}.bool{color:#3fb950;}
+code{font-family:'JetBrains Mono',monospace;font-size:12.5px;background:rgba(88,166,255,0.1);border:1px solid rgba(88,166,255,0.2);color:var(--accent2);padding:1px 7px;border-radius:4px;}
+.callout{border-radius:8px;padding:16px 20px;margin:20px 0;display:flex;gap:14px;align-items:flex-start;}
+.callout-icon{font-size:18px;flex-shrink:0;margin-top:1px;}.callout-body{flex:1;}
+.callout-title{font-weight:700;font-size:13px;margin-bottom:4px;}.callout p{margin-bottom:0;font-size:13.5px;}
+.note{background:rgba(88,166,255,0.07);border-left:3px solid var(--accent2);}.note .callout-title{color:var(--accent2);}
+.tip{background:rgba(63,185,80,0.07);border-left:3px solid var(--accent3);}.tip .callout-title{color:var(--accent3);}
+.warn{background:rgba(240,165,0,0.07);border-left:3px solid var(--accent);}.warn .callout-title{color:var(--accent);}
+.error{background:rgba(255,123,114,0.07);border-left:3px solid var(--accent4);}.error .callout-title{color:var(--accent4);}
+.purple{background:rgba(210,168,255,0.07);border-left:3px solid var(--accent5);}.purple .callout-title{color:var(--accent5);}
+.table-wrap{overflow-x:auto;margin:20px 0;}
+table{width:100%;border-collapse:collapse;font-size:13.5px;}
+thead tr{background:var(--bg2);border-bottom:2px solid var(--accent2);}
+th{padding:12px 16px;text-align:left;font-weight:700;font-size:12px;letter-spacing:0.5px;text-transform:uppercase;color:var(--accent2);}
+td{padding:11px 16px;border-bottom:1px solid var(--border);color:var(--muted);}
+tr:hover td{background:rgba(255,255,255,0.02);}
+td:first-child{font-family:'JetBrains Mono',monospace;color:var(--accent);font-size:13px;}
+.diagram-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:28px 24px;margin:24px 0;overflow:hidden;}
+.diagram-title{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:20px;text-align:center;}
+.hour-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(88,166,255,0.1);border:1px solid rgba(88,166,255,0.25);color:var(--accent2);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:1px;padding:5px 14px;border-radius:20px;margin-bottom:18px;margin-top:30px;}
+.mistake-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:20px 0;}
+.mistake-card{background:rgba(255,123,114,0.05);border:1px solid rgba(255,123,114,0.2);border-radius:8px;padding:16px;}
+.mistake-card .mt{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent4);font-weight:700;margin-bottom:8px;}
+.mistake-card p{font-size:13px;margin:0;}
+.checklist{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:24px 28px;margin:24px 0;}
+.checklist-title{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent3);letter-spacing:1.5px;text-transform:uppercase;font-weight:700;margin-bottom:16px;}
+.check-item{display:flex;align-items:flex-start;gap:12px;padding:9px 0;border-bottom:1px solid rgba(48,54,61,0.5);font-size:14px;color:var(--muted);}
+.check-item:last-child{border-bottom:none;}
+.check-box{width:18px;height:18px;border:2px solid var(--accent3);border-radius:4px;flex-shrink:0;margin-top:2px;}
+.resource-list{list-style:none;padding:0;margin:12px 0;}
+.resource-list li{padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;margin-bottom:8px;font-size:13.5px;display:flex;gap:10px;align-items:center;}
+.resource-list li a{color:var(--accent2);text-decoration:none;}
+.footer{background:var(--bg2);border-top:1px solid var(--border);padding:24px 40px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);}
+.footer span{color:var(--accent2);}
+::-webkit-scrollbar{width:6px;height:6px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+@media(max-width:640px){.hero{padding:32px 20px 24px;}.hero h1{font-size:24px;}.container{padding:24px 16px 60px;}}
+</style>
+</head>
+<body>
+<div class="hero">
+  <div class="hero-tag">Phase 2 &middot; Day 10 of 65</div>
+  <h1>WebDriver Interface <span>&amp; Browser Drivers</span></h1>
+  <div class="hero-sub">
+    <span><span class="dot"></span>2 Hours</span>
+    <span><span class="dot"></span>WebDriver interface &middot; DriverFactory &middot; Timeouts &middot; Cookies &middot; Screenshots</span>
+  </div>
+</div>
+<div class="container">
+
+<div class="toc">
+  <div class="toc-title">// Table of Contents</div>
+  <ol>
+    <li><a href="#s1">WebDriver Interface — Deep Dive</a></li>
+    <li><a href="#s2">WebDriver Sub-Interfaces &amp; Classes</a></li>
+    <li><a href="#s3">DriverFactory — Reusable Driver Creation</a></li>
+    <li><a href="#s4">Timeouts — Implicit, Page Load, Script</a></li>
+    <li><a href="#s5">Cookie Management</a></li>
+    <li><a href="#s6">Taking Screenshots</a></li>
+    <li><a href="#s7">Browser Window &amp; Position</a></li>
+    <li><a href="#s8">WebDriver Capabilities</a></li>
+    <li><a href="#s9">BaseTest Class — Framework Foundation</a></li>
+    <li><a href="#s10">Running Multiple Browsers in Sequence</a></li>
+    <li><a href="#s11">Practice Task + Expected Output</a></li>
+    <li><a href="#s12">Common Mistakes</a></li>
+    <li><a href="#s13">End of Day Checklist + Resources</a></li>
+  </ol>
+</div>
+
+<!-- S1 -->
+<div class="section" id="s1">
+  <div class="section-header"><div class="section-num">01</div><h2>WebDriver Interface — Deep Dive</h2></div>
+  <div class="hour-badge">&#9200; Hour 1 — WebDriver Architecture (60 mins)</div>
+  <p>On Day 5 you learned that <code>WebDriver</code> is an <strong>interface</strong>. Now let's see exactly what that means in the context of Selenium — every method you call on <code>driver</code> is defined in this interface.</p>
+
+  <div class="diagram-wrap">
+    <div class="diagram-title">// WebDriver Interface Hierarchy</div>
+    <svg viewBox="0 0 700 260" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:700px;display:block;margin:0 auto">
+      <defs>
+        <marker id="inh" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto">
+          <polygon points="0,0 10,5 0,10" fill="none" stroke="#58a6ff" stroke-width="1.5"/>
+        </marker>
+        <marker id="imp" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto">
+          <polygon points="0,0 10,5 0,10" fill="none" stroke="#3fb950" stroke-width="1.5" stroke-dasharray="2,1"/>
+        </marker>
+      </defs>
+      <!-- SearchContext (top) -->
+      <rect x="240" y="10" width="220" height="30" rx="6" fill="#0d1117" stroke="#d2a8ff" stroke-width="1.5"/>
+      <text x="350" y="30" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#d2a8ff">&lt;&lt;SearchContext&gt;&gt;</text>
+      <!-- WebDriver extends SearchContext -->
+      <line x1="350" y1="40" x2="350" y2="65" stroke="#8b949e" stroke-width="1.5" marker-end="url(#inh)"/>
+      <!-- WebDriver -->
+      <rect x="200" y="65" width="300" height="65" rx="8" fill="#0d1117" stroke="#58a6ff" stroke-width="2"/>
+      <rect x="200" y="65" width="300" height="24" rx="8" fill="rgba(88,166,255,0.12)"/>
+      <rect x="200" y="77" width="300" height="12" fill="rgba(88,166,255,0.12)"/>
+      <text x="350" y="80" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#58a6ff" font-weight="700">&lt;&lt;WebDriver&gt;&gt;</text>
+      <text x="215" y="100" font-family="JetBrains Mono,monospace" font-size="9" fill="#8b949e">get() &nbsp; getTitle() &nbsp; findElement() &nbsp; findElements()</text>
+      <text x="215" y="115" font-family="JetBrains Mono,monospace" font-size="9" fill="#8b949e">getCurrentUrl() &nbsp; getPageSource() &nbsp; close() &nbsp; quit()</text>
+      <!-- RemoteWebDriver -->
+      <line x1="350" y1="130" x2="350" y2="155" stroke="#8b949e" stroke-width="1.5" marker-end="url(#inh)"/>
+      <rect x="220" y="155" width="260" height="30" rx="6" fill="#0d1117" stroke="#f0a500" stroke-width="1.5"/>
+      <text x="350" y="175" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#f0a500">RemoteWebDriver</text>
+      <!-- ChromeDriver, FirefoxDriver, EdgeDriver -->
+      <line x1="280" y1="185" x2="140" y2="215" stroke="#8b949e" stroke-width="1.5" marker-end="url(#inh)"/>
+      <line x1="350" y1="185" x2="350" y2="215" stroke="#8b949e" stroke-width="1.5" marker-end="url(#inh)"/>
+      <line x1="420" y1="185" x2="560" y2="215" stroke="#8b949e" stroke-width="1.5" marker-end="url(#inh)"/>
+
+      <rect x="50" y="215" width="150" height="30" rx="6" fill="#1e2530" stroke="#3fb950" stroke-width="1.5"/>
+      <text x="125" y="234" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#3fb950">ChromeDriver</text>
+
+      <rect x="270" y="215" width="160" height="30" rx="6" fill="#1e2530" stroke="#3fb950" stroke-width="1.5"/>
+      <text x="350" y="234" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#3fb950">FirefoxDriver</text>
+
+      <rect x="480" y="215" width="150" height="30" rx="6" fill="#1e2530" stroke="#3fb950" stroke-width="1.5"/>
+      <text x="555" y="234" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#3fb950">EdgeDriver</text>
+
+      <text x="350" y="258" text-anchor="middle" font-family="Sora,sans-serif" font-size="10" fill="#6e7681">All three extend RemoteWebDriver which implements WebDriver</text>
+    </svg>
+  </div>
+
+  <p>Because all drivers share the <code>WebDriver</code> interface, you declare your variable as <code>WebDriver driver</code> (the interface type) and assign any concrete driver. Swap Chrome to Firefox by changing <strong>one word</strong> — the rest of your test code stays identical.</p>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">InterfaceType.java</span></div>
+    <pre><span class="cm">// Interface type on left — concrete class on right</span>
+WebDriver <span class="nm">driver</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">ChromeDriver</span>();   <span class="cm">// ← change this one word</span>
+<span class="cm">// WebDriver driver = new FirefoxDriver(); ← to this</span>
+<span class="cm">// WebDriver driver = new EdgeDriver();    ← or this</span>
+
+<span class="cm">// ALL test code below works unchanged for any browser:</span>
+driver.<span class="fn">get</span>(<span class="st">"https://orangehrm.com"</span>);
+driver.<span class="fn">getTitle</span>();
+driver.<span class="fn">findElement</span>(By.<span class="fn">id</span>(<span class="st">"username"</span>));   <span class="cm">// Day 14</span>
+driver.<span class="fn">quit</span>();
+
+<span class="cm">// Never do this — you lose portability:</span>
+<span class="nm">ChromeDriver</span> <span class="nm">driver</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">ChromeDriver</span>(); <span class="cm">// ← BAD — tied to Chrome</span></pre>
+  </div>
+</div>
+
+<!-- S2 -->
+<div class="section" id="s2">
+  <div class="section-header"><div class="section-num">02</div><h2>WebDriver Sub-Interfaces &amp; Classes</h2></div>
+  <p>WebDriver has nested sub-interfaces for specific functionality. You access them via <code>driver.manage()</code>, <code>driver.navigate()</code>, and <code>driver.switchTo()</code>.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Sub-Interface</th><th>Access Via</th><th>What It Controls</th></tr></thead>
+      <tbody>
+        <tr><td>WebDriver.Options</td><td><code>driver.manage()</code></td><td>Cookies, timeouts, window size, logs</td></tr>
+        <tr><td>WebDriver.Navigation</td><td><code>driver.navigate()</code></td><td>Back, forward, refresh, navigate to URL</td></tr>
+        <tr><td>WebDriver.TargetLocator</td><td><code>driver.switchTo()</code></td><td>Switch to alert, frame, window tab</td></tr>
+        <tr><td>WebDriver.Timeouts</td><td><code>driver.manage().timeouts()</code></td><td>Implicit wait, page load, script timeout</td></tr>
+        <tr><td>WebDriver.Window</td><td><code>driver.manage().window()</code></td><td>Maximize, minimize, set size, set position</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">SubInterfaces.java</span></div>
+    <pre><span class="cm">// Options — cookie + timeout + window control</span>
+driver.<span class="fn">manage</span>().<span class="fn">deleteAllCookies</span>();
+driver.<span class="fn">manage</span>().<span class="fn">window</span>().<span class="fn">maximize</span>();
+driver.<span class="fn">manage</span>().<span class="fn">timeouts</span>().<span class="fn">implicitlyWait</span>(Duration.<span class="fn">ofSeconds</span>(<span class="nu">10</span>));
+
+<span class="cm">// Navigation — browser history</span>
+driver.<span class="fn">navigate</span>().<span class="fn">to</span>(<span class="st">"https://site.com"</span>);
+driver.<span class="fn">navigate</span>().<span class="fn">back</span>();
+driver.<span class="fn">navigate</span>().<span class="fn">forward</span>();
+driver.<span class="fn">navigate</span>().<span class="fn">refresh</span>();
+
+<span class="cm">// TargetLocator — switch context (Day 21-23)</span>
+driver.<span class="fn">switchTo</span>().<span class="fn">alert</span>();             <span class="cm">// Day 21</span>
+driver.<span class="fn">switchTo</span>().<span class="fn">frame</span>(<span class="st">"frameName"</span>); <span class="cm">// Day 23</span>
+driver.<span class="fn">switchTo</span>().<span class="fn">window</span>(handle);    <span class="cm">// Day 22</span></pre>
+  </div>
+</div>
+
+<!-- S3 -->
+<div class="section" id="s3">
+  <div class="section-header"><div class="section-num">03</div><h2>DriverFactory — Reusable Driver Creation</h2></div>
+  <p>Instead of repeating <code>WebDriverManager.chromedriver().setup(); new ChromeDriver();</code> in every test, build a <strong>DriverFactory</strong> class once. This is the first piece of your final framework architecture — it will be used from Day 10 through Day 65.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">DriverFactory.java — utils/DriverFactory.java</span></div>
+    <pre><span class="kw">package</span> com.qaautomation.utils;
+
+<span class="kw">import</span> io.github.bonigarcia.wdm.WebDriverManager;
+<span class="kw">import</span> org.openqa.selenium.WebDriver;
+<span class="kw">import</span> org.openqa.selenium.chrome.ChromeDriver;
+<span class="kw">import</span> org.openqa.selenium.chrome.ChromeOptions;
+<span class="kw">import</span> org.openqa.selenium.firefox.FirefoxDriver;
+<span class="kw">import</span> org.openqa.selenium.firefox.FirefoxOptions;
+<span class="kw">import</span> org.openqa.selenium.edge.EdgeDriver;
+<span class="kw">import</span> java.time.Duration;
+
+<span class="kw">public class</span> <span class="nm">DriverFactory</span> {
+
+    <span class="cm">// Config constants</span>
+    <span class="kw">private static final int</span>    <span class="nm">IMPLICIT_WAIT</span>   <span class="op">=</span> <span class="nu">10</span>;
+    <span class="kw">private static final int</span>    <span class="nm">PAGE_LOAD_WAIT</span>  <span class="op">=</span> <span class="nu">30</span>;
+    <span class="kw">private static final</span> <span class="ty">String</span> <span class="nm">DEFAULT_BROWSER</span> <span class="op">=</span> <span class="st">"chrome"</span>;
+
+    <span class="cm">// Create driver by browser name — reads from system property or uses default</span>
+    <span class="kw">public static</span> WebDriver <span class="fn">getDriver</span>() {
+        <span class="ty">String</span> <span class="nm">browser</span> <span class="op">=</span> System.<span class="fn">getProperty</span>(<span class="st">"browser"</span>, DEFAULT_BROWSER);
+        <span class="kw">return</span> <span class="fn">getDriver</span>(browser);
+    }
+
+    <span class="kw">public static</span> WebDriver <span class="fn">getDriver</span>(<span class="ty">String</span> <span class="nm">browser</span>) {
+        WebDriver <span class="nm">driver</span>;
+
+        <span class="kw">switch</span> (browser.<span class="fn">toLowerCase</span>().<span class="fn">trim</span>()) {
+
+            <span class="kw">case</span> <span class="st">"chrome"</span>:
+                WebDriverManager.<span class="fn">chromedriver</span>().<span class="fn">setup</span>();
+                <span class="nm">ChromeOptions</span> <span class="nm">chromeOpts</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">ChromeOptions</span>();
+                chromeOpts.<span class="fn">addArguments</span>(<span class="st">"--disable-notifications"</span>);
+                chromeOpts.<span class="fn">addArguments</span>(<span class="st">"--disable-infobars"</span>);
+                driver <span class="op">=</span> <span class="kw">new</span> <span class="fn">ChromeDriver</span>(chromeOpts);
+                <span class="kw">break</span>;
+
+            <span class="kw">case</span> <span class="st">"chrome-headless"</span>:
+                WebDriverManager.<span class="fn">chromedriver</span>().<span class="fn">setup</span>();
+                <span class="nm">ChromeOptions</span> <span class="nm">headlessOpts</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">ChromeOptions</span>();
+                headlessOpts.<span class="fn">addArguments</span>(<span class="st">"--headless=new"</span>);
+                headlessOpts.<span class="fn">addArguments</span>(<span class="st">"--window-size=1920,1080"</span>);
+                headlessOpts.<span class="fn">addArguments</span>(<span class="st">"--disable-notifications"</span>);
+                driver <span class="op">=</span> <span class="kw">new</span> <span class="fn">ChromeDriver</span>(headlessOpts);
+                <span class="kw">break</span>;
+
+            <span class="kw">case</span> <span class="st">"firefox"</span>:
+                WebDriverManager.<span class="fn">firefoxdriver</span>().<span class="fn">setup</span>();
+                driver <span class="op">=</span> <span class="kw">new</span> <span class="fn">FirefoxDriver</span>();
+                <span class="kw">break</span>;
+
+            <span class="kw">case</span> <span class="st">"edge"</span>:
+                WebDriverManager.<span class="fn">edgedriver</span>().<span class="fn">setup</span>();
+                driver <span class="op">=</span> <span class="kw">new</span> <span class="fn">EdgeDriver</span>();
+                <span class="kw">break</span>;
+
+            <span class="kw">default</span>:
+                <span class="kw">throw</span> <span class="kw">new</span> <span class="fn">IllegalArgumentException</span>(
+                    <span class="st">"Browser not supported: "</span> <span class="op">+</span> browser
+                    <span class="op">+</span> <span class="st">". Use: chrome, chrome-headless, firefox, edge"</span>
+                );
+        }
+
+        <span class="cm">// Apply common settings to all browsers</span>
+        driver.<span class="fn">manage</span>().<span class="fn">window</span>().<span class="fn">maximize</span>();
+        driver.<span class="fn">manage</span>().<span class="fn">deleteAllCookies</span>();
+        driver.<span class="fn">manage</span>().<span class="fn">timeouts</span>().<span class="fn">implicitlyWait</span>(Duration.<span class="fn">ofSeconds</span>(IMPLICIT_WAIT));
+        driver.<span class="fn">manage</span>().<span class="fn">timeouts</span>().<span class="fn">pageLoadTimeout</span>(Duration.<span class="fn">ofSeconds</span>(PAGE_LOAD_WAIT));
+
+        <span class="kw">return</span> driver;
+    }
+}
+
+<span class="cm">// Usage in any test class — just one line:</span>
+WebDriver <span class="nm">driver</span> <span class="op">=</span> DriverFactory.<span class="fn">getDriver</span>(<span class="st">"chrome"</span>);
+<span class="cm">// or with system property: mvn test -Dbrowser=firefox</span>
+WebDriver <span class="nm">driver2</span> <span class="op">=</span> DriverFactory.<span class="fn">getDriver</span>(); <span class="cm">// reads -Dbrowser param</span></pre>
+  </div>
+  <div class="callout purple">
+    <span class="callout-icon">&#127775;</span>
+    <div class="callout-body">
+      <div class="callout-title">This is real framework code</div>
+      <p>The DriverFactory you just wrote is production-grade. Every professional Selenium framework has exactly this pattern. When you reach Phase 4 CI/CD, you'll pass <code>-Dbrowser=chrome-headless</code> to GitHub Actions and this factory handles the rest automatically.</p>
+    </div>
+  </div>
+</div>
+
+<!-- S4 -->
+<div class="section" id="s4">
+  <div class="section-header"><div class="section-num">04</div><h2>Timeouts — Implicit, Page Load, Script</h2></div>
+  <p>Selenium has 3 types of timeouts. Understanding the difference is critical — wrong timeout settings cause either slow tests (too long) or flaky tests (too short).</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Timeout Type</th><th>What It Controls</th><th>When to Use</th><th>Typical Value</th></tr></thead>
+      <tbody>
+        <tr><td>implicitlyWait</td><td>How long WebDriver waits for an element before throwing NoSuchElementException</td><td>Set once globally. Basic safety net.</td><td>10 seconds</td></tr>
+        <tr><td>pageLoadTimeout</td><td>How long to wait for a page to fully load after get() or navigate()</td><td>Always set. Default is too short for slow pages.</td><td>30 seconds</td></tr>
+        <tr><td>setScriptTimeout</td><td>How long async JavaScript executes before timeout (Day 25)</td><td>Only if you use executeAsyncScript()</td><td>30 seconds</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">Timeouts.java</span></div>
+    <pre><span class="kw">import</span> java.time.Duration;
+
+WebDriver <span class="nm">driver</span> <span class="op">=</span> DriverFactory.<span class="fn">getDriver</span>(<span class="st">"chrome"</span>);
+
+<span class="cm">// ── Implicit Wait ─────────────────────────────────────────────</span>
+<span class="cm">// Tells WebDriver: when findElement() doesn't find the element,</span>
+<span class="cm">// wait up to X seconds polling the DOM before throwing exception</span>
+driver.<span class="fn">manage</span>().<span class="fn">timeouts</span>().<span class="fn">implicitlyWait</span>(Duration.<span class="fn">ofSeconds</span>(<span class="nu">10</span>));
+
+<span class="cm">// ── Page Load Timeout ─────────────────────────────────────────</span>
+<span class="cm">// If page takes longer than 30s to load — TimeoutException thrown</span>
+driver.<span class="fn">manage</span>().<span class="fn">timeouts</span>().<span class="fn">pageLoadTimeout</span>(Duration.<span class="fn">ofSeconds</span>(<span class="nu">30</span>));
+
+<span class="cm">// ── Script Timeout ────────────────────────────────────────────</span>
+<span class="cm">// For async JS execution via executeAsyncScript()</span>
+driver.<span class="fn">manage</span>().<span class="fn">timeouts</span>().<span class="fn">scriptTimeout</span>(Duration.<span class="fn">ofSeconds</span>(<span class="nu">30</span>));
+
+<span class="cm">// IMPORTANT: Implicit wait vs Explicit wait (Day 20)</span>
+<span class="cm">// Implicit: set once, applies to all findElement() calls globally</span>
+<span class="cm">// Explicit: set per-element with WebDriverWait — more precise</span>
+<span class="cm">// NEVER mix both in the same script — causes unpredictable behavior</span>
+<span class="cm">// Best practice: use ONLY explicit waits in production frameworks</span>
+<span class="cm">// For now (Days 9-19): use implicit wait. Switch to explicit on Day 20.</span></pre>
+  </div>
+</div>
+
+<!-- S5 -->
+<div class="section" id="s5">
+  <div class="section-header"><div class="section-num">05</div><h2>Cookie Management</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">Cookies.java</span></div>
+    <pre><span class="kw">import</span> org.openqa.selenium.Cookie;
+<span class="kw">import</span> java.util.Set;
+
+driver.<span class="fn">get</span>(<span class="st">"https://opensource-demo.orangehrmlive.com"</span>);
+
+<span class="cm">// Get all cookies</span>
+Set&lt;Cookie&gt; <span class="nm">cookies</span> <span class="op">=</span> driver.<span class="fn">manage</span>().<span class="fn">getCookies</span>();
+<span class="fn">System.out.println</span>(<span class="st">"Total cookies: "</span> <span class="op">+</span> cookies.<span class="fn">size</span>());
+
+<span class="kw">for</span> (Cookie <span class="nm">c</span> : cookies) {
+    <span class="fn">System.out.println</span>(<span class="st">"  Name: "</span> <span class="op">+</span> c.<span class="fn">getName</span>()
+        <span class="op">+</span> <span class="st">"  Value: "</span> <span class="op">+</span> c.<span class="fn">getValue</span>()
+        <span class="op">+</span> <span class="st">"  Domain: "</span> <span class="op">+</span> c.<span class="fn">getDomain</span>());
+}
+
+<span class="cm">// Get specific cookie by name</span>
+Cookie <span class="nm">sessionCookie</span> <span class="op">=</span> driver.<span class="fn">manage</span>().<span class="fn">getCookieNamed</span>(<span class="st">"PHPSESSID"</span>);
+<span class="kw">if</span> (sessionCookie <span class="op">!=</span> <span class="kw">null</span>) {
+    <span class="fn">System.out.println</span>(<span class="st">"Session: "</span> <span class="op">+</span> sessionCookie.<span class="fn">getValue</span>());
+}
+
+<span class="cm">// Add a cookie</span>
+Cookie <span class="nm">myCookie</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">Cookie</span>(<span class="st">"testMode"</span>, <span class="st">"true"</span>);
+driver.<span class="fn">manage</span>().<span class="fn">addCookie</span>(myCookie);
+
+<span class="cm">// Delete specific cookie</span>
+driver.<span class="fn">manage</span>().<span class="fn">deleteCookieNamed</span>(<span class="st">"testMode"</span>);
+
+<span class="cm">// Delete all cookies — clean state before each test</span>
+driver.<span class="fn">manage</span>().<span class="fn">deleteAllCookies</span>();
+
+<span class="cm">// Real use case: inject auth cookie to bypass login page in tests</span>
+<span class="cm">// (Advanced technique — used in Day 77+ project)</span></pre>
+  </div>
+</div>
+
+<!-- S6 -->
+<div class="section" id="s6">
+  <div class="section-header"><div class="section-num">06</div><h2>Taking Screenshots</h2></div>
+  <p>Screenshots are essential for debugging test failures. You capture the browser state at the moment of failure and save it as a PNG file for review.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">Screenshots.java</span></div>
+    <pre><span class="kw">import</span> org.openqa.selenium.TakesScreenshot;
+<span class="kw">import</span> org.openqa.selenium.OutputType;
+<span class="kw">import</span> org.apache.commons.io.FileUtils;
+<span class="kw">import</span> java.io.File;
+<span class="kw">import</span> java.io.IOException;
+
+<span class="cm">// Method 1: Save screenshot to file</span>
+<span class="kw">public static void</span> <span class="fn">takeScreenshot</span>(WebDriver <span class="nm">driver</span>, <span class="ty">String</span> <span class="nm">fileName</span>) {
+    <span class="kw">try</span> {
+        <span class="cm">// Cast driver to TakesScreenshot interface</span>
+        <span class="nm">TakesScreenshot</span> <span class="nm">ts</span> <span class="op">=</span> (<span class="nm">TakesScreenshot</span>) driver;
+
+        <span class="cm">// Capture screenshot as a File</span>
+        File <span class="nm">screenshot</span> <span class="op">=</span> ts.<span class="fn">getScreenshotAs</span>(OutputType.FILE);
+
+        <span class="cm">// Copy to your output folder</span>
+        File <span class="nm">dest</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">File</span>(<span class="st">"screenshots/"</span> <span class="op">+</span> fileName <span class="op">+</span> <span class="st">".png"</span>);
+        FileUtils.<span class="fn">copyFile</span>(screenshot, dest);
+        <span class="fn">System.out.println</span>(<span class="st">"Screenshot saved: "</span> <span class="op">+</span> dest.<span class="fn">getAbsolutePath</span>());
+
+    } <span class="kw">catch</span> (IOException <span class="nm">e</span>) {
+        <span class="fn">System.out.println</span>(<span class="st">"Screenshot failed: "</span> <span class="op">+</span> e.<span class="fn">getMessage</span>());
+    }
+}
+
+<span class="cm">// Method 2: Get screenshot as Base64 (for embedding in HTML reports)</span>
+<span class="ty">String</span> <span class="nm">base64</span> <span class="op">=</span> ((<span class="nm">TakesScreenshot</span>) driver).<span class="fn">getScreenshotAs</span>(OutputType.BASE64);
+<span class="fn">System.out.println</span>(<span class="st">"Base64 length: "</span> <span class="op">+</span> base64.<span class="fn">length</span>());
+
+<span class="cm">// Usage in test — always screenshot on failure:</span>
+<span class="kw">try</span> {
+    driver.<span class="fn">get</span>(<span class="st">"https://site.com"</span>);
+    <span class="cm">// ... test steps ...</span>
+} <span class="kw">catch</span> (Exception <span class="nm">e</span>) {
+    <span class="fn">takeScreenshot</span>(driver, <span class="st">"login_test_FAIL"</span>);  <span class="cm">// capture state on failure</span>
+    <span class="kw">throw</span> e;  <span class="cm">// re-throw so test still fails properly</span>
+} <span class="kw">finally</span> {
+    driver.<span class="fn">quit</span>();
+}
+
+<span class="cm">// Add commons-io dependency to pom.xml for FileUtils:</span>
+<span class="cm">//   &lt;dependency&gt;</span>
+<span class="cm">//     &lt;groupId&gt;commons-io&lt;/groupId&gt;</span>
+<span class="cm">//     &lt;artifactId&gt;commons-io&lt;/artifactId&gt;</span>
+<span class="cm">//     &lt;version&gt;2.15.1&lt;/version&gt;</span>
+<span class="cm">//   &lt;/dependency&gt;</span></pre>
+  </div>
+</div>
+
+<!-- S7 -->
+<div class="section" id="s7">
+  <div class="section-header"><div class="section-num">07</div><h2>Browser Window &amp; Position</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">WindowManagement.java</span></div>
+    <pre><span class="kw">import</span> org.openqa.selenium.Dimension;
+<span class="kw">import</span> org.openqa.selenium.Point;
+
+<span class="cm">// Window size</span>
+driver.<span class="fn">manage</span>().<span class="fn">window</span>().<span class="fn">maximize</span>();                          <span class="cm">// full screen</span>
+driver.<span class="fn">manage</span>().<span class="fn">window</span>().<span class="fn">minimize</span>();                          <span class="cm">// minimize</span>
+driver.<span class="fn">manage</span>().<span class="fn">window</span>().<span class="fn">fullscreen</span>();                        <span class="cm">// F11 mode</span>
+driver.<span class="fn">manage</span>().<span class="fn">window</span>().<span class="fn">setSize</span>(<span class="kw">new</span> <span class="fn">Dimension</span>(<span class="nu">1366</span>, <span class="nu">768</span>));  <span class="cm">// specific size</span>
+
+<span class="cm">// Get current window size</span>
+Dimension <span class="nm">size</span> <span class="op">=</span> driver.<span class="fn">manage</span>().<span class="fn">window</span>().<span class="fn">getSize</span>();
+<span class="fn">System.out.println</span>(<span class="st">"Width: "</span>  <span class="op">+</span> size.<span class="fn">getWidth</span>());
+<span class="fn">System.out.println</span>(<span class="st">"Height: "</span> <span class="op">+</span> size.<span class="fn">getHeight</span>());
+
+<span class="cm">// Window position (top-left corner on screen)</span>
+driver.<span class="fn">manage</span>().<span class="fn">window</span>().<span class="fn">setPosition</span>(<span class="kw">new</span> <span class="fn">Point</span>(<span class="nu">0</span>, <span class="nu">0</span>)); <span class="cm">// top-left</span>
+Point <span class="nm">pos</span> <span class="op">=</span> driver.<span class="fn">manage</span>().<span class="fn">window</span>().<span class="fn">getPosition</span>();
+<span class="fn">System.out.println</span>(<span class="st">"Position: x="</span> <span class="op">+</span> pos.<span class="fn">getX</span>() <span class="op">+</span> <span class="st">" y="</span> <span class="op">+</span> pos.<span class="fn">getY</span>());
+
+<span class="cm">// Mobile emulation — useful for responsive testing</span>
+<span class="nm">ChromeOptions</span> <span class="nm">mobileOpts</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">ChromeOptions</span>();
+Map&lt;<span class="ty">String</span>, <span class="ty">String</span>&gt; <span class="nm">mobileDevice</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">HashMap</span>&lt;&gt;();
+mobileDevice.<span class="fn">put</span>(<span class="st">"deviceName"</span>, <span class="st">"iPhone 12 Pro"</span>);
+mobileOpts.<span class="fn">setExperimentalOption</span>(<span class="st">"mobileEmulation"</span>, mobileDevice);
+WebDriver <span class="nm">mobile</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">ChromeDriver</span>(mobileOpts);</pre>
+  </div>
+</div>
+
+<!-- S8 -->
+<div class="section" id="s8">
+  <div class="section-header"><div class="section-num">08</div><h2>WebDriver Capabilities</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">Capabilities.java</span></div>
+    <pre><span class="kw">import</span> org.openqa.selenium.Capabilities;
+<span class="kw">import</span> org.openqa.selenium.remote.RemoteWebDriver;
+
+<span class="cm">// Get browser info at runtime</span>
+Capabilities <span class="nm">caps</span> <span class="op">=</span> ((<span class="nm">RemoteWebDriver</span>) driver).<span class="fn">getCapabilities</span>();
+
+<span class="fn">System.out.println</span>(<span class="st">"Browser Name   : "</span> <span class="op">+</span> caps.<span class="fn">getBrowserName</span>());
+<span class="fn">System.out.println</span>(<span class="st">"Browser Version: "</span> <span class="op">+</span> caps.<span class="fn">getBrowserVersion</span>());
+<span class="fn">System.out.println</span>(<span class="st">"Platform       : "</span> <span class="op">+</span> caps.<span class="fn">getPlatformName</span>());
+
+<span class="cm">// Output example:</span>
+<span class="cm">// Browser Name   : chrome</span>
+<span class="cm">// Browser Version: 122.0.6261.94</span>
+<span class="cm">// Platform       : WIN10</span>
+
+<span class="cm">// Useful for: logging test environment in reports</span>
+<span class="ty">String</span> <span class="nm">env</span> <span class="op">=</span> <span class="ty">String</span>.<span class="fn">format</span>(<span class="st">"%s v%s on %s"</span>,
+    caps.<span class="fn">getBrowserName</span>(), caps.<span class="fn">getBrowserVersion</span>(), caps.<span class="fn">getPlatformName</span>());
+<span class="fn">System.out.println</span>(<span class="st">"Test Environment: "</span> <span class="op">+</span> env);</pre>
+  </div>
+</div>
+
+<!-- S9 -->
+<div class="section" id="s9">
+  <div class="section-header"><div class="section-num">09</div><h2>BaseTest Class — Framework Foundation</h2></div>
+  <p>Every professional framework has a <strong>BaseTest</strong> class that all test classes extend. It handles driver creation, setup, and teardown in one place. This is the exact pattern your framework will use from Day 37 with TestNG annotations.</p>
+  <div class="hour-badge">&#9200; Hour 2 — Framework Pattern (60 mins)</div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">BaseTest.java — tests/BaseTest.java</span></div>
+    <pre><span class="kw">package</span> com.qaautomation.tests;
+
+<span class="kw">import</span> com.qaautomation.utils.DriverFactory;
+<span class="kw">import</span> org.openqa.selenium.WebDriver;
+
+<span class="kw">public class</span> <span class="nm">BaseTest</span> {
+
+    <span class="cm">// protected = accessible by child test classes</span>
+    <span class="kw">protected</span> WebDriver <span class="nm">driver</span>;
+    <span class="kw">protected</span> <span class="ty">String</span>    <span class="nm">browser</span> <span class="op">=</span> <span class="st">"chrome"</span>;
+
+    <span class="cm">// setUp() — runs before each test</span>
+    <span class="cm">// In TestNG this becomes: @BeforeMethod (Day 27)</span>
+    <span class="kw">public void</span> <span class="fn">setUp</span>() {
+        driver <span class="op">=</span> DriverFactory.<span class="fn">getDriver</span>(browser);
+        <span class="fn">System.out.println</span>(<span class="st">"[SETUP] "</span> <span class="op">+</span> browser <span class="op">+</span> <span class="st">" started"</span>);
+    }
+
+    <span class="cm">// tearDown() — runs after each test, even on failure</span>
+    <span class="cm">// In TestNG this becomes: @AfterMethod (Day 27)</span>
+    <span class="kw">public void</span> <span class="fn">tearDown</span>() {
+        <span class="kw">if</span> (driver <span class="op">!=</span> <span class="kw">null</span>) {
+            driver.<span class="fn">quit</span>();
+            <span class="fn">System.out.println</span>(<span class="st">"[QUIT] Browser closed"</span>);
+        }
+    }
+
+    <span class="cm">// Helper: take screenshot from any test</span>
+    <span class="kw">protected void</span> <span class="fn">screenshot</span>(<span class="ty">String</span> <span class="nm">name</span>) {
+        <span class="fn">System.out.println</span>(<span class="st">"[SCRN] Saved: "</span> <span class="op">+</span> name <span class="op">+</span> <span class="st">".png"</span>);
+        <span class="cm">// Real implementation: ScreenshotUtils.take(driver, name);</span>
+    }
+
+    <span class="cm">// Helper: navigate and return title</span>
+    <span class="kw">protected</span> <span class="ty">String</span> <span class="fn">navigateTo</span>(<span class="ty">String</span> <span class="nm">url</span>) {
+        driver.<span class="fn">get</span>(url);
+        <span class="kw">return</span> driver.<span class="fn">getTitle</span>();
+    }
+}
+
+<span class="cm">// ── A test class that extends BaseTest ──────────────────────────</span>
+<span class="kw">public class</span> <span class="nm">LoginPageTest</span> <span class="kw">extends</span> <span class="nm">BaseTest</span> {
+
+    <span class="kw">public void</span> <span class="fn">testLoginPageLoads</span>() {
+        <span class="fn">setUp</span>();  <span class="cm">// @BeforeMethod on Day 27 — will call automatically</span>
+        <span class="kw">try</span> {
+            <span class="ty">String</span> <span class="nm">title</span> <span class="op">=</span> <span class="fn">navigateTo</span>(<span class="st">"https://opensource-demo.orangehrmlive.com"</span>);
+            <span class="fn">System.out.println</span>(<span class="st">"Title: "</span> <span class="op">+</span> title);
+
+            <span class="ty">boolean</span> <span class="nm">passed</span> <span class="op">=</span> title.<span class="fn">equals</span>(<span class="st">"OrangeHRM"</span>);
+            <span class="fn">System.out.println</span>(passed <span class="op">?</span> <span class="st">"✓ PASS"</span> <span class="op">:</span> <span class="st">"✗ FAIL"</span>);
+
+        } <span class="kw">catch</span> (Exception <span class="nm">e</span>) {
+            <span class="fn">screenshot</span>(<span class="st">"login_page_fail"</span>);
+            <span class="fn">System.out.println</span>(<span class="st">"Error: "</span> <span class="op">+</span> e.<span class="fn">getMessage</span>());
+        } <span class="kw">finally</span> {
+            <span class="fn">tearDown</span>();  <span class="cm">// @AfterMethod on Day 27 — will call automatically</span>
+        }
+    }
+}</pre>
+  </div>
+</div>
+
+<!-- S10 -->
+<div class="section" id="s10">
+  <div class="section-header"><div class="section-num">10</div><h2>Running Multiple Browsers in Sequence</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">CrossBrowserRun.java</span></div>
+    <pre><span class="kw">public class</span> <span class="nm">CrossBrowserRun</span> {
+
+    <span class="kw">public static void</span> <span class="fn">runTest</span>(<span class="ty">String</span> <span class="nm">browser</span>) {
+        WebDriver <span class="nm">driver</span> <span class="op">=</span> DriverFactory.<span class="fn">getDriver</span>(browser);
+        <span class="kw">try</span> {
+            driver.<span class="fn">get</span>(<span class="st">"https://opensource-demo.orangehrmlive.com"</span>);
+            <span class="ty">String</span> <span class="nm">title</span>   <span class="op">=</span> driver.<span class="fn">getTitle</span>();
+            <span class="ty">String</span> <span class="nm">url</span>     <span class="op">=</span> driver.<span class="fn">getCurrentUrl</span>();
+            <span class="ty">boolean</span> <span class="nm">passed</span> <span class="op">=</span> title.<span class="fn">equals</span>(<span class="st">"OrangeHRM"</span>);
+
+            <span class="fn">System.out.printf</span>(<span class="st">"  [%-8s] Title: %-15s URL check: %s  %s%n"</span>,
+                browser.<span class="fn">toUpperCase</span>(), title,
+                url.<span class="fn">contains</span>(<span class="st">"login"</span>) <span class="op">?</span> <span class="st">"PASS"</span> <span class="op">:</span> <span class="st">"FAIL"</span>,
+                passed <span class="op">?</span> <span class="st">"✓"</span> <span class="op">:</span> <span class="st">"✗"</span>);
+
+        } <span class="kw">catch</span> (Exception <span class="nm">e</span>) {
+            <span class="fn">System.out.printf</span>(<span class="st">"  [%-8s] ERROR: %s%n"</span>, browser, e.<span class="fn">getMessage</span>());
+        } <span class="kw">finally</span> {
+            driver.<span class="fn">quit</span>();
+        }
+    }
+
+    <span class="kw">public static void</span> <span class="fn">main</span>(<span class="ty">String</span>[] args) {
+        <span class="fn">System.out.println</span>(<span class="st">"====== CROSS-BROWSER TEST ======"</span>);
+        <span class="ty">String</span>[] <span class="nm">browsers</span> <span class="op">=</span> {<span class="st">"chrome"</span>, <span class="st">"firefox"</span>, <span class="st">"edge"</span>};
+        <span class="kw">for</span> (<span class="ty">String</span> <span class="nm">b</span> : browsers) {
+            <span class="fn">runTest</span>(b);
+        }
+        <span class="fn">System.out.println</span>(<span class="st">"====== DONE ======"</span>);
+    }
+}</pre>
+  </div>
+</div>
+
+<!-- S11 -->
+<div class="section" id="s11">
+  <div class="section-header"><div class="section-num">11</div><h2>Practice Task + Expected Output</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">Day10Practice.java</span></div>
+    <pre><span class="kw">package</span> com.qaautomation.tests;
+
+<span class="kw">import</span> com.qaautomation.utils.DriverFactory;
+<span class="kw">import</span> org.openqa.selenium.*;
+<span class="kw">import</span> org.openqa.selenium.remote.RemoteWebDriver;
+<span class="kw">import</span> java.time.Duration;
+
+<span class="kw">public class</span> <span class="nm">Day10Practice</span> {
+
+    <span class="kw">public static void</span> <span class="fn">main</span>(<span class="ty">String</span>[] args) {
+
+        WebDriver <span class="nm">driver</span> <span class="op">=</span> DriverFactory.<span class="fn">getDriver</span>(<span class="st">"chrome"</span>);
+
+        <span class="kw">try</span> {
+            <span class="cm">// ── Task 1: Browser Info ──────────────────────────────</span>
+            <span class="fn">System.out.println</span>(<span class="st">"====== TASK 1: Browser Info ======"</span>);
+            Capabilities <span class="nm">caps</span> <span class="op">=</span> ((<span class="nm">RemoteWebDriver</span>) driver).<span class="fn">getCapabilities</span>();
+            <span class="fn">System.out.println</span>(<span class="st">"  Browser : "</span> <span class="op">+</span> caps.<span class="fn">getBrowserName</span>());
+            <span class="fn">System.out.println</span>(<span class="st">"  Version : "</span> <span class="op">+</span> caps.<span class="fn">getBrowserVersion</span>());
+            <span class="fn">System.out.println</span>(<span class="st">"  Platform: "</span> <span class="op">+</span> caps.<span class="fn">getPlatformName</span>());
+
+            Dimension <span class="nm">size</span> <span class="op">=</span> driver.<span class="fn">manage</span>().<span class="fn">window</span>().<span class="fn">getSize</span>();
+            <span class="fn">System.out.println</span>(<span class="st">"  Window  : "</span> <span class="op">+</span> size.<span class="fn">getWidth</span>() <span class="op">+</span> <span class="st">"x"</span> <span class="op">+</span> size.<span class="fn">getHeight</span>());
+
+            <span class="cm">// ── Task 2: Navigate and Collect Info ────────────────</span>
+            <span class="fn">System.out.println</span>(<span class="st">"\n====== TASK 2: Site Inspection ======"</span>);
+            driver.<span class="fn">get</span>(<span class="st">"https://opensource-demo.orangehrmlive.com"</span>);
+
+            <span class="fn">System.out.println</span>(<span class="st">"  Title  : "</span> <span class="op">+</span> driver.<span class="fn">getTitle</span>());
+            <span class="fn">System.out.println</span>(<span class="st">"  URL    : "</span> <span class="op">+</span> driver.<span class="fn">getCurrentUrl</span>());
+            <span class="fn">System.out.println</span>(<span class="st">"  Source : "</span> <span class="op">+</span> driver.<span class="fn">getPageSource</span>().<span class="fn">length</span>() <span class="op">+</span> <span class="st">" chars"</span>);
+
+            <span class="cm">// ── Task 3: Cookies ──────────────────────────────────</span>
+            <span class="fn">System.out.println</span>(<span class="st">"\n====== TASK 3: Cookies ======"</span>);
+            <span class="fn">System.out.println</span>(<span class="st">"  Cookies before clear: "</span> <span class="op">+</span> driver.<span class="fn">manage</span>().<span class="fn">getCookies</span>().<span class="fn">size</span>());
+            driver.<span class="fn">manage</span>().<span class="fn">deleteAllCookies</span>();
+            <span class="fn">System.out.println</span>(<span class="st">"  Cookies after clear : "</span> <span class="op">+</span> driver.<span class="fn">manage</span>().<span class="fn">getCookies</span>().<span class="fn">size</span>());
+            driver.<span class="fn">manage</span>().<span class="fn">addCookie</span>(<span class="kw">new</span> <span class="fn">Cookie</span>(<span class="st">"testRun"</span>, <span class="st">"day10"</span>));
+            <span class="fn">System.out.println</span>(<span class="st">"  Cookies after add   : "</span> <span class="op">+</span> driver.<span class="fn">manage</span>().<span class="fn">getCookies</span>().<span class="fn">size</span>());
+            Cookie <span class="nm">tc</span> <span class="op">=</span> driver.<span class="fn">manage</span>().<span class="fn">getCookieNamed</span>(<span class="st">"testRun"</span>);
+            <span class="fn">System.out.println</span>(<span class="st">"  testRun value       : "</span> <span class="op">+</span> (tc <span class="op">!=</span> <span class="kw">null</span> <span class="op">?</span> tc.<span class="fn">getValue</span>() <span class="op">:</span> <span class="st">"not found"</span>));
+
+            <span class="cm">// ── Task 4: Window Resize ────────────────────────────</span>
+            <span class="fn">System.out.println</span>(<span class="st">"\n====== TASK 4: Window Resize ======"</span>);
+            <span class="ty">int</span>[][] <span class="nm">sizes</span> <span class="op">=</span> {{<span class="nu">1920</span>,<span class="nu">1080</span>},{<span class="nu">1366</span>,<span class="nu">768</span>},{<span class="nu">375</span>,<span class="nu">812</span>}};
+            <span class="ty">String</span>[] <span class="nm">labels</span> <span class="op">=</span> {<span class="st">"Desktop"</span>, <span class="st">"Laptop"</span>, <span class="st">"Mobile"</span>};
+            <span class="kw">for</span> (<span class="ty">int</span> <span class="nm">i</span> <span class="op">=</span> <span class="nu">0</span>; <span class="nm">i</span> <span class="op">&lt;</span> sizes.<span class="nm">length</span>; <span class="nm">i</span>++) {
+                driver.<span class="fn">manage</span>().<span class="fn">window</span>().<span class="fn">setSize</span>(<span class="kw">new</span> <span class="fn">Dimension</span>(sizes[<span class="nm">i</span>][<span class="nu">0</span>], sizes[<span class="nm">i</span>][<span class="nu">1</span>]));
+                Dimension <span class="nm">d</span> <span class="op">=</span> driver.<span class="fn">manage</span>().<span class="fn">window</span>().<span class="fn">getSize</span>();
+                <span class="fn">System.out.printf</span>(<span class="st">"  %-8s: %dx%d%n"</span>, labels[<span class="nm">i</span>], d.<span class="fn">getWidth</span>(), d.<span class="fn">getHeight</span>());
+            }
+
+            <span class="cm">// ── Task 5: DriverFactory method test ────────────────</span>
+            <span class="fn">System.out.println</span>(<span class="st">"\n====== TASK 5: DriverFactory validation ======"</span>);
+            <span class="ty">String</span>[] <span class="nm">testBrowsers</span> <span class="op">=</span> {<span class="st">"chrome"</span>};  <span class="cm">// add firefox/edge if installed</span>
+            <span class="kw">for</span> (<span class="ty">String</span> <span class="nm">b</span> : testBrowsers) {
+                WebDriver <span class="nm">d2</span> <span class="op">=</span> DriverFactory.<span class="fn">getDriver</span>(b);
+                <span class="kw">try</span> {
+                    d2.<span class="fn">get</span>(<span class="st">"https://www.selenium.dev"</span>);
+                    <span class="fn">System.out.printf</span>(<span class="st">"  %-10s OK — Title: %s%n"</span>, b, d2.<span class="fn">getTitle</span>());
+                } <span class="kw">finally</span> {
+                    d2.<span class="fn">quit</span>();
+                }
+            }
+
+        } <span class="kw">catch</span> (Exception <span class="nm">e</span>) {
+            <span class="fn">System.out.println</span>(<span class="st">"Error: "</span> <span class="op">+</span> e.<span class="fn">getMessage</span>());
+        } <span class="kw">finally</span> {
+            driver.<span class="fn">quit</span>();
+            <span class="fn">System.out.println</span>(<span class="st">"\nAll browsers closed ✓"</span>);
+        }
+    }
+}</pre>
+  </div>
+  <h3>Expected Output</h3>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Output</span><span class="code-file">Console (values vary by machine)</span></div>
+    <pre>====== TASK 1: Browser Info ======
+  Browser : chrome
+  Version : 122.0.6261.94
+  Platform: WIN10
+  Window  : 1936x1056
+
+====== TASK 2: Site Inspection ======
+  Title  : OrangeHRM
+  URL    : https://opensource-demo.orangehrmlive.com/web/index.php/auth/login
+  Source : 47832 chars
+
+====== TASK 3: Cookies ======
+  Cookies before clear: 2
+  Cookies after clear : 0
+  Cookies after add   : 1
+  testRun value       : day10
+
+====== TASK 4: Window Resize ======
+  Desktop : 1920x1080
+  Laptop  : 1366x768
+  Mobile  : 375x812
+
+====== TASK 5: DriverFactory validation ======
+  chrome     OK — Title: Selenium
+
+All browsers closed ✓</pre>
+  </div>
+</div>
+
+<!-- S12 -->
+<div class="section" id="s12">
+  <div class="section-header"><div class="section-num">12</div><h2>Common Mistakes</h2></div>
+  <div class="mistake-grid">
+    <div class="mistake-card"><div class="mt">&#10060; Using ChromeDriver type instead of WebDriver</div><p>Declaring <code>ChromeDriver driver = new ChromeDriver()</code> breaks cross-browser flexibility. Always declare as <code>WebDriver driver</code>.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; Implicit + Explicit wait together</div><p>Mixing <code>implicitlyWait(10)</code> and <code>WebDriverWait</code> in the same script causes unpredictable timing. Choose one. Use explicit wait for Day 20+ framework.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; Not null-checking driver in tearDown</div><p>If driver creation failed (bad browser name, crash), <code>driver.quit()</code> in finally throws NullPointerException. Always: <code>if (driver != null) driver.quit();</code></p></div>
+    <div class="mistake-card"><div class="mt">&#10060; Cookie operations before get()</div><p>Selenium throws WebDriverException if you try to manage cookies before loading a URL. Always <code>driver.get(url)</code> first, then handle cookies.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; Screenshot folder doesn't exist</div><p>If the "screenshots/" directory doesn't exist, FileUtils.copyFile() throws IOException. Create the folder first: <code>new File("screenshots").mkdirs();</code></p></div>
+    <div class="mistake-card"><div class="mt">&#10060; Calling setup() from a static context</div><p>If your test class methods are static, they can't access instance fields like <code>driver</code>. Either make driver static or use instance methods.</p></div>
+  </div>
+</div>
+
+<!-- S13 -->
+<div class="section" id="s13">
+  <div class="section-header"><div class="section-num">13</div><h2>End of Day Checklist + Resources</h2></div>
+  <div class="checklist">
+    <div class="checklist-title">&#10022; End of Day 10 Checklist</div>
+    <div class="check-item"><div class="check-box"></div>I understand the WebDriver interface hierarchy (SearchContext → WebDriver → RemoteWebDriver → ChromeDriver)</div>
+    <div class="check-item"><div class="check-box"></div>I always declare: <code>WebDriver driver = new ChromeDriver()</code> NOT <code>ChromeDriver driver</code></div>
+    <div class="check-item"><div class="check-box"></div>DriverFactory.java created in utils package — returns configured driver for any browser</div>
+    <div class="check-item"><div class="check-box"></div>I know all 3 timeout types: implicitlyWait, pageLoadTimeout, scriptTimeout</div>
+    <div class="check-item"><div class="check-box"></div>I can get, add, delete cookies using driver.manage().getCookies()</div>
+    <div class="check-item"><div class="check-box"></div>I can take screenshots using TakesScreenshot interface</div>
+    <div class="check-item"><div class="check-box"></div>I can resize browser window using Dimension</div>
+    <div class="check-item"><div class="check-box"></div>BaseTest class created — setUp() and tearDown() methods ready</div>
+    <div class="check-item"><div class="check-box"></div>Practice task runs — all 5 sections print correctly</div>
+    <div class="check-item"><div class="check-box"></div>I understand why I should NEVER mix implicit + explicit waits</div>
+  </div>
+  <h3>Resources for Today</h3>
+  <ul class="resource-list">
+    <li><span>&#128214;</span><strong>Selenium Docs:&nbsp;</strong><a href="https://www.selenium.dev/documentation/webdriver/drivers/" target="_blank">Selenium — Browser Drivers</a> &nbsp;<span style="color:var(--muted);font-size:12px">Official reference for driver setup and capabilities.</span></li>
+    <li><span>&#128214;</span><strong>Selenium Docs:&nbsp;</strong><a href="https://www.selenium.dev/documentation/webdriver/interactions/" target="_blank">Selenium — Browser Interactions</a> &nbsp;<span style="color:var(--muted);font-size:12px">Covers windows, cookies, navigation in detail.</span></li>
+    <li><span>&#127909;</span><strong>YouTube:&nbsp;</strong><a href="https://www.youtube.com/results?search_query=selenium+webdriver+driver+factory+java+2024" target="_blank">Search: "Selenium DriverFactory Java 2024"</a> &nbsp;<span style="color:var(--muted);font-size:12px">See how senior QAs structure their DriverFactory in production.</span></li>
+  </ul>
+  <div class="callout tip">
+    <span class="callout-icon">&#128640;</span>
+    <div class="callout-body">
+      <div class="callout-title">Day 11 Preview — First Selenium Script (Full Script)</div>
+      <p>Tomorrow: write a <strong>complete end-to-end script</strong> — open OrangeHRM, wait for the login form, enter credentials, click login, verify dashboard loads. You'll use <code>findElement()</code> for the first time. This is where automation starts feeling real.</p>
+    </div>
+  </div>
+</div>
+
+</div>
+<div class="footer">
+  <span>Day 10 of 65</span> &nbsp;&middot;&nbsp; Selenium + Java Automation Roadmap &nbsp;&middot;&nbsp; Phase 2 &mdash; Core Selenium &nbsp;&middot;&nbsp; <span>Next: Day 11 &mdash; First Full Selenium Script</span>
+</div>
+</body>
+</html>
