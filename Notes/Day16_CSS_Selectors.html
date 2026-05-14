@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 16 — CSS Selectors</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Sora:wght@400;600;700;800&display=swap');
+:root{--bg:#0d1117;--bg2:#161b22;--bg3:#1e2530;--border:#30363d;--accent:#f0a500;--accent2:#58a6ff;--accent3:#3fb950;--accent4:#ff7b72;--accent5:#d2a8ff;--text:#e6edf3;--muted:#8b949e;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);line-height:1.75;font-size:15px;}
+.hero{background:linear-gradient(135deg,#0d1117,#161b22,#0a1a0d);border-bottom:2px solid var(--accent3);padding:48px 40px 36px;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:0;right:0;width:400px;height:400px;background:radial-gradient(circle,rgba(63,185,80,0.07),transparent 70%);pointer-events:none;}
+.hero-tag{display:inline-block;background:rgba(63,185,80,0.12);border:1px solid rgba(63,185,80,0.3);color:var(--accent3);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;padding:4px 12px;border-radius:20px;margin-bottom:16px;}
+.hero h1{font-size:34px;font-weight:800;line-height:1.2;margin-bottom:10px;}
+.hero h1 span{color:var(--accent3);}
+.hero-sub{color:var(--muted);font-size:14px;display:flex;gap:24px;flex-wrap:wrap;margin-top:16px;}
+.hero-sub span{display:flex;align-items:center;gap:6px;}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--accent3);display:inline-block;}
+.container{max-width:980px;margin:0 auto;padding:40px 32px 80px;}
+.toc{background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--accent3);border-radius:8px;padding:24px 28px;margin-bottom:48px;}
+.toc-title{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--accent3);margin-bottom:14px;}
+.toc ol{padding-left:20px;}.toc li{margin-bottom:6px;}
+.toc a{color:var(--muted);text-decoration:none;font-size:14px;}.toc a:hover{color:var(--accent3);}
+.section{margin-bottom:56px;}
+.section-header{display:flex;align-items:center;gap:14px;margin-bottom:24px;padding-bottom:14px;border-bottom:1px solid var(--border);}
+.section-num{background:var(--accent3);color:#000;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:12px;width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.section h2{font-size:22px;font-weight:700;}
+h3{font-size:16px;font-weight:600;color:var(--accent3);margin:28px 0 12px;display:flex;align-items:center;gap:8px;}
+h3::before{content:'▸';color:var(--accent);font-size:12px;}
+p{color:var(--muted);margin-bottom:14px;line-height:1.8;}strong{color:var(--text);font-weight:600;}
+.code-block{background:#010409;border:1px solid var(--border);border-radius:10px;margin:20px 0;overflow:hidden;}
+.code-header{background:var(--bg2);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
+.code-lang{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent3);letter-spacing:1px;text-transform:uppercase;font-weight:600;}
+.code-file{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);}
+pre{font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.85;padding:20px;overflow-x:auto;color:#e6edf3;}
+.kw{color:#ff7b72;font-weight:500;}.ty{color:#ffa657;}.st{color:#a5d6ff;}.cm{color:#6e7681;font-style:italic;}
+.nm{color:#79c0ff;}.nu{color:#79c0ff;}.fn{color:#d2a8ff;}.op{color:#ff7b72;}.bool{color:#3fb950;}
+.ht{color:#ff7b72;}.ha{color:#f0a500;}.hv{color:#a5d6ff;}
+.cs{color:#3fb950;}.csa{color:#f0a500;}.csv{color:#a5d6ff;}
+code{font-family:'JetBrains Mono',monospace;font-size:12.5px;background:rgba(63,185,80,0.1);border:1px solid rgba(63,185,80,0.2);color:var(--accent3);padding:1px 7px;border-radius:4px;}
+.callout{border-radius:8px;padding:16px 20px;margin:20px 0;display:flex;gap:14px;align-items:flex-start;}
+.callout-icon{font-size:18px;flex-shrink:0;margin-top:1px;}.callout-body{flex:1;}
+.callout-title{font-weight:700;font-size:13px;margin-bottom:4px;}.callout p{margin-bottom:0;font-size:13.5px;}
+.note{background:rgba(88,166,255,0.07);border-left:3px solid var(--accent2);}.note .callout-title{color:var(--accent2);}
+.tip{background:rgba(63,185,80,0.07);border-left:3px solid var(--accent3);}.tip .callout-title{color:var(--accent3);}
+.warn{background:rgba(240,165,0,0.07);border-left:3px solid var(--accent);}.warn .callout-title{color:var(--accent);}
+.error{background:rgba(255,123,114,0.07);border-left:3px solid var(--accent4);}.error .callout-title{color:var(--accent4);}
+.purple{background:rgba(210,168,255,0.07);border-left:3px solid var(--accent5);}.purple .callout-title{color:var(--accent5);}
+.table-wrap{overflow-x:auto;margin:20px 0;}
+table{width:100%;border-collapse:collapse;font-size:13.5px;}
+thead tr{background:var(--bg2);border-bottom:2px solid var(--accent3);}
+th{padding:12px 16px;text-align:left;font-weight:700;font-size:12px;letter-spacing:0.5px;text-transform:uppercase;color:var(--accent3);}
+td{padding:11px 16px;border-bottom:1px solid var(--border);color:var(--muted);}
+tr:hover td{background:rgba(255,255,255,0.02);}
+td:first-child{font-family:'JetBrains Mono',monospace;color:var(--accent2);font-size:13px;}
+.diagram-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:28px 24px;margin:24px 0;overflow:hidden;}
+.diagram-title{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:20px;text-align:center;}
+.hour-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(63,185,80,0.1);border:1px solid rgba(63,185,80,0.25);color:var(--accent3);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:1px;padding:5px 14px;border-radius:20px;margin-bottom:18px;margin-top:30px;}
+.mistake-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:20px 0;}
+.mistake-card{background:rgba(255,123,114,0.05);border:1px solid rgba(255,123,114,0.2);border-radius:8px;padding:16px;}
+.mistake-card .mt{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent4);font-weight:700;margin-bottom:8px;}
+.mistake-card p{font-size:13px;margin:0;}
+.checklist{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:24px 28px;margin:24px 0;}
+.checklist-title{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent3);letter-spacing:1.5px;text-transform:uppercase;font-weight:700;margin-bottom:16px;}
+.check-item{display:flex;align-items:flex-start;gap:12px;padding:9px 0;border-bottom:1px solid rgba(48,54,61,0.5);font-size:14px;color:var(--muted);}
+.check-item:last-child{border-bottom:none;}
+.check-box{width:18px;height:18px;border:2px solid var(--accent3);border-radius:4px;flex-shrink:0;margin-top:2px;}
+.resource-list{list-style:none;padding:0;margin:12px 0;}
+.resource-list li{padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;margin-bottom:8px;font-size:13.5px;display:flex;gap:10px;align-items:center;}
+.resource-list li a{color:var(--accent2);text-decoration:none;}
+.footer{background:var(--bg2);border-top:1px solid var(--border);padding:24px 40px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);}
+.footer span{color:var(--accent3);}
+::-webkit-scrollbar{width:6px;height:6px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+@media(max-width:640px){.hero{padding:32px 20px 24px;}.hero h1{font-size:24px;}.container{padding:24px 16px 60px;}}
+</style>
+</head>
+<body>
+<div class="hero">
+  <div class="hero-tag">Phase 2 &middot; Day 16 of 65</div>
+  <h1>CSS <span>Selectors</span></h1>
+  <div class="hero-sub">
+    <span><span class="dot"></span>2 Hours</span>
+    <span><span class="dot"></span>Class &middot; ID &middot; Attribute &middot; Combinators &middot; Pseudo-selectors &middot; Complete Reference</span>
+  </div>
+</div>
+<div class="container">
+
+<div class="toc">
+  <div class="toc-title">// Table of Contents</div>
+  <ol>
+    <li><a href="#s1">What is a CSS Selector?</a></li>
+    <li><a href="#s2">CSS Selector Anatomy</a></li>
+    <li><a href="#s3">Basic Selectors — tag, class, id</a></li>
+    <li><a href="#s4">Attribute Selectors</a></li>
+    <li><a href="#s5">Attribute Value Matching — ^=, $=, *=</a></li>
+    <li><a href="#s6">Combinators — descendant, child, sibling</a></li>
+    <li><a href="#s7">Multiple Classes</a></li>
+    <li><a href="#s8">Pseudo-selectors — :first-child, :last-child, :nth-child</a></li>
+    <li><a href="#s9">Pseudo-classes — :not(), :enabled, :disabled, :checked</a></li>
+    <li><a href="#s10">CSS vs XPath — Full Comparison</a></li>
+    <li><a href="#s11">OrangeHRM CSS Selector Map</a></li>
+    <li><a href="#s12">Testing CSS Selectors in Browser</a></li>
+    <li><a href="#s13">Complete Locator Strategy Reference</a></li>
+    <li><a href="#s14">Practice Task + Expected Output</a></li>
+    <li><a href="#s15">Common Mistakes</a></li>
+    <li><a href="#s16">End of Day Checklist + Resources</a></li>
+  </ol>
+</div>
+
+<!-- S1 -->
+<div class="section" id="s1">
+  <div class="section-header"><div class="section-num">01</div><h2>What is a CSS Selector?</h2></div>
+  <div class="hour-badge">&#9200; Hour 1 — CSS Selector Fundamentals (60 mins)</div>
+  <p>A <strong>CSS selector</strong> is a pattern that matches HTML elements — the same syntax used by stylesheets to apply styling. Selenium uses it to locate elements too. CSS selectors are <strong>faster than XPath</strong> (natively parsed by the browser) and more readable for class and attribute-based locators.</p>
+  <div class="callout note">
+    <span class="callout-icon">&#128204;</span>
+    <div class="callout-body">
+      <div class="callout-title">CSS vs XPath — Pick the right tool</div>
+      <p>CSS: class-based, attribute-based, descendant, child — fast and readable.<br>
+      XPath: text-based (text()), parent traversal, complex relational — more powerful.<br>
+      Learn both. A senior QA switches between them naturally based on the element.</p>
+    </div>
+  </div>
+</div>
+
+<!-- S2 -->
+<div class="section" id="s2">
+  <div class="section-header"><div class="section-num">02</div><h2>CSS Selector Anatomy</h2></div>
+  <div class="diagram-wrap">
+    <div class="diagram-title">// CSS Selector Breakdown</div>
+    <svg viewBox="0 0 700 110" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:700px;display:block;margin:0 auto">
+      <text x="350" y="28" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="18" fill="#e6edf3" font-weight="700">input.oxd-input[name='username']</text>
+      <line x1="38" y1="36" x2="38" y2="58" stroke="#f0a500" stroke-width="1.5"/>
+      <line x1="38" y1="58" x2="68" y2="58" stroke="#f0a500" stroke-width="1.5"/>
+      <text x="73" y="62" font-family="Sora,sans-serif" font-size="11" fill="#f0a500">tag name: input</text>
+      <line x1="102" y1="36" x2="102" y2="75" stroke="#3fb950" stroke-width="1.5"/>
+      <line x1="102" y1="75" x2="132" y2="75" stroke="#3fb950" stroke-width="1.5"/>
+      <text x="137" y="79" font-family="Sora,sans-serif" font-size="11" fill="#3fb950">.oxd-input = class selector (dot prefix)</text>
+      <line x1="205" y1="36" x2="205" y2="95" stroke="#58a6ff" stroke-width="1.5"/>
+      <line x1="205" y1="95" x2="235" y2="95" stroke="#58a6ff" stroke-width="1.5"/>
+      <text x="240" y="99" font-family="Sora,sans-serif" font-size="11" fill="#58a6ff">[name='username'] = attribute selector</text>
+    </svg>
+  </div>
+</div>
+
+<!-- S3 -->
+<div class="section" id="s3">
+  <div class="section-header"><div class="section-num">03</div><h2>Basic Selectors — tag, class, id</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">CSS + Java</span><span class="code-file">BasicSelectors.java</span></div>
+    <pre><span class="cm">// ── Tag selector ──────────────────────────────────────────────</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"input"</span>)          <span class="cm">// all input elements</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"button"</span>)        <span class="cm">// all buttons</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"h1"</span>)            <span class="cm">// all h1 headings</span>
+
+<span class="cm">// ── Class selector — dot prefix ───────────────────────────────</span>
+By.<span class="fn">cssSelector</span>(<span class="st">".oxd-input"</span>)    <span class="cm">// any element with class oxd-input</span>
+By.<span class="fn">cssSelector</span>(<span class="st">".error-message"</span>)<span class="cm">// any element with class error-message</span>
+By.<span class="fn">cssSelector</span>(<span class="st">".oxd-button"</span>)   <span class="cm">// any element with class oxd-button</span>
+
+<span class="cm">// ── ID selector — hash prefix ─────────────────────────────────</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"#loginBtn"</span>)     <span class="cm">// element with id="loginBtn"</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"#username"</span>)    <span class="cm">// element with id="username"</span>
+
+<span class="cm">// ── Tag + Class (more specific) ───────────────────────────────</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"input.oxd-input"</span>)    <span class="cm">// input with class oxd-input</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"button.oxd-button"</span>)  <span class="cm">// button with class oxd-button</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"div.login-card"</span>)     <span class="cm">// div with class login-card</span>
+
+<span class="cm">// ── Tag + ID ──────────────────────────────────────────────────</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"input#txtUsername"</span>)  <span class="cm">// input with id="txtUsername"</span>
+
+<span class="cm">// Practical examples:</span>
+WebElement <span class="nm">user</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">cssSelector</span>(<span class="st">"input.oxd-input"</span>));
+user.<span class="fn">sendKeys</span>(<span class="st">"Admin"</span>);
+driver.<span class="fn">findElement</span>(By.<span class="fn">cssSelector</span>(<span class="st">"button.oxd-button"</span>)).<span class="fn">click</span>();</pre>
+  </div>
+</div>
+
+<!-- S4 -->
+<div class="section" id="s4">
+  <div class="section-header"><div class="section-num">04</div><h2>Attribute Selectors</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">CSS + Java</span><span class="code-file">AttributeSelectors.java</span></div>
+    <pre><span class="cm">// ── [attribute='value'] — exact match ────────────────────────</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"input[name='username']"</span>)       <span class="cm">// name equals "username"</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"input[type='password']"</span>)       <span class="cm">// type equals "password"</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"button[type='submit']"</span>)        <span class="cm">// submit button</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"a[href='/logout']"</span>)            <span class="cm">// link to /logout</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"input[placeholder='Username']"</span>)  <span class="cm">// input with placeholder</span>
+
+<span class="cm">// ── [attribute] — attribute exists (any value) ───────────────</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"input[disabled]"</span>)    <span class="cm">// any disabled input</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"input[required]"</span>)    <span class="cm">// any required input</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"input[readonly]"</span>)    <span class="cm">// any readonly input</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"img[alt]"</span>)          <span class="cm">// images that have alt text</span>
+
+<span class="cm">// ── Tag + attribute combination ───────────────────────────────</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"input[type='text'][name='username']"</span>)  <span class="cm">// both conditions</span>
+
+<span class="cm">// Practical examples from OrangeHRM:</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"input[name='username']"</span>)
+By.<span class="fn">cssSelector</span>(<span class="st">"input[name='password']"</span>)
+By.<span class="fn">cssSelector</span>(<span class="st">"button[type='submit']"</span>)</pre>
+  </div>
+</div>
+
+<!-- S5 -->
+<div class="section" id="s5">
+  <div class="section-header"><div class="section-num">05</div><h2>Attribute Value Matching — ^=, $=, *=</h2></div>
+  <p>CSS offers partial attribute matching — crucial for dynamic attributes and partially known values.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Operator</th><th>Meaning</th><th>Example</th><th>Matches</th></tr></thead>
+      <tbody>
+        <tr><td>[attr^='val']</td><td>Starts with</td><td><code>[id^='input-']</code></td><td>id="input-1234", id="input-abc"</td></tr>
+        <tr><td>[attr$='val']</td><td>Ends with</td><td><code>[class$='--active']</code></td><td>class="oxd-input--active"</td></tr>
+        <tr><td>[attr*='val']</td><td>Contains</td><td><code>[class*='alert']</code></td><td>class="oxd-alert-content"</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">CSS + Java</span><span class="code-file">PartialMatch.java</span></div>
+    <pre><span class="cm">// ^= starts with</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"input[id^='txt']"</span>)          <span class="cm">// id starts with 'txt'</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"div[class^='oxd']"</span>)          <span class="cm">// class starts with 'oxd'</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"a[href^='/dashboard']"</span>)       <span class="cm">// href starts with '/dashboard'</span>
+
+<span class="cm">// $= ends with</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"input[class$='--active']"</span>)    <span class="cm">// class ends with '--active'</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"img[src$='.png']"</span>)           <span class="cm">// png images</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"a[href$='.pdf']"</span>)            <span class="cm">// PDF links</span>
+
+<span class="cm">// *= contains (most flexible)</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"div[class*='alert']"</span>)         <span class="cm">// class contains 'alert'</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"input[class*='input']"</span>)       <span class="cm">// class contains 'input'</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"a[href*='orangehrm']"</span>)        <span class="cm">// href contains 'orangehrm'</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"[class*='userdropdown']"</span>)     <span class="cm">// any element with this in class</span>
+
+<span class="cm">// Combined</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"input[type='text'][class*='oxd']"</span>)  <span class="cm">// type=text AND class has 'oxd'</span></pre>
+  </div>
+</div>
+
+<!-- S6 -->
+<div class="section" id="s6">
+  <div class="section-header"><div class="section-num">06</div><h2>Combinators — descendant, child, sibling</h2></div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Combinator</th><th>Symbol</th><th>Meaning</th><th>Example</th></tr></thead>
+      <tbody>
+        <tr><td>Descendant</td><td>space</td><td>Any descendant (child, grandchild...)</td><td><code>form input</code></td></tr>
+        <tr><td>Child</td><td>&gt;</td><td>Direct child only</td><td><code>div > input</code></td></tr>
+        <tr><td>Adjacent sibling</td><td>+</td><td>Immediately following sibling</td><td><code>label + input</code></td></tr>
+        <tr><td>General sibling</td><td>~</td><td>Any following sibling</td><td><code>label ~ input</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">CSS + Java</span><span class="code-file">Combinators.java</span></div>
+    <pre><span class="cm">// ── Descendant (space) — most common ──────────────────────────</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"form input"</span>)                  <span class="cm">// any input anywhere inside form</span>
+By.<span class="fn">cssSelector</span>(<span class="st">".login-form input"</span>)           <span class="cm">// input inside element with class</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"div.card input[type='text']"</span>) <span class="cm">// text input inside card div</span>
+
+<span class="cm">// ── Child (>) — direct children only ─────────────────────────</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"form > div"</span>)                  <span class="cm">// divs that are DIRECT children of form</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"ul > li"</span>)                    <span class="cm">// li that are direct children of ul</span>
+
+<span class="cm">// ── Adjacent sibling (+) ─────────────────────────────────────</span>
+<span class="cm">// Finds input that comes IMMEDIATELY after a label</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"label + input"</span>)               <span class="cm">// input right after label</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"h3 + p"</span>)                     <span class="cm">// p immediately after h3</span>
+
+<span class="cm">// ── General sibling (~) ───────────────────────────────────────</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"label ~ input"</span>)               <span class="cm">// any input after label (same parent)</span>
+
+<span class="cm">// Real OrangeHRM examples:</span>
+By.<span class="fn">cssSelector</span>(<span class="st">".oxd-form input[name='username']"</span>)
+By.<span class="fn">cssSelector</span>(<span class="st">".login-card > div > button"</span>)
+By.<span class="fn">cssSelector</span>(<span class="st">".oxd-table-body .oxd-table-row"</span>)  <span class="cm">// all data rows in table</span></pre>
+  </div>
+</div>
+
+<!-- S7 -->
+<div class="section" id="s7">
+  <div class="section-header"><div class="section-num">07</div><h2>Multiple Classes</h2></div>
+  <p>CSS handles multiple classes elegantly — just chain them with dots. This is where CSS beats XPath's verbose <code>contains(@class,'a') and contains(@class,'b')</code>.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">CSS + Java</span><span class="code-file">MultipleClasses.java</span></div>
+    <pre><span class="cm">// HTML: &lt;input class="oxd-input oxd-input--active"&gt;</span>
+
+<span class="cm">// Single class — matches if element HAS this class (among others)</span>
+By.<span class="fn">cssSelector</span>(<span class="st">".oxd-input"</span>)                      <span class="cm">// any element with oxd-input</span>
+
+<span class="cm">// Multiple classes — element must have ALL of them</span>
+By.<span class="fn">cssSelector</span>(<span class="st">".oxd-input.oxd-input--active"</span>)     <span class="cm">// has BOTH classes</span>
+By.<span class="fn">cssSelector</span>(<span class="st">".oxd-button.oxd-button--main"</span>)     <span class="cm">// main button variant</span>
+By.<span class="fn">cssSelector</span>(<span class="st">".oxd-button.oxd-button--medium"</span>)   <span class="cm">// medium size button</span>
+
+<span class="cm">// Tag + multiple classes</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"input.oxd-input.oxd-input--active"</span>) <span class="cm">// input with both classes</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"button.oxd-button.oxd-button--main"</span>) <span class="cm">// main button</span>
+
+<span class="cm">// vs XPath equivalent (much more verbose):</span>
+<span class="cm">// "//input[contains(@class,'oxd-input') and contains(@class,'oxd-input--active')]"</span>
+<span class="cm">// CSS wins for multi-class selection</span></pre>
+  </div>
+</div>
+
+<!-- S8 -->
+<div class="section" id="s8">
+  <div class="section-header"><div class="section-num">08</div><h2>Pseudo-selectors — :first-child, :last-child, :nth-child</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">CSS + Java</span><span class="code-file">PseudoSelectors.java</span></div>
+    <pre><span class="cm">// ── :first-child ─────────────────────────────────────────────</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"li:first-child"</span>)          <span class="cm">// first li in its parent</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"tr:first-child"</span>)          <span class="cm">// first row in table</span>
+By.<span class="fn">cssSelector</span>(<span class="st">".menu > a:first-child"</span>)   <span class="cm">// first link in menu</span>
+
+<span class="cm">// ── :last-child ──────────────────────────────────────────────</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"li:last-child"</span>)           <span class="cm">// last list item</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"tr:last-child"</span>)           <span class="cm">// last table row</span>
+
+<span class="cm">// ── :nth-child(n) ─────────────────────────────────────────────</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"tr:nth-child(2)"</span>)         <span class="cm">// 2nd row (first data row)</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"tr:nth-child(3)"</span>)         <span class="cm">// 3rd row</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"tr:nth-child(odd)"</span>)       <span class="cm">// odd rows</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"tr:nth-child(even)"</span>)      <span class="cm">// even rows</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"li:nth-child(2n+1)"</span>)      <span class="cm">// odd items (formula)</span>
+
+<span class="cm">// ── :nth-of-type(n) — among same-type siblings ───────────────</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"input:nth-of-type(1)"</span>)    <span class="cm">// first input in parent</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"input:nth-of-type(2)"</span>)    <span class="cm">// second input (password field)</span>
+
+<span class="cm">// Table cell targeting</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"tbody tr:nth-child(1) td:nth-child(2)"</span>) <span class="cm">// row1, col2</span>
+
+<span class="cm">// All data rows (skip header)</span>
+List&lt;WebElement&gt; <span class="nm">rows</span> <span class="op">=</span> driver.<span class="fn">findElements</span>(
+    By.<span class="fn">cssSelector</span>(<span class="st">"tbody tr"</span>));
+<span class="fn">System.out.println</span>(<span class="st">"Data rows: "</span> <span class="op">+</span> rows.<span class="fn">size</span>());</pre>
+  </div>
+</div>
+
+<!-- S9 -->
+<div class="section" id="s9">
+  <div class="section-header"><div class="section-num">09</div><h2>Pseudo-classes — :not(), :enabled, :disabled, :checked</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">CSS + Java</span><span class="code-file">PseudoClasses.java</span></div>
+    <pre><span class="cm">// ── :not() — exclude elements ────────────────────────────────</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"input:not([type='hidden'])"</span>)  <span class="cm">// non-hidden inputs</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"button:not([disabled])"</span>)      <span class="cm">// enabled buttons only</span>
+By.<span class="fn">cssSelector</span>(<span class="st">".item:not(.selected)"</span>)        <span class="cm">// unselected items</span>
+
+<span class="cm">// ── :enabled / :disabled ─────────────────────────────────────</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"input:enabled"</span>)    <span class="cm">// all enabled inputs</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"input:disabled"</span>)   <span class="cm">// all disabled inputs</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"button:enabled"</span>)   <span class="cm">// clickable buttons</span>
+
+<span class="cm">// ── :checked ─────────────────────────────────────────────────</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"input:checked"</span>)        <span class="cm">// checked checkboxes/radios</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"input[type='checkbox']:checked"</span>) <span class="cm">// only checked checkboxes</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"input[type='radio']:checked"</span>)    <span class="cm">// selected radio button</span>
+
+<span class="cm">// ── :focus ───────────────────────────────────────────────────</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"input:focus"</span>)     <span class="cm">// currently focused input</span>
+
+<span class="cm">// ── :empty — element with no children ────────────────────────</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"div:empty"</span>)       <span class="cm">// empty div (no content)</span>
+
+<span class="cm">// Combined practical examples</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"input[type='text']:enabled:not([readonly])"</span>)  <span class="cm">// editable text inputs</span>
+List&lt;WebElement&gt; <span class="nm">checks</span> <span class="op">=</span> driver.<span class="fn">findElements</span>(
+    By.<span class="fn">cssSelector</span>(<span class="st">"input[type='checkbox']:checked"</span>));
+<span class="fn">System.out.println</span>(<span class="st">"Checked boxes: "</span> <span class="op">+</span> checks.<span class="fn">size</span>());</pre>
+  </div>
+</div>
+
+<!-- S10 -->
+<div class="section" id="s10">
+  <div class="section-header"><div class="section-num">10</div><h2>CSS vs XPath — Full Comparison</h2></div>
+  <div class="hour-badge">&#9200; Hour 2 — Applied CSS + Final Reference (60 mins)</div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Task</th><th>CSS Selector</th><th>XPath</th><th>Winner</th></tr></thead>
+      <tbody>
+        <tr><td>By id</td><td><code>#loginBtn</code></td><td><code>//*[@id='loginBtn']</code></td><td>CSS (shorter)</td></tr>
+        <tr><td>By class</td><td><code>.oxd-input</code></td><td><code>//*[@class='oxd-input']</code></td><td>CSS (cleaner)</td></tr>
+        <tr><td>By attribute</td><td><code>[name='user']</code></td><td><code>[@name='user']</code></td><td>Tie</td></tr>
+        <tr><td>By text</td><td>Not possible</td><td><code>//button[text()='Login']</code></td><td>XPath only</td></tr>
+        <tr><td>Multiple classes</td><td><code>.class1.class2</code></td><td><code>contains(@class,'c1') and contains(@class,'c2')</code></td><td>CSS (cleaner)</td></tr>
+        <tr><td>Partial attribute</td><td><code>[class*='alert']</code></td><td><code>contains(@class,'alert')</code></td><td>Tie</td></tr>
+        <tr><td>Parent element</td><td>Not possible</td><td><code>//input/parent::div</code></td><td>XPath only</td></tr>
+        <tr><td>Adjacent sibling</td><td><code>label + input</code></td><td><code>//label/following-sibling::input[1]</code></td><td>CSS (cleaner)</td></tr>
+        <tr><td>nth element</td><td><code>tr:nth-child(3)</code></td><td><code>(//tr)[3]</code></td><td>Tie</td></tr>
+        <tr><td>Disabled input</td><td><code>input:disabled</code></td><td><code>//input[@disabled]</code></td><td>CSS (cleaner)</td></tr>
+        <tr><td>Performance</td><td>Faster (native)</td><td>Slightly slower</td><td>CSS</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- S11 -->
+<div class="section" id="s11">
+  <div class="section-header"><div class="section-num">11</div><h2>OrangeHRM CSS Selector Map</h2></div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Element</th><th>CSS Selector</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Username field</td><td><code>input[name='username']</code></td><td>Most reliable</td></tr>
+        <tr><td>Password field</td><td><code>input[name='password']</code></td><td>Most reliable</td></tr>
+        <tr><td>Login button</td><td><code>button[type='submit']</code></td><td>Submit button</td></tr>
+        <tr><td>Login button (class)</td><td><code>.oxd-button.oxd-button--main</code></td><td>Alternative</td></tr>
+        <tr><td>Error alert</td><td><code>.oxd-alert-content</code></td><td>Contains error text</td></tr>
+        <tr><td>Error alert text</td><td><code>.oxd-alert-content p</code></td><td>Specific paragraph</td></tr>
+        <tr><td>User dropdown</td><td><code>.oxd-userdropdown-tab</code></td><td>Click to open menu</td></tr>
+        <tr><td>Username display</td><td><code>.oxd-userdropdown-name</code></td><td>Logged in user name</td></tr>
+        <tr><td>OrangeHRM logo</td><td><code>.orangehrm-login-logo img</code></td><td>Logo image</td></tr>
+        <tr><td>Table rows</td><td><code>.oxd-table-body .oxd-table-row</code></td><td>All data rows</td></tr>
+        <tr><td>All nav links</td><td><code>.oxd-nav-item a</code></td><td>Side nav items</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- S12 -->
+<div class="section" id="s12">
+  <div class="section-header"><div class="section-num">12</div><h2>Testing CSS Selectors in Browser</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">JavaScript</span><span class="code-file">Browser Console — F12 → Console tab</span></div>
+    <pre><span class="cm">// $$ is DevTools shorthand for document.querySelectorAll</span>
+
+<span class="cm">// Test class selector</span>
+$$(<span class="st">".oxd-input"</span>)
+$$(<span class="st">".oxd-button"</span>)
+
+<span class="cm">// Test attribute selector</span>
+$$(<span class="st">"input[name='username']"</span>)
+$$(<span class="st">"button[type='submit']"</span>)
+
+<span class="cm">// Test combinator</span>
+$$(<span class="st">".login-form input"</span>)
+
+<span class="cm">// Test pseudo-selector</span>
+$$(<span class="st">"input:enabled"</span>)
+$$(<span class="st">"input:nth-of-type(2)"</span>)
+
+<span class="cm">// Check count (should be 1 for unique elements)</span>
+$$(<span class="st">"input[name='username']"</span>).length   <span class="cm">// → 1 ✓</span>
+$$(<span class="st">".oxd-input"</span>).length               <span class="cm">// → 2 (may not be unique)</span>
+
+<span class="cm">// $ is shorthand for document.querySelector (first match only)</span>
+$(<span class="st">"input[name='username']"</span>)   <span class="cm">// returns single element</span>
+
+<span class="cm">// WORKFLOW:</span>
+<span class="cm">// 1. Open DevTools → Console tab</span>
+<span class="cm">// 2. $$("your-selector") — verify it returns what you expect</span>
+<span class="cm">// 3. Check .length to verify uniqueness</span>
+<span class="cm">// 4. Copy to Java: By.cssSelector("your-selector")</span></pre>
+  </div>
+</div>
+
+<!-- S13 -->
+<div class="section" id="s13">
+  <div class="section-header"><div class="section-num">13</div><h2>Complete Locator Strategy Reference</h2></div>
+  <p>After Days 14, 15, 16 — here is the complete reference for all locator strategies. Bookmark this as your daily reference.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">CompleteLocatorReference.java</span></div>
+    <pre><span class="cm">// ═══════════════════════════════════════════════════════════</span>
+<span class="cm">// TIER 1 — Use first (most specific, most stable)</span>
+<span class="cm">// ═══════════════════════════════════════════════════════════</span>
+By.<span class="fn">id</span>(<span class="st">"loginBtn"</span>)                              <span class="cm">// id attribute</span>
+By.<span class="fn">name</span>(<span class="st">"username"</span>)                            <span class="cm">// name attribute (form fields)</span>
+
+<span class="cm">// ═══════════════════════════════════════════════════════════</span>
+<span class="cm">// TIER 2 — Use when no id/name (CSS)</span>
+<span class="cm">// ═══════════════════════════════════════════════════════════</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"button[type='submit']"</span>)         <span class="cm">// attribute</span>
+By.<span class="fn">cssSelector</span>(<span class="st">".oxd-input"</span>)                   <span class="cm">// class</span>
+By.<span class="fn">cssSelector</span>(<span class="st">".oxd-button.oxd-button--main"</span>)  <span class="cm">// multiple classes</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"input[class*='oxd-input']"</span>)    <span class="cm">// partial class</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"form input:nth-of-type(2)"</span>)    <span class="cm">// nth element</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"label + input"</span>)               <span class="cm">// sibling</span>
+By.<span class="fn">cssSelector</span>(<span class="st">"input:not([disabled])"</span>)        <span class="cm">// not disabled</span>
+
+<span class="cm">// ═══════════════════════════════════════════════════════════</span>
+<span class="cm">// TIER 3 — Use for text, parent nav, complex (XPath)</span>
+<span class="cm">// ═══════════════════════════════════════════════════════════</span>
+By.<span class="fn">xpath</span>(<span class="st">"//button[text()='Login']"</span>)           <span class="cm">// text match</span>
+By.<span class="fn">xpath</span>(<span class="st">"//a[contains(text(),'Forgot')]"</span>)     <span class="cm">// partial text</span>
+By.<span class="fn">xpath</span>(<span class="st">"//label[text()='User']/following-sibling::input"</span>) <span class="cm">// sibling</span>
+By.<span class="fn">xpath</span>(<span class="st">"//input/parent::div"</span>)               <span class="cm">// parent nav</span>
+By.<span class="fn">xpath</span>(<span class="st">"//tr[td[text()='John']]//button"</span>)   <span class="cm">// row-based</span>
+By.<span class="fn">xpath</span>(<span class="st">"(//input)[last()]"</span>)                 <span class="cm">// positional</span>
+
+<span class="cm">// ═══════════════════════════════════════════════════════════</span>
+<span class="cm">// TIER 4 — Use for collections only</span>
+<span class="cm">// ═══════════════════════════════════════════════════════════</span>
+By.<span class="fn">tagName</span>(<span class="st">"input"</span>)     <span class="cm">// all inputs (findElements)</span>
+By.<span class="fn">tagName</span>(<span class="st">"a"</span>)         <span class="cm">// all links (findElements)</span>
+By.<span class="fn">tagName</span>(<span class="st">"tr"</span>)        <span class="cm">// all rows (findElements)</span>
+
+<span class="cm">// ═══════════════════════════════════════════════════════════</span>
+<span class="cm">// AVOID — fragile</span>
+<span class="cm">// ═══════════════════════════════════════════════════════════</span>
+<span class="cm">// By.xpath("/html/body/div[3]/...")  ← absolute xpath - NEVER</span>
+<span class="cm">// By.id("input-1638291234")         ← dynamic id - AVOID</span>
+<span class="cm">// By.linkText("Submit")             ← text changes = breaks</span></pre>
+  </div>
+</div>
+
+<!-- S14 -->
+<div class="section" id="s14">
+  <div class="section-header"><div class="section-num">14</div><h2>Practice Task + Expected Output</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">Day16Practice.java</span></div>
+    <pre><span class="kw">package</span> com.qaautomation.tests;
+
+<span class="kw">import</span> com.qaautomation.utils.*;
+<span class="kw">import</span> org.openqa.selenium.*;
+<span class="kw">import</span> java.util.List;
+
+<span class="kw">public class</span> <span class="nm">Day16Practice</span> {
+
+    <span class="cm">// CSS locators as constants</span>
+    <span class="kw">static final</span> By <span class="nm">USERNAME</span>  <span class="op">=</span> By.<span class="fn">cssSelector</span>(<span class="st">"input[name='username']"</span>);
+    <span class="kw">static final</span> By <span class="nm">PASSWORD</span>  <span class="op">=</span> By.<span class="fn">cssSelector</span>(<span class="st">"input[name='password']"</span>);
+    <span class="kw">static final</span> By <span class="nm">LOGIN_BTN</span> <span class="op">=</span> By.<span class="fn">cssSelector</span>(<span class="st">"button[type='submit']"</span>);
+    <span class="kw">static final</span> By <span class="nm">ERROR</span>     <span class="op">=</span> By.<span class="fn">cssSelector</span>(<span class="st">".oxd-alert-content"</span>);
+    <span class="kw">static final</span> By <span class="nm">USER_NAME</span> <span class="op">=</span> By.<span class="fn">cssSelector</span>(<span class="st">".oxd-userdropdown-name"</span>);
+    <span class="kw">static final</span> By <span class="nm">ALL_INPUTS</span><span class="op">=</span> By.<span class="fn">cssSelector</span>(<span class="st">"input:not([type='hidden'])"</span>);
+
+    <span class="kw">public static void</span> <span class="fn">main</span>(<span class="ty">String</span>[] args) <span class="kw">throws</span> InterruptedException {
+        WebDriver <span class="nm">driver</span> <span class="op">=</span> DriverFactory.<span class="fn">getDriver</span>(<span class="st">"chrome"</span>);
+        <span class="kw">try</span> {
+            driver.<span class="fn">get</span>(ConfigReader.<span class="fn">getBaseUrl</span>());
+
+            <span class="cm">// Task 1: Basic CSS selectors</span>
+            <span class="fn">System.out.println</span>(<span class="st">"====== TASK 1: CSS Selectors ======"</span>);
+            <span class="fn">System.out.println</span>(<span class="st">"  Username visible: "</span> <span class="op">+</span> driver.<span class="fn">findElement</span>(USERNAME).<span class="fn">isDisplayed</span>());
+            <span class="fn">System.out.println</span>(<span class="st">"  Password type   : "</span> <span class="op">+</span> driver.<span class="fn">findElement</span>(PASSWORD).<span class="fn">getAttribute</span>(<span class="st">"type"</span>));
+            <span class="fn">System.out.println</span>(<span class="st">"  Button enabled  : "</span> <span class="op">+</span> driver.<span class="fn">findElement</span>(LOGIN_BTN).<span class="fn">isEnabled</span>());
+
+            <span class="cm">// Task 2: findElements with CSS</span>
+            <span class="fn">System.out.println</span>(<span class="st">"\n====== TASK 2: findElements CSS ======"</span>);
+            List&lt;WebElement&gt; <span class="nm">inputs</span> <span class="op">=</span> driver.<span class="fn">findElements</span>(ALL_INPUTS);
+            <span class="fn">System.out.println</span>(<span class="st">"  Visible inputs: "</span> <span class="op">+</span> inputs.<span class="fn">size</span>());
+            <span class="kw">for</span> (WebElement <span class="nm">i</span> : inputs)
+                <span class="fn">System.out.println</span>(<span class="st">"  → name="</span> <span class="op">+</span> i.<span class="fn">getAttribute</span>(<span class="st">"name"</span>) <span class="op">+</span> <span class="st">" type="</span> <span class="op">+</span> i.<span class="fn">getAttribute</span>(<span class="st">"type"</span>));
+
+            <span class="cm">// Task 3: Login with CSS locators</span>
+            <span class="fn">System.out.println</span>(<span class="st">"\n====== TASK 3: Login ======"</span>);
+            driver.<span class="fn">findElement</span>(USERNAME).<span class="fn">sendKeys</span>(ConfigReader.<span class="fn">getUsername</span>());
+            driver.<span class="fn">findElement</span>(PASSWORD).<span class="fn">sendKeys</span>(ConfigReader.<span class="fn">getPassword</span>());
+            driver.<span class="fn">findElement</span>(LOGIN_BTN).<span class="fn">click</span>();
+            Thread.<span class="fn">sleep</span>(<span class="nu">2000</span>);
+            <span class="ty">boolean</span> <span class="nm">passed</span> <span class="op">=</span> driver.<span class="fn">getCurrentUrl</span>().<span class="fn">contains</span>(<span class="st">"dashboard"</span>);
+            <span class="fn">System.out.println</span>(<span class="st">"  Logged in as: "</span> <span class="op">+</span> driver.<span class="fn">findElement</span>(USER_NAME).<span class="fn">getText</span>());
+            <span class="fn">System.out.println</span>(passed <span class="op">?</span> <span class="st">"  ✓ PASS"</span> <span class="op">:</span> <span class="st">"  ✗ FAIL"</span>);
+
+            <span class="cm">// Task 4: attribute value matching operators</span>
+            <span class="fn">System.out.println</span>(<span class="st">"\n====== TASK 4: Attribute Matching ======"</span>);
+            driver.<span class="fn">get</span>(ConfigReader.<span class="fn">getBaseUrl</span>());
+            <span class="ty">boolean</span> <span class="nm">startsOxd</span> <span class="op">=</span> !driver.<span class="fn">findElements</span>(
+                By.<span class="fn">cssSelector</span>(<span class="st">"input[class*='oxd-input']"</span>)).<span class="fn">isEmpty</span>();
+            <span class="ty">boolean</span> <span class="nm">submitType</span> <span class="op">=</span> !driver.<span class="fn">findElements</span>(
+                By.<span class="fn">cssSelector</span>(<span class="st">"button[type='submit']"</span>)).<span class="fn">isEmpty</span>();
+            <span class="ty">boolean</span> <span class="nm">enInputs</span>  <span class="op">=</span> !driver.<span class="fn">findElements</span>(
+                By.<span class="fn">cssSelector</span>(<span class="st">"input:enabled"</span>)).<span class="fn">isEmpty</span>();
+            <span class="fn">System.out.println</span>(<span class="st">"  class*='oxd-input': "</span> <span class="op">+</span> startsOxd);
+            <span class="fn">System.out.println</span>(<span class="st">"  button[type=submit]: "</span> <span class="op">+</span> submitType);
+            <span class="fn">System.out.println</span>(<span class="st">"  input:enabled     : "</span> <span class="op">+</span> enInputs);
+
+            <span class="cm">// Task 5: nth-of-type</span>
+            <span class="fn">System.out.println</span>(<span class="st">"\n====== TASK 5: nth-of-type ======"</span>);
+            WebElement <span class="nm">firstInput</span>  <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">cssSelector</span>(<span class="st">"input:nth-of-type(1)"</span>));
+            WebElement <span class="nm">secondInput</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">cssSelector</span>(<span class="st">"input:nth-of-type(2)"</span>));
+            <span class="fn">System.out.println</span>(<span class="st">"  1st input name: "</span> <span class="op">+</span> firstInput.<span class="fn">getAttribute</span>(<span class="st">"name"</span>));
+            <span class="fn">System.out.println</span>(<span class="st">"  2nd input name: "</span> <span class="op">+</span> secondInput.<span class="fn">getAttribute</span>(<span class="st">"name"</span>));
+
+        } <span class="kw">catch</span> (Exception <span class="nm">e</span>) {
+            <span class="fn">System.out.println</span>(<span class="st">"Error: "</span> <span class="op">+</span> e.<span class="fn">getMessage</span>());
+        } <span class="kw">finally</span> {
+            driver.<span class="fn">quit</span>();
+            <span class="fn">System.out.println</span>(<span class="st">"\nBrowser closed ✓"</span>);
+        }
+    }
+}</pre>
+  </div>
+  <h3>Expected Output</h3>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Output</span><span class="code-file">Console</span></div>
+    <pre>====== TASK 1: CSS Selectors ======
+  Username visible: true
+  Password type   : password
+  Button enabled  : true
+
+====== TASK 2: findElements CSS ======
+  Visible inputs: 2
+  → name=username type=text
+  → name=password type=password
+
+====== TASK 3: Login ======
+  Logged in as: Admin
+  ✓ PASS
+
+====== TASK 4: Attribute Matching ======
+  class*='oxd-input': true
+  button[type=submit]: true
+  input:enabled     : true
+
+====== TASK 5: nth-of-type ======
+  1st input name: username
+  2nd input name: password
+
+Browser closed ✓</pre>
+  </div>
+</div>
+
+<!-- S15 -->
+<div class="section" id="s15">
+  <div class="section-header"><div class="section-num">15</div><h2>Common Mistakes</h2></div>
+  <div class="mistake-grid">
+    <div class="mistake-card"><div class="mt">&#10060; Confusing . and # prefixes</div><p><code>.classname</code> = class selector. <code>#idname</code> = id selector. <code>[attr]</code> = attribute selector. No prefix = tag name. Mix them up and nothing is found.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; CSS can't match by text</div><p>There is no CSS equivalent of XPath's <code>text()='Login'</code>. If you need to find an element by its visible text, you must use XPath. This is the key limitation of CSS selectors.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; CSS can't navigate to parent</div><p>CSS has no parent selector. <code>div > input</code> finds input INSIDE div — you can't go UP the tree. For parent navigation, use XPath <code>//input/parent::div</code>.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; Space vs > (descendant vs child)</div><p><code>div input</code> finds any input inside div at any depth. <code>div > input</code> only finds direct children. The wrong one may match the wrong element.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; :nth-child vs :nth-of-type</div><p><code>input:nth-child(2)</code> finds input that is the 2nd child of its parent. <code>input:nth-of-type(2)</code> finds the 2nd input within its parent. They differ when there are mixed element types.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; Testing selector returns 0</div><p>If <code>$$(".myClass").length === 0</code> in console, the selector is wrong or element isn't on the page yet. Check spelling, check page load, check if it's in an iframe.</p></div>
+  </div>
+</div>
+
+<!-- S16 -->
+<div class="section" id="s16">
+  <div class="section-header"><div class="section-num">16</div><h2>End of Day Checklist + Resources</h2></div>
+  <div class="checklist">
+    <div class="checklist-title">&#10022; End of Day 16 Checklist — Locators COMPLETE</div>
+    <div class="check-item"><div class="check-box"></div>I know basic CSS selectors: tag, .class, #id, [attr='val']</div>
+    <div class="check-item"><div class="check-box"></div>I can use ^=, $=, *= for partial attribute matching</div>
+    <div class="check-item"><div class="check-box"></div>I can chain multiple classes: .class1.class2</div>
+    <div class="check-item"><div class="check-box"></div>I understand space (descendant) vs > (child) combinators</div>
+    <div class="check-item"><div class="check-box"></div>I can use :nth-of-type, :first-child, :last-child for positional selection</div>
+    <div class="check-item"><div class="check-box"></div>I know :not(), :enabled, :disabled, :checked pseudo-classes</div>
+    <div class="check-item"><div class="check-box"></div>I know CSS CANNOT match text — use XPath for text-based locators</div>
+    <div class="check-item"><div class="check-box"></div>I know CSS CANNOT navigate to parent — use XPath for that</div>
+    <div class="check-item"><div class="check-box"></div>I test CSS with $$("selector") in browser console before Java</div>
+    <div class="check-item"><div class="check-box"></div>Practice task runs — all 5 tasks produce correct output</div>
+    <div class="check-item"><div class="check-box"></div>&#127881; LOCATORS MASTERED: id, name, className, tagName, linkText, CSS, XPath</div>
+  </div>
+  <h3>Resources</h3>
+  <ul class="resource-list">
+    <li><span>&#127947;</span><strong>Practice:&nbsp;</strong><a href="https://flukeout.github.io" target="_blank">CSS Diner — flukeout.github.io</a> &nbsp;<span style="color:var(--muted);font-size:12px">Best interactive CSS selector game. Complete all 32 levels.</span></li>
+    <li><span>&#128214;</span><strong>Reference:&nbsp;</strong><a href="https://www.w3schools.com/cssref/css_selectors.php" target="_blank">W3Schools — CSS Selectors</a> &nbsp;<span style="color:var(--muted);font-size:12px">Complete CSS selector reference with examples.</span></li>
+    <li><span>&#128214;</span><strong>Selenium Docs:&nbsp;</strong><a href="https://www.selenium.dev/documentation/webdriver/elements/locators/#css-selector" target="_blank">Selenium — CSS Selector Locator</a> &nbsp;<span style="color:var(--muted);font-size:12px">Official Selenium CSS selector docs.</span></li>
+  </ul>
+  <div class="callout tip">
+    <span class="callout-icon">&#128640;</span>
+    <div class="callout-body">
+      <div class="callout-title">Day 17 Preview — WebElement Methods Deep Dive</div>
+      <p>Locators are done. From Day 17 you go deeper into <strong>WebElement interactions</strong> — checkboxes, radio buttons, dropdown select, file upload, drag-and-drop preview. Every element type gets dedicated coverage so you can automate any form on any site.</p>
+    </div>
+  </div>
+</div>
+
+</div>
+<div class="footer">
+  <span>Day 16 of 65</span> &nbsp;&middot;&nbsp; Selenium + Java Automation Roadmap &nbsp;&middot;&nbsp; Phase 2 &mdash; Core Selenium &nbsp;&middot;&nbsp; <span>Next: Day 17 &mdash; WebElement Methods Deep Dive</span>
+</div>
+</body>
+</html>

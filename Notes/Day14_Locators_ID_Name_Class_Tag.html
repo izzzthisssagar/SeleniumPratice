@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 14 — Locators: ID, Name, ClassName, TagName</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Sora:wght@400;600;700;800&display=swap');
+:root{--bg:#0d1117;--bg2:#161b22;--bg3:#1e2530;--border:#30363d;--accent:#f0a500;--accent2:#58a6ff;--accent3:#3fb950;--accent4:#ff7b72;--accent5:#d2a8ff;--text:#e6edf3;--muted:#8b949e;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);line-height:1.75;font-size:15px;}
+.hero{background:linear-gradient(135deg,#0d1117,#161b22,#0d1522);border-bottom:2px solid var(--accent2);padding:48px 40px 36px;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:0;right:0;width:400px;height:400px;background:radial-gradient(circle,rgba(88,166,255,0.07),transparent 70%);pointer-events:none;}
+.hero-tag{display:inline-block;background:rgba(88,166,255,0.12);border:1px solid rgba(88,166,255,0.3);color:var(--accent2);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;padding:4px 12px;border-radius:20px;margin-bottom:16px;}
+.hero h1{font-size:34px;font-weight:800;line-height:1.2;margin-bottom:10px;}
+.hero h1 span{color:var(--accent2);}
+.hero-sub{color:var(--muted);font-size:14px;display:flex;gap:24px;flex-wrap:wrap;margin-top:16px;}
+.hero-sub span{display:flex;align-items:center;gap:6px;}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--accent2);display:inline-block;}
+.container{max-width:980px;margin:0 auto;padding:40px 32px 80px;}
+.toc{background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--accent2);border-radius:8px;padding:24px 28px;margin-bottom:48px;}
+.toc-title{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--accent2);margin-bottom:14px;}
+.toc ol{padding-left:20px;}.toc li{margin-bottom:6px;}
+.toc a{color:var(--muted);text-decoration:none;font-size:14px;}.toc a:hover{color:var(--accent2);}
+.section{margin-bottom:56px;}
+.section-header{display:flex;align-items:center;gap:14px;margin-bottom:24px;padding-bottom:14px;border-bottom:1px solid var(--border);}
+.section-num{background:var(--accent2);color:#000;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:12px;width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.section h2{font-size:22px;font-weight:700;}
+h3{font-size:16px;font-weight:600;color:var(--accent2);margin:28px 0 12px;display:flex;align-items:center;gap:8px;}
+h3::before{content:'▸';color:var(--accent);font-size:12px;}
+p{color:var(--muted);margin-bottom:14px;line-height:1.8;}strong{color:var(--text);font-weight:600;}
+.code-block{background:#010409;border:1px solid var(--border);border-radius:10px;margin:20px 0;overflow:hidden;}
+.code-header{background:var(--bg2);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
+.code-lang{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent2);letter-spacing:1px;text-transform:uppercase;font-weight:600;}
+.code-file{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);}
+pre{font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.85;padding:20px;overflow-x:auto;color:#e6edf3;}
+.kw{color:#ff7b72;font-weight:500;}.ty{color:#ffa657;}.st{color:#a5d6ff;}.cm{color:#6e7681;font-style:italic;}
+.nm{color:#79c0ff;}.nu{color:#79c0ff;}.fn{color:#d2a8ff;}.op{color:#ff7b72;}.bool{color:#3fb950;}
+.ht{color:#ff7b72;}.ha{color:#f0a500;}.hv{color:#a5d6ff;}
+code{font-family:'JetBrains Mono',monospace;font-size:12.5px;background:rgba(88,166,255,0.1);border:1px solid rgba(88,166,255,0.2);color:var(--accent2);padding:1px 7px;border-radius:4px;}
+.callout{border-radius:8px;padding:16px 20px;margin:20px 0;display:flex;gap:14px;align-items:flex-start;}
+.callout-icon{font-size:18px;flex-shrink:0;margin-top:1px;}.callout-body{flex:1;}
+.callout-title{font-weight:700;font-size:13px;margin-bottom:4px;}.callout p{margin-bottom:0;font-size:13.5px;}
+.note{background:rgba(88,166,255,0.07);border-left:3px solid var(--accent2);}.note .callout-title{color:var(--accent2);}
+.tip{background:rgba(63,185,80,0.07);border-left:3px solid var(--accent3);}.tip .callout-title{color:var(--accent3);}
+.warn{background:rgba(240,165,0,0.07);border-left:3px solid var(--accent);}.warn .callout-title{color:var(--accent);}
+.error{background:rgba(255,123,114,0.07);border-left:3px solid var(--accent4);}.error .callout-title{color:var(--accent4);}
+.purple{background:rgba(210,168,255,0.07);border-left:3px solid var(--accent5);}.purple .callout-title{color:var(--accent5);}
+.table-wrap{overflow-x:auto;margin:20px 0;}
+table{width:100%;border-collapse:collapse;font-size:13.5px;}
+thead tr{background:var(--bg2);border-bottom:2px solid var(--accent2);}
+th{padding:12px 16px;text-align:left;font-weight:700;font-size:12px;letter-spacing:0.5px;text-transform:uppercase;color:var(--accent2);}
+td{padding:11px 16px;border-bottom:1px solid var(--border);color:var(--muted);}
+tr:hover td{background:rgba(255,255,255,0.02);}
+td:first-child{font-family:'JetBrains Mono',monospace;color:var(--accent);font-size:13px;}
+.diagram-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:28px 24px;margin:24px 0;overflow:hidden;}
+.diagram-title{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:20px;text-align:center;}
+.hour-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(88,166,255,0.1);border:1px solid rgba(88,166,255,0.25);color:var(--accent2);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:1px;padding:5px 14px;border-radius:20px;margin-bottom:18px;margin-top:30px;}
+.locator-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin:20px 0;}
+.locator-card{border-radius:10px;padding:20px;border:1px solid var(--border);}
+.locator-card.best{background:rgba(63,185,80,0.07);border-color:rgba(63,185,80,0.3);}
+.locator-card.good{background:rgba(88,166,255,0.07);border-color:rgba(88,166,255,0.3);}
+.locator-card.ok{background:rgba(240,165,0,0.07);border-color:rgba(240,165,0,0.3);}
+.locator-card.avoid{background:rgba(255,123,114,0.07);border-color:rgba(255,123,114,0.3);}
+.lc-name{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;margin-bottom:8px;}
+.locator-card.best .lc-name{color:var(--accent3);}
+.locator-card.good .lc-name{color:var(--accent2);}
+.locator-card.ok .lc-name{color:var(--accent);}
+.locator-card.avoid .lc-name{color:var(--accent4);}
+.lc-body{font-size:12.5px;color:var(--muted);}
+.mistake-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:20px 0;}
+.mistake-card{background:rgba(255,123,114,0.05);border:1px solid rgba(255,123,114,0.2);border-radius:8px;padding:16px;}
+.mistake-card .mt{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent4);font-weight:700;margin-bottom:8px;}
+.mistake-card p{font-size:13px;margin:0;}
+.checklist{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:24px 28px;margin:24px 0;}
+.checklist-title{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent3);letter-spacing:1.5px;text-transform:uppercase;font-weight:700;margin-bottom:16px;}
+.check-item{display:flex;align-items:flex-start;gap:12px;padding:9px 0;border-bottom:1px solid rgba(48,54,61,0.5);font-size:14px;color:var(--muted);}
+.check-item:last-child{border-bottom:none;}
+.check-box{width:18px;height:18px;border:2px solid var(--accent3);border-radius:4px;flex-shrink:0;margin-top:2px;}
+.resource-list{list-style:none;padding:0;margin:12px 0;}
+.resource-list li{padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;margin-bottom:8px;font-size:13.5px;display:flex;gap:10px;align-items:center;}
+.resource-list li a{color:var(--accent2);text-decoration:none;}
+.footer{background:var(--bg2);border-top:1px solid var(--border);padding:24px 40px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);}
+.footer span{color:var(--accent2);}
+::-webkit-scrollbar{width:6px;height:6px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+@media(max-width:640px){.hero{padding:32px 20px 24px;}.hero h1{font-size:24px;}.container{padding:24px 16px 60px;}}
+</style>
+</head>
+<body>
+<div class="hero">
+  <div class="hero-tag">Phase 2 &middot; Day 14 of 65</div>
+  <h1>Locators: <span>ID, Name, ClassName, TagName</span></h1>
+  <div class="hero-sub">
+    <span><span class="dot"></span>2 Hours</span>
+    <span><span class="dot"></span>By.id &middot; By.name &middot; By.className &middot; By.tagName &middot; By.linkText &middot; Locator Strategy</span>
+  </div>
+</div>
+<div class="container">
+
+<div class="toc">
+  <div class="toc-title">// Table of Contents</div>
+  <ol>
+    <li><a href="#s1">What is a Locator?</a></li>
+    <li><a href="#s2">All 8 Locator Types — Overview</a></li>
+    <li><a href="#s3">Locator Priority — Which to Use First</a></li>
+    <li><a href="#s4">By.id — Most Reliable Locator</a></li>
+    <li><a href="#s5">By.name — Best for Form Fields</a></li>
+    <li><a href="#s6">By.className — Single Class Only</a></li>
+    <li><a href="#s7">By.tagName — For All Elements of a Type</a></li>
+    <li><a href="#s8">By.linkText &amp; By.partialLinkText</a></li>
+    <li><a href="#s9">Inspecting Elements to Find Locators</a></li>
+    <li><a href="#s10">Testing Locators in Browser Console</a></li>
+    <li><a href="#s11">OrangeHRM Locator Map</a></li>
+    <li><a href="#s12">Locator Best Practices</a></li>
+    <li><a href="#s13">Practice Task + Expected Output</a></li>
+    <li><a href="#s14">Common Mistakes</a></li>
+    <li><a href="#s15">End of Day Checklist + Resources</a></li>
+  </ol>
+</div>
+
+<!-- S1 -->
+<div class="section" id="s1">
+  <div class="section-header"><div class="section-num">01</div><h2>What is a Locator?</h2></div>
+  <div class="hour-badge">&#9200; Hour 1 — Simple Locators (60 mins)</div>
+  <p>A <strong>locator</strong> is how you tell Selenium which element on the page you want to interact with. It's the translation between "click the Login button" and the actual HTML element on screen. Getting locators right is <strong>the single most important skill</strong> in Selenium — a bad locator is the #1 cause of flaky tests.</p>
+  <div class="diagram-wrap">
+    <div class="diagram-title">// How Locators Work</div>
+    <svg viewBox="0 0 700 140" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:700px;display:block;margin:0 auto">
+      <defs><marker id="la" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0L0,6L8,3z" fill="#58a6ff"/></marker></defs>
+      <rect x="10" y="30" width="160" height="70" rx="8" fill="#1e2530" stroke="#d2a8ff" stroke-width="1.5"/>
+      <text x="90" y="55" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#d2a8ff" font-weight="700">Your Java Code</text>
+      <text x="90" y="73" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#8b949e">findElement(</text>
+      <text x="90" y="87" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#3fb950">By.id("btn")</text>
+      <text x="90" y="100" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#8b949e">)</text>
+      <line x1="170" y1="65" x2="210" y2="65" stroke="#58a6ff" stroke-width="1.5" marker-end="url(#la)"/>
+      <rect x="210" y="30" width="180" height="70" rx="8" fill="#1e2530" stroke="#58a6ff" stroke-width="1.5"/>
+      <text x="300" y="50" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#58a6ff" font-weight="700">Selenium Searches</text>
+      <text x="300" y="67" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#8b949e">Scans entire DOM</text>
+      <text x="300" y="82" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#8b949e">looking for element</text>
+      <text x="300" y="96" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#8b949e">with id="btn"</text>
+      <line x1="390" y1="65" x2="430" y2="65" stroke="#58a6ff" stroke-width="1.5" marker-end="url(#la)"/>
+      <rect x="430" y="20" width="260" height="90" rx="8" fill="#010409" stroke="#3fb950" stroke-width="1.5"/>
+      <text x="560" y="42" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#3fb950" font-weight="700">HTML Page</text>
+      <text x="446" y="62" font-family="JetBrains Mono,monospace" font-size="11"><tspan fill="#6e7681">&lt;</tspan><tspan fill="#ff7b72">button </tspan><tspan fill="#f0a500">id</tspan><tspan fill="#e6edf3">=</tspan><tspan fill="#a5d6ff">"btn"</tspan><tspan fill="#e6edf3">&gt;</tspan></tspan></text>
+      <text x="460" y="80" font-family="JetBrains Mono,monospace" font-size="11" fill="#3fb950">Login</text>
+      <text x="446" y="98" font-family="JetBrains Mono,monospace" font-size="11"><tspan fill="#6e7681">&lt;/</tspan><tspan fill="#ff7b72">button</tspan><tspan fill="#6e7681">&gt;</tspan></text>
+      <text x="560" y="122" text-anchor="middle" font-family="Sora,sans-serif" font-size="10" fill="#6e7681">FOUND → returns WebElement</text>
+    </svg>
+  </div>
+</div>
+
+<!-- S2 -->
+<div class="section" id="s2">
+  <div class="section-header"><div class="section-num">02</div><h2>All 8 Locator Types — Overview</h2></div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Locator</th><th>Syntax</th><th>Matches HTML Attribute</th><th>Reliability</th></tr></thead>
+      <tbody>
+        <tr><td>By.id</td><td><code>By.id("loginBtn")</code></td><td>id="loginBtn"</td><td>&#11088; Best</td></tr>
+        <tr><td>By.name</td><td><code>By.name("username")</code></td><td>name="username"</td><td>&#11088; Excellent</td></tr>
+        <tr><td>By.className</td><td><code>By.className("oxd-input")</code></td><td>class="oxd-input"</td><td>&#9733; Good (single class)</td></tr>
+        <tr><td>By.tagName</td><td><code>By.tagName("input")</code></td><td>HTML tag name</td><td>&#9733; Useful for findElements</td></tr>
+        <tr><td>By.linkText</td><td><code>By.linkText("Click here")</code></td><td>Exact anchor text</td><td>&#9733; Good for links</td></tr>
+        <tr><td>By.partialLinkText</td><td><code>By.partialLinkText("Click")</code></td><td>Partial anchor text</td><td>&#9733; Flexible links</td></tr>
+        <tr><td>By.cssSelector</td><td><code>By.cssSelector(".btn-primary")</code></td><td>CSS selector rules</td><td>&#11088; Excellent (Day 16)</td></tr>
+        <tr><td>By.xpath</td><td><code>By.xpath("//input[@id='u']")</code></td><td>XML path expression</td><td>&#11088; Most powerful (Day 15)</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- S3 -->
+<div class="section" id="s3">
+  <div class="section-header"><div class="section-num">03</div><h2>Locator Priority — Which to Use First</h2></div>
+  <div class="locator-grid">
+    <div class="locator-card best">
+      <div class="lc-name">1. By.id &#11088;</div>
+      <div class="lc-body">Always check for id first. IDs are meant to be unique. Fastest lookup. Most stable across page changes.</div>
+    </div>
+    <div class="locator-card best">
+      <div class="lc-name">2. By.name &#11088;</div>
+      <div class="lc-body">Use for form fields (input, select, textarea). Very common and stable. Second choice after id.</div>
+    </div>
+    <div class="locator-card good">
+      <div class="lc-name">3. By.cssSelector &#9733;</div>
+      <div class="lc-body">Powerful and fast. Use when no id/name available. Covered fully on Day 16.</div>
+    </div>
+    <div class="locator-card good">
+      <div class="lc-name">4. By.xpath &#9733;</div>
+      <div class="lc-body">Most flexible — handles complex cases. Slightly slower. Full coverage Day 15.</div>
+    </div>
+    <div class="locator-card ok">
+      <div class="lc-name">5. By.className &#9733;</div>
+      <div class="lc-body">OK if class is unique. Problem: classes often repeat across many elements.</div>
+    </div>
+    <div class="locator-card avoid">
+      <div class="lc-name">6. By.tagName &#9888;</div>
+      <div class="lc-body">Use only with findElements() to get all elements of a type. Useless for findElement().</div>
+    </div>
+  </div>
+  <div class="callout tip">
+    <span class="callout-icon">&#9989;</span>
+    <div class="callout-body">
+      <div class="callout-title">The Locator Decision Tree</div>
+      <p>When writing a locator: 1) Has id? → Use id. 2) Has name? → Use name. 3) Has unique class? → Use className or CSS. 4) Nothing clean? → Build XPath. Never use absolute XPath (auto-generated from DevTools) — they break with any HTML change.</p>
+    </div>
+  </div>
+</div>
+
+<!-- S4 -->
+<div class="section" id="s4">
+  <div class="section-header"><div class="section-num">04</div><h2>By.id — Most Reliable Locator</h2></div>
+  <p>The <code>id</code> attribute is supposed to be <strong>unique on the entire page</strong> (HTML spec). If an element has an id, use it — it's the fastest and most stable locator.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">HTML</span><span class="code-file">Example HTML</span></div>
+    <pre><span class="ht">&lt;input</span> <span class="ha">id</span>=<span class="hv">"txtUsername"</span> <span class="ha">type</span>=<span class="hv">"text"</span> <span class="ha">name</span>=<span class="hv">"username"</span> <span class="ha">placeholder</span>=<span class="hv">"Username"</span><span class="ht">&gt;</span>
+<span class="ht">&lt;button</span> <span class="ha">id</span>=<span class="hv">"btnLogin"</span> <span class="ha">type</span>=<span class="hv">"submit"</span><span class="ht">&gt;</span>Login<span class="ht">&lt;/button&gt;</span>
+<span class="ht">&lt;div</span> <span class="ha">id</span>=<span class="hv">"errorMsg"</span> <span class="ha">class</span>=<span class="hv">"error-text"</span><span class="ht">&gt;</span>Invalid credentials<span class="ht">&lt;/div&gt;</span></pre>
+  </div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">ById.java</span></div>
+    <pre><span class="cm">// Basic usage</span>
+WebElement <span class="nm">userField</span>  <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">id</span>(<span class="st">"txtUsername"</span>));
+WebElement <span class="nm">loginBtn</span>   <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">id</span>(<span class="st">"btnLogin"</span>));
+WebElement <span class="nm">errorMsg</span>   <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">id</span>(<span class="st">"errorMsg"</span>));
+
+<span class="cm">// Interact</span>
+userField.<span class="fn">sendKeys</span>(<span class="st">"Admin"</span>);
+loginBtn.<span class="fn">click</span>();
+<span class="fn">System.out.println</span>(errorMsg.<span class="fn">getText</span>());
+
+<span class="cm">// Safe check — does element with this id exist?</span>
+<span class="ty">boolean</span> <span class="nm">exists</span> <span class="op">=</span> !driver.<span class="fn">findElements</span>(By.<span class="fn">id</span>(<span class="st">"errorMsg"</span>)).<span class="fn">isEmpty</span>();
+<span class="fn">System.out.println</span>(<span class="st">"Error shown: "</span> <span class="op">+</span> exists);
+
+<span class="cm">// WHEN IDs CHANGE: some frameworks generate dynamic IDs like:</span>
+<span class="cm">// id="input-1638291234" — number changes each page load</span>
+<span class="cm">// AVOID these. Use name or CSS instead.</span></pre>
+  </div>
+  <div class="callout warn">
+    <span class="callout-icon">&#9889;</span>
+    <div class="callout-body">
+      <div class="callout-title">Watch out for dynamic IDs</div>
+      <p>IDs like <code>id="username-12345"</code> where the number changes every page load are useless as locators. If the id contains a number that changes, use <code>By.name</code> or <code>By.cssSelector</code> instead. Always test your locator by refreshing the page and seeing if it still works.</p>
+    </div>
+  </div>
+</div>
+
+<!-- S5 -->
+<div class="section" id="s5">
+  <div class="section-header"><div class="section-num">05</div><h2>By.name — Best for Form Fields</h2></div>
+  <p>The <code>name</code> attribute is commonly used on form elements (input, select, textarea, radio buttons). It's the second most reliable locator after id.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">HTML</span><span class="code-file">Form HTML</span></div>
+    <pre><span class="ht">&lt;form&gt;</span>
+  <span class="ht">&lt;input</span> <span class="ha">type</span>=<span class="hv">"text"</span>     <span class="ha">name</span>=<span class="hv">"username"</span>  <span class="ha">placeholder</span>=<span class="hv">"Username"</span><span class="ht">&gt;</span>
+  <span class="ht">&lt;input</span> <span class="ha">type</span>=<span class="hv">"password"</span> <span class="ha">name</span>=<span class="hv">"password"</span>  <span class="ha">placeholder</span>=<span class="hv">"Password"</span><span class="ht">&gt;</span>
+  <span class="ht">&lt;select</span> <span class="ha">name</span>=<span class="hv">"country"</span><span class="ht">&gt;</span>
+    <span class="ht">&lt;option</span> <span class="ha">value</span>=<span class="hv">"np"</span><span class="ht">&gt;</span>Nepal<span class="ht">&lt;/option&gt;</span>
+    <span class="ht">&lt;option</span> <span class="ha">value</span>=<span class="hv">"in"</span><span class="ht">&gt;</span>India<span class="ht">&lt;/option&gt;</span>
+  <span class="ht">&lt;/select&gt;</span>
+  <span class="ht">&lt;input</span> <span class="ha">type</span>=<span class="hv">"radio"</span> <span class="ha">name</span>=<span class="hv">"gender"</span> <span class="ha">value</span>=<span class="hv">"male"</span><span class="ht">&gt;</span>   Male
+  <span class="ht">&lt;input</span> <span class="ha">type</span>=<span class="hv">"radio"</span> <span class="ha">name</span>=<span class="hv">"gender"</span> <span class="ha">value</span>=<span class="hv">"female"</span><span class="ht">&gt;</span> Female
+<span class="ht">&lt;/form&gt;</span></pre>
+  </div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">ByName.java</span></div>
+    <pre><span class="cm">// Single element by name</span>
+WebElement <span class="nm">usernameField</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">name</span>(<span class="st">"username"</span>));
+WebElement <span class="nm">passwordField</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">name</span>(<span class="st">"password"</span>));
+
+usernameField.<span class="fn">sendKeys</span>(<span class="st">"Admin"</span>);
+passwordField.<span class="fn">sendKeys</span>(<span class="st">"admin123"</span>);
+
+<span class="cm">// Multiple elements with same name (radio buttons)</span>
+List&lt;WebElement&gt; <span class="nm">genderOptions</span> <span class="op">=</span> driver.<span class="fn">findElements</span>(By.<span class="fn">name</span>(<span class="st">"gender"</span>));
+<span class="fn">System.out.println</span>(<span class="st">"Gender options: "</span> <span class="op">+</span> genderOptions.<span class="fn">size</span>()); <span class="cm">// 2</span>
+
+<span class="cm">// Click radio button with specific value</span>
+<span class="kw">for</span> (WebElement <span class="nm">option</span> : genderOptions) {
+    <span class="kw">if</span> (option.<span class="fn">getAttribute</span>(<span class="st">"value"</span>).<span class="fn">equals</span>(<span class="st">"male"</span>)) {
+        option.<span class="fn">click</span>();
+        <span class="kw">break</span>;
+    }
+}
+
+<span class="cm">// Verify field content</span>
+<span class="ty">String</span> <span class="nm">typedValue</span> <span class="op">=</span> usernameField.<span class="fn">getAttribute</span>(<span class="st">"value"</span>);
+<span class="fn">System.out.println</span>(<span class="st">"Field contains: "</span> <span class="op">+</span> typedValue); <span class="cm">// Admin</span></pre>
+  </div>
+</div>
+
+<!-- S6 -->
+<div class="section" id="s6">
+  <div class="section-header"><div class="section-num">06</div><h2>By.className — Single Class Only</h2></div>
+  <p>Finds elements by CSS class name. <strong>Critical rule</strong>: <code>By.className</code> only works with a <strong>single class name</strong>. If an element has multiple classes, pick one. Use <code>By.cssSelector</code> (Day 16) for multiple classes.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">HTML</span><span class="code-file">Class HTML</span></div>
+    <pre><span class="ht">&lt;input</span> <span class="ha">class</span>=<span class="hv">"oxd-input oxd-input--active"</span> <span class="ha">name</span>=<span class="hv">"username"</span><span class="ht">&gt;</span>
+<span class="ht">&lt;button</span> <span class="ha">class</span>=<span class="hv">"oxd-button oxd-button--medium oxd-button--main"</span><span class="ht">&gt;</span>Login<span class="ht">&lt;/button&gt;</span>
+<span class="ht">&lt;p</span> <span class="ha">class</span>=<span class="hv">"error-message"</span><span class="ht">&gt;</span>Invalid credentials<span class="ht">&lt;/p&gt;</span></pre>
+  </div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">ByClassName.java</span></div>
+    <pre><span class="cm">// Single class — works fine</span>
+WebElement <span class="nm">error</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">className</span>(<span class="st">"error-message"</span>));
+<span class="fn">System.out.println</span>(error.<span class="fn">getText</span>());
+
+<span class="cm">// Multiple classes — use ONLY ONE of them</span>
+<span class="cm">// &lt;input class="oxd-input oxd-input--active"&gt;</span>
+WebElement <span class="nm">input</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">className</span>(<span class="st">"oxd-input"</span>)); <span class="cm">// ✓</span>
+<span class="cm">// By.className("oxd-input oxd-input--active") ← ERROR: spaces not allowed!</span>
+<span class="cm">// Use By.cssSelector(".oxd-input.oxd-input--active") for multiple classes (Day 16)</span>
+
+<span class="cm">// Get ALL elements with a class — useful for lists</span>
+List&lt;WebElement&gt; <span class="nm">allInputs</span> <span class="op">=</span> driver.<span class="fn">findElements</span>(By.<span class="fn">className</span>(<span class="st">"oxd-input"</span>));
+<span class="fn">System.out.println</span>(<span class="st">"Input count: "</span> <span class="op">+</span> allInputs.<span class="fn">size</span>());
+
+<span class="kw">for</span> (WebElement <span class="nm">el</span> : allInputs) {
+    <span class="fn">System.out.println</span>(<span class="st">"  Tag: "</span> <span class="op">+</span> el.<span class="fn">getTagName</span>()
+        <span class="op">+</span> <span class="st">"  Name: "</span> <span class="op">+</span> el.<span class="fn">getAttribute</span>(<span class="st">"name"</span>)
+        <span class="op">+</span> <span class="st">"  Displayed: "</span> <span class="op">+</span> el.<span class="fn">isDisplayed</span>());
+}
+
+<span class="cm">// Check if error class present (test assertion)</span>
+<span class="ty">boolean</span> <span class="nm">hasError</span> <span class="op">=</span> !driver.<span class="fn">findElements</span>(By.<span class="fn">className</span>(<span class="st">"error-message"</span>)).<span class="fn">isEmpty</span>();
+<span class="fn">System.out.println</span>(<span class="st">"Error shown: "</span> <span class="op">+</span> hasError);</pre>
+  </div>
+  <div class="callout error">
+    <span class="callout-icon">&#128680;</span>
+    <div class="callout-body">
+      <div class="callout-title">By.className with space = InvalidSelectorException</div>
+      <p><code>By.className("oxd-input oxd-input--active")</code> throws <code>InvalidSelectorException</code> because the space makes Selenium think it's two separate class names. Always use only ONE class name. For multiple classes, use CSS selector: <code>By.cssSelector(".oxd-input.oxd-input--active")</code></p>
+    </div>
+  </div>
+</div>
+
+<!-- S7 -->
+<div class="section" id="s7">
+  <div class="section-header"><div class="section-num">07</div><h2>By.tagName — For All Elements of a Type</h2></div>
+  <p><code>By.tagName</code> finds elements by their HTML tag name. Almost always used with <code>findElements()</code> (plural) to get a collection of all elements of that type. Rarely useful with <code>findElement()</code> since there are usually many of the same tag.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">ByTagName.java</span></div>
+    <pre><span class="cm">// Get ALL links on page</span>
+List&lt;WebElement&gt; <span class="nm">allLinks</span> <span class="op">=</span> driver.<span class="fn">findElements</span>(By.<span class="fn">tagName</span>(<span class="st">"a"</span>));
+<span class="fn">System.out.println</span>(<span class="st">"Total links: "</span> <span class="op">+</span> allLinks.<span class="fn">size</span>());
+<span class="kw">for</span> (WebElement <span class="nm">link</span> : allLinks) {
+    <span class="ty">String</span> <span class="nm">text</span> <span class="op">=</span> link.<span class="fn">getText</span>();
+    <span class="ty">String</span> <span class="nm">href</span> <span class="op">=</span> link.<span class="fn">getAttribute</span>(<span class="st">"href"</span>);
+    <span class="kw">if</span> (!text.<span class="fn">isEmpty</span>()) {
+        <span class="fn">System.out.println</span>(<span class="st">"  Link: "</span> <span class="op">+</span> text <span class="op">+</span> <span class="st">" → "</span> <span class="op">+</span> href);
+    }
+}
+
+<span class="cm">// Get ALL input fields on a form</span>
+List&lt;WebElement&gt; <span class="nm">inputs</span> <span class="op">=</span> driver.<span class="fn">findElements</span>(By.<span class="fn">tagName</span>(<span class="st">"input"</span>));
+<span class="fn">System.out.println</span>(<span class="st">"Input fields: "</span> <span class="op">+</span> inputs.<span class="fn">size</span>());
+<span class="kw">for</span> (WebElement <span class="nm">input</span> : inputs) {
+    <span class="fn">System.out.println</span>(<span class="st">"  type="</span> <span class="op">+</span> input.<span class="fn">getAttribute</span>(<span class="st">"type"</span>)
+        <span class="op">+</span> <span class="st">"  name="</span> <span class="op">+</span> input.<span class="fn">getAttribute</span>(<span class="st">"name"</span>));
+}
+
+<span class="cm">// Get ALL table rows</span>
+List&lt;WebElement&gt; <span class="nm">rows</span> <span class="op">=</span> driver.<span class="fn">findElements</span>(By.<span class="fn">tagName</span>(<span class="st">"tr"</span>));
+<span class="fn">System.out.println</span>(<span class="st">"Table rows: "</span> <span class="op">+</span> rows.<span class="fn">size</span>());
+
+<span class="cm">// Get page's h1</span>
+WebElement <span class="nm">heading</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">tagName</span>(<span class="st">"h1"</span>)); <span class="cm">// OK if only one h1</span>
+<span class="fn">System.out.println</span>(<span class="st">"Page heading: "</span> <span class="op">+</span> heading.<span class="fn">getText</span>());</pre>
+  </div>
+</div>
+
+<!-- S8 -->
+<div class="section" id="s8">
+  <div class="section-header"><div class="section-num">08</div><h2>By.linkText &amp; By.partialLinkText</h2></div>
+  <p>Only works on <code>&lt;a&gt;</code> anchor elements. Matches by the visible text of the link.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">HTML</span><span class="code-file">Link HTML</span></div>
+    <pre><span class="ht">&lt;a</span> <span class="ha">href</span>=<span class="hv">"/forgot-password"</span><span class="ht">&gt;</span>Forgot your password?<span class="ht">&lt;/a&gt;</span>
+<span class="ht">&lt;a</span> <span class="ha">href</span>=<span class="hv">"/help"</span><span class="ht">&gt;</span>Need help? Click here<span class="ht">&lt;/a&gt;</span>
+<span class="ht">&lt;a</span> <span class="ha">href</span>=<span class="hv">"/privacy"</span><span class="ht">&gt;</span>Privacy Policy<span class="ht">&lt;/a&gt;</span></pre>
+  </div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">ByLinkText.java</span></div>
+    <pre><span class="cm">// By.linkText — exact full text match (case sensitive)</span>
+WebElement <span class="nm">forgotLink</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">linkText</span>(<span class="st">"Forgot your password?"</span>));
+forgotLink.<span class="fn">click</span>();
+
+<span class="cm">// By.partialLinkText — substring match</span>
+WebElement <span class="nm">helpLink</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">partialLinkText</span>(<span class="st">"Need help"</span>));
+helpLink.<span class="fn">click</span>();
+
+<span class="cm">// Get ALL links and filter by text</span>
+List&lt;WebElement&gt; <span class="nm">links</span> <span class="op">=</span> driver.<span class="fn">findElements</span>(By.<span class="fn">tagName</span>(<span class="st">"a"</span>));
+<span class="kw">for</span> (WebElement <span class="nm">link</span> : links) {
+    <span class="kw">if</span> (link.<span class="fn">getText</span>().<span class="fn">contains</span>(<span class="st">"Policy"</span>)) {
+        <span class="fn">System.out.println</span>(<span class="st">"Found: "</span> <span class="op">+</span> link.<span class="fn">getText</span>() <span class="op">+</span> <span class="st">" → "</span> <span class="op">+</span> link.<span class="fn">getAttribute</span>(<span class="st">"href"</span>));
+    }
+}
+
+<span class="cm">// Limitations:</span>
+<span class="cm">// - Only works on &lt;a&gt; tags (not buttons, divs, spans)</span>
+<span class="cm">// - linkText is case-sensitive and whitespace-sensitive</span>
+<span class="cm">// - Text changes = locator breaks (fragile for i18n apps)</span></pre>
+  </div>
+</div>
+
+<!-- S9 -->
+<div class="section" id="s9">
+  <div class="section-header"><div class="section-num">09</div><h2>Inspecting Elements to Find Locators</h2></div>
+  <div class="diagram-wrap">
+    <div class="diagram-title">// DevTools Workflow — Finding the Right Locator</div>
+    <svg viewBox="0 0 700 220" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:700px;display:block;margin:0 auto">
+      <defs><marker id="lb" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0L0,6L8,3z" fill="#8b949e"/></marker></defs>
+      <!-- Step boxes -->
+      <rect x="10" y="20" width="140" height="60" rx="8" fill="#1e2530" stroke="#3fb950" stroke-width="1.5"/>
+      <text x="80" y="42" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#3fb950" font-weight="700">Step 1</text>
+      <text x="80" y="58" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#8b949e">Right-click</text>
+      <text x="80" y="71" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#8b949e">→ Inspect</text>
+      <line x1="150" y1="50" x2="175" y2="50" stroke="#8b949e" stroke-width="1.5" marker-end="url(#lb)"/>
+      <rect x="175" y="20" width="140" height="60" rx="8" fill="#1e2530" stroke="#f0a500" stroke-width="1.5"/>
+      <text x="245" y="42" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#f0a500" font-weight="700">Step 2</text>
+      <text x="245" y="58" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#8b949e">Look for id=</text>
+      <text x="245" y="71" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#8b949e">or name=</text>
+      <line x1="315" y1="50" x2="340" y2="50" stroke="#8b949e" stroke-width="1.5" marker-end="url(#lb)"/>
+      <rect x="340" y="20" width="140" height="60" rx="8" fill="#1e2530" stroke="#58a6ff" stroke-width="1.5"/>
+      <text x="410" y="42" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#58a6ff" font-weight="700">Step 3</text>
+      <text x="410" y="58" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#8b949e">Test in console:</text>
+      <text x="410" y="71" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="8" fill="#3fb950">$$("#id")</text>
+      <line x1="480" y1="50" x2="505" y2="50" stroke="#8b949e" stroke-width="1.5" marker-end="url(#lb)"/>
+      <rect x="505" y="20" width="185" height="60" rx="8" fill="#1e2530" stroke="#d2a8ff" stroke-width="1.5"/>
+      <text x="597" y="42" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#d2a8ff" font-weight="700">Step 4</text>
+      <text x="597" y="58" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#8b949e">Write Java locator</text>
+      <text x="597" y="71" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#8b949e">By.id("value")</text>
+
+      <!-- HTML example -->
+      <rect x="10" y="110" width="680" height="100" rx="8" fill="#010409" stroke="#30363d"/>
+      <text x="26" y="132" font-family="JetBrains Mono,monospace" font-size="12">
+        <tspan fill="#6e7681">&lt;</tspan><tspan fill="#ff7b72">input</tspan>
+      </text>
+      <text x="80" y="132" font-family="JetBrains Mono,monospace" font-size="12"><tspan fill="#f0a500"> id</tspan><tspan fill="#e6edf3">=</tspan><tspan fill="#a5d6ff">"txtUsername"</tspan><tspan fill="#f0a500">   ← By.id("txtUsername")</tspan></text>
+      <text x="80" y="152" font-family="JetBrains Mono,monospace" font-size="12"><tspan fill="#f0a500"> name</tspan><tspan fill="#e6edf3">=</tspan><tspan fill="#a5d6ff">"username"</tspan><tspan fill="#f0a500">     ← By.name("username")</tspan></text>
+      <text x="80" y="172" font-family="JetBrains Mono,monospace" font-size="12"><tspan fill="#f0a500"> class</tspan><tspan fill="#e6edf3">=</tspan><tspan fill="#a5d6ff">"oxd-input"</tspan><tspan fill="#f0a500">    ← By.className("oxd-input")</tspan></text>
+      <text x="80" y="192" font-family="JetBrains Mono,monospace" font-size="12"><tspan fill="#f0a500"> placeholder</tspan><tspan fill="#e6edf3">=</tspan><tspan fill="#a5d6ff">"Username"</tspan><tspan fill="#6e7681">/&gt;</tspan></text>
+    </svg>
+  </div>
+</div>
+
+<!-- S10 -->
+<div class="section" id="s10">
+  <div class="section-header"><div class="section-num">10</div><h2>Testing Locators in Browser Console</h2></div>
+  <p>Before writing Java, <strong>always test your locator in the browser console</strong> (F12 → Console tab). This saves time — verify it works in 10 seconds before writing code.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">JavaScript</span><span class="code-file">Browser Console — Test locators here (F12 → Console)</span></div>
+    <pre><span class="cm">// Test By.id equivalent</span>
+document.<span class="fn">getElementById</span>(<span class="st">"txtUsername"</span>)
+<span class="cm">// Returns: &lt;input id="txtUsername" ...&gt; or null</span>
+
+<span class="cm">// Test By.name equivalent</span>
+document.<span class="fn">querySelector</span>(<span class="st">"[name='username']"</span>)
+<span class="cm">// Returns: the element or null</span>
+
+<span class="cm">// Test By.className equivalent</span>
+document.<span class="fn">getElementsByClassName</span>(<span class="st">"oxd-input"</span>)
+<span class="cm">// Returns: HTMLCollection of all matches</span>
+
+<span class="cm">// Test CSS selector (works for By.cssSelector too)</span>
+<span class="cm">// $$ is DevTools shortcut for document.querySelectorAll</span>
+$$(<span class="st">".oxd-input"</span>)           <span class="cm">// all elements with class oxd-input</span>
+$$(<span class="st">"input[name='username']"</span>) <span class="cm">// input with name="username"</span>
+$$(<span class="st">"button[type='submit']"</span>)  <span class="cm">// submit button</span>
+
+<span class="cm">// Test XPath (Day 15)</span>
+<span class="cm">// $x is DevTools shortcut for XPath</span>
+$x(<span class="st">"//input[@name='username']"</span>)
+$x(<span class="st">"//button[text()='Login']"</span>)
+
+<span class="cm">// Check how many results your locator finds</span>
+$$(<span class="st">".oxd-input"</span>).length   <span class="cm">// if more than 1, locator is not unique enough</span></pre>
+  </div>
+  <div class="callout tip">
+    <span class="callout-icon">&#9989;</span>
+    <div class="callout-body">
+      <div class="callout-title">Golden Rule: Locator must return exactly 1 result for findElement()</div>
+      <p>In the browser console, run your selector. If it returns more than 1 element, your locator is not specific enough — <code>findElement()</code> will grab the first one arbitrarily. Make it more specific until <code>$$(selector).length === 1</code>. For <code>findElements()</code>, multiple results are expected and fine.</p>
+    </div>
+  </div>
+</div>
+
+<!-- S11 -->
+<div class="section" id="s11">
+  <div class="section-header"><div class="section-num">11</div><h2>OrangeHRM Locator Map</h2></div>
+  <p>These are the actual locators for OrangeHRM's login page — the elements you'll interact with most in Phase 2. Inspect them yourself to verify they match your current version of the demo site.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Element</th><th>Best Locator</th><th>Alternative</th></tr></thead>
+      <tbody>
+        <tr><td>Username field</td><td><code>By.name("username")</code></td><td><code>By.cssSelector("input[name='username']")</code></td></tr>
+        <tr><td>Password field</td><td><code>By.name("password")</code></td><td><code>By.cssSelector("input[name='password']")</code></td></tr>
+        <tr><td>Login button</td><td><code>By.cssSelector("button[type='submit']")</code></td><td><code>By.xpath("//button[@type='submit']")</code></td></tr>
+        <tr><td>Error message</td><td><code>By.cssSelector(".oxd-alert-content")</code></td><td><code>By.className("oxd-alert-content")</code></td></tr>
+        <tr><td>Username label</td><td><code>By.xpath("//label[text()='Username']")</code></td><td>N/A</td></tr>
+        <tr><td>User dropdown (post-login)</td><td><code>By.cssSelector(".oxd-userdropdown-tab")</code></td><td><code>By.className("oxd-userdropdown-tab")</code></td></tr>
+        <tr><td>User name text (post-login)</td><td><code>By.cssSelector(".oxd-userdropdown-name")</code></td><td><code>By.className("oxd-userdropdown-name")</code></td></tr>
+        <tr><td>Logout menu item</td><td><code>By.xpath("//a[text()='Logout']")</code></td><td><code>By.linkText("Logout")</code></td></tr>
+        <tr><td>Dashboard heading</td><td><code>By.xpath("//h6[text()='Dashboard']")</code></td><td><code>By.cssSelector(".oxd-topbar-header-breadcrumb h6")</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- S12 -->
+<div class="section" id="s12">
+  <div class="section-header"><div class="section-num">12</div><h2>Locator Best Practices</h2></div>
+  <div class="hour-badge">&#9200; Hour 2 — Practice &amp; Best Practices (60 mins)</div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Practice</th><th>Do</th><th>Don't</th></tr></thead>
+      <tbody>
+        <tr><td>Prefer static attributes</td><td><code>By.id("loginBtn")</code> — stable</td><td><code>By.id("btn-1638291234")</code> — dynamic</td></tr>
+        <tr><td>Test before coding</td><td>Verify in browser console first</td><td>Write Java then wonder why it fails</td></tr>
+        <tr><td>Keep locators in Page Object</td><td>Define locators as constants at top of page class</td><td>Hardcode locator strings everywhere in tests</td></tr>
+        <tr><td>Use most specific attribute</td><td><code>By.id</code> then <code>By.name</code></td><td>Jump straight to XPath for everything</td></tr>
+        <tr><td>Handle multiple matches</td><td>Make locator unique or use index with findElements()</td><td>Assume findElement() grabs the right one</td></tr>
+        <tr><td>Avoid generated text locators</td><td><code>By.id("submitBtn")</code></td><td><code>By.linkText("SUBMIT")</code> — breaks on text change</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">BestPractice — Store locators as constants</span></div>
+    <pre><span class="cm">// BAD — locator strings scattered everywhere</span>
+driver.<span class="fn">findElement</span>(By.<span class="fn">name</span>(<span class="st">"username"</span>)).<span class="fn">sendKeys</span>(<span class="st">"Admin"</span>);
+driver.<span class="fn">findElement</span>(By.<span class="fn">name</span>(<span class="st">"username"</span>)).<span class="fn">clear</span>();  <span class="cm">// repeated string!</span>
+
+<span class="cm">// GOOD — constants at top of class (pre-POM pattern)</span>
+<span class="kw">private static final</span> By <span class="nm">USERNAME_FIELD</span>  <span class="op">=</span> By.<span class="fn">name</span>(<span class="st">"username"</span>);
+<span class="kw">private static final</span> By <span class="nm">PASSWORD_FIELD</span>  <span class="op">=</span> By.<span class="fn">name</span>(<span class="st">"password"</span>);
+<span class="kw">private static final</span> By <span class="nm">LOGIN_BUTTON</span>    <span class="op">=</span> By.<span class="fn">cssSelector</span>(<span class="st">"button[type='submit']"</span>);
+<span class="kw">private static final</span> By <span class="nm">ERROR_MSG</span>       <span class="op">=</span> By.<span class="fn">cssSelector</span>(<span class="st">".oxd-alert-content"</span>);
+<span class="kw">private static final</span> By <span class="nm">USER_DROPDOWN</span>  <span class="op">=</span> By.<span class="fn">cssSelector</span>(<span class="st">".oxd-userdropdown-name"</span>);
+
+<span class="cm">// Usage — clean, maintainable, change in one place</span>
+driver.<span class="fn">findElement</span>(USERNAME_FIELD).<span class="fn">sendKeys</span>(<span class="st">"Admin"</span>);
+driver.<span class="fn">findElement</span>(PASSWORD_FIELD).<span class="fn">sendKeys</span>(<span class="st">"admin123"</span>);
+driver.<span class="fn">findElement</span>(LOGIN_BUTTON).<span class="fn">click</span>();</pre>
+  </div>
+</div>
+
+<!-- S13 -->
+<div class="section" id="s13">
+  <div class="section-header"><div class="section-num">13</div><h2>Practice Task + Expected Output</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">Day14Practice.java</span></div>
+    <pre><span class="kw">package</span> com.qaautomation.tests;
+
+<span class="kw">import</span> com.qaautomation.utils.*;
+<span class="kw">import</span> org.openqa.selenium.*;
+<span class="kw">import</span> java.util.List;
+
+<span class="kw">public class</span> <span class="nm">Day14Practice</span> {
+
+    <span class="cm">// Locators as constants — best practice</span>
+    <span class="kw">static final</span> By <span class="nm">USERNAME</span>  <span class="op">=</span> By.<span class="fn">name</span>(<span class="st">"username"</span>);
+    <span class="kw">static final</span> By <span class="nm">PASSWORD</span>  <span class="op">=</span> By.<span class="fn">name</span>(<span class="st">"password"</span>);
+    <span class="kw">static final</span> By <span class="nm">LOGIN_BTN</span> <span class="op">=</span> By.<span class="fn">cssSelector</span>(<span class="st">"button[type='submit']"</span>);
+    <span class="kw">static final</span> By <span class="nm">ERROR</span>     <span class="op">=</span> By.<span class="fn">cssSelector</span>(<span class="st">".oxd-alert-content"</span>);
+    <span class="kw">static final</span> By <span class="nm">USER_NAME</span> <span class="op">=</span> By.<span class="fn">cssSelector</span>(<span class="st">".oxd-userdropdown-name"</span>);
+
+    <span class="kw">public static void</span> <span class="fn">main</span>(<span class="ty">String</span>[] args) <span class="kw">throws</span> InterruptedException {
+
+        WebDriver <span class="nm">driver</span> <span class="op">=</span> DriverFactory.<span class="fn">getDriver</span>(<span class="st">"chrome"</span>);
+
+        <span class="kw">try</span> {
+            driver.<span class="fn">get</span>(ConfigReader.<span class="fn">getBaseUrl</span>());
+
+            <span class="cm">// Task 1: By.name — login fields</span>
+            <span class="fn">System.out.println</span>(<span class="st">"====== TASK 1: By.name ======"</span>);
+            WebElement <span class="nm">u</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(USERNAME);
+            WebElement <span class="nm">p</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(PASSWORD);
+            <span class="fn">System.out.println</span>(<span class="st">"  Username displayed: "</span> <span class="op">+</span> u.<span class="fn">isDisplayed</span>());
+            <span class="fn">System.out.println</span>(<span class="st">"  Password enabled  : "</span> <span class="op">+</span> p.<span class="fn">isEnabled</span>());
+            <span class="fn">System.out.println</span>(<span class="st">"  Username tag      : "</span> <span class="op">+</span> u.<span class="fn">getTagName</span>());
+            <span class="fn">System.out.println</span>(<span class="st">"  Password type     : "</span> <span class="op">+</span> p.<span class="fn">getAttribute</span>(<span class="st">"type"</span>));
+
+            <span class="cm">// Task 2: By.tagName — all inputs on page</span>
+            <span class="fn">System.out.println</span>(<span class="st">"\n====== TASK 2: By.tagName ======"</span>);
+            List&lt;WebElement&gt; <span class="nm">inputs</span> <span class="op">=</span> driver.<span class="fn">findElements</span>(By.<span class="fn">tagName</span>(<span class="st">"input"</span>));
+            <span class="fn">System.out.println</span>(<span class="st">"  Total input fields: "</span> <span class="op">+</span> inputs.<span class="fn">size</span>());
+            <span class="kw">for</span> (WebElement <span class="nm">inp</span> : inputs) {
+                <span class="fn">System.out.println</span>(<span class="st">"  type="</span> <span class="op">+</span> inp.<span class="fn">getAttribute</span>(<span class="st">"type"</span>)
+                    <span class="op">+</span> <span class="st">"  name="</span> <span class="op">+</span> inp.<span class="fn">getAttribute</span>(<span class="st">"name"</span>));
+            }
+
+            <span class="cm">// Task 3: By.linkText</span>
+            <span class="fn">System.out.println</span>(<span class="st">"\n====== TASK 3: By.linkText ======"</span>);
+            List&lt;WebElement&gt; <span class="nm">links</span> <span class="op">=</span> driver.<span class="fn">findElements</span>(By.<span class="fn">tagName</span>(<span class="st">"a"</span>));
+            <span class="fn">System.out.println</span>(<span class="st">"  Total links: "</span> <span class="op">+</span> links.<span class="fn">size</span>());
+            <span class="kw">for</span> (WebElement <span class="nm">link</span> : links) {
+                <span class="ty">String</span> <span class="nm">txt</span> <span class="op">=</span> link.<span class="fn">getText</span>();
+                <span class="kw">if</span> (!txt.<span class="fn">isEmpty</span>())
+                    <span class="fn">System.out.println</span>(<span class="st">"  Link: '"</span> <span class="op">+</span> txt <span class="op">+</span> <span class="st">"'"</span>);
+            }
+
+            <span class="cm">// Task 4: Login + verify with locators</span>
+            <span class="fn">System.out.println</span>(<span class="st">"\n====== TASK 4: Login Flow ======"</span>);
+            u.<span class="fn">sendKeys</span>(ConfigReader.<span class="fn">getUsername</span>());
+            p.<span class="fn">sendKeys</span>(ConfigReader.<span class="fn">getPassword</span>());
+            driver.<span class="fn">findElement</span>(LOGIN_BTN).<span class="fn">click</span>();
+            Thread.<span class="fn">sleep</span>(<span class="nu">2000</span>);
+            <span class="ty">boolean</span> <span class="nm">passed</span> <span class="op">=</span> driver.<span class="fn">getCurrentUrl</span>().<span class="fn">contains</span>(<span class="st">"dashboard"</span>);
+            <span class="ty">String</span> <span class="nm">who</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(USER_NAME).<span class="fn">getText</span>();
+            <span class="fn">System.out.println</span>(<span class="st">"  Dashboard reached: "</span> <span class="op">+</span> passed);
+            <span class="fn">System.out.println</span>(<span class="st">"  Logged in as    : "</span> <span class="op">+</span> who);
+            <span class="fn">System.out.println</span>(passed <span class="op">?</span> <span class="st">"  ✓ PASS"</span> <span class="op">:</span> <span class="st">"  ✗ FAIL"</span>);
+
+            <span class="cm">// Task 5: Invalid login — check error</span>
+            <span class="fn">System.out.println</span>(<span class="st">"\n====== TASK 5: Invalid Login ======"</span>);
+            driver.<span class="fn">get</span>(ConfigReader.<span class="fn">getBaseUrl</span>());
+            driver.<span class="fn">findElement</span>(USERNAME).<span class="fn">sendKeys</span>(<span class="st">"wronguser"</span>);
+            driver.<span class="fn">findElement</span>(PASSWORD).<span class="fn">sendKeys</span>(<span class="st">"wrongpass"</span>);
+            driver.<span class="fn">findElement</span>(LOGIN_BTN).<span class="fn">click</span>();
+            Thread.<span class="fn">sleep</span>(<span class="nu">1500</span>);
+            <span class="ty">boolean</span> <span class="nm">errorShown</span> <span class="op">=</span> !driver.<span class="fn">findElements</span>(ERROR).<span class="fn">isEmpty</span>();
+            <span class="fn">System.out.println</span>(<span class="st">"  Error shown  : "</span> <span class="op">+</span> errorShown);
+            <span class="kw">if</span> (errorShown)
+                <span class="fn">System.out.println</span>(<span class="st">"  Error message: "</span> <span class="op">+</span> driver.<span class="fn">findElement</span>(ERROR).<span class="fn">getText</span>());
+            <span class="fn">System.out.println</span>(errorShown <span class="op">?</span> <span class="st">"  ✓ PASS"</span> <span class="op">:</span> <span class="st">"  ✗ FAIL"</span>);
+
+        } <span class="kw">catch</span> (Exception <span class="nm">e</span>) {
+            <span class="fn">System.out.println</span>(<span class="st">"Error: "</span> <span class="op">+</span> e.<span class="fn">getMessage</span>());
+        } <span class="kw">finally</span> {
+            driver.<span class="fn">quit</span>();
+            <span class="fn">System.out.println</span>(<span class="st">"\nBrowser closed ✓"</span>);
+        }
+    }
+}</pre>
+  </div>
+  <h3>Expected Output</h3>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Output</span><span class="code-file">Console</span></div>
+    <pre>====== TASK 1: By.name ======
+  Username displayed: true
+  Password enabled  : true
+  Username tag      : input
+  Password type     : password
+
+====== TASK 2: By.tagName ======
+  Total input fields: 2
+  type=text      name=username
+  type=password  name=password
+
+====== TASK 3: By.linkText ======
+  Total links: 1
+  Link: 'Forgot your password?'
+
+====== TASK 4: Login Flow ======
+  Dashboard reached: true
+  Logged in as    : Admin
+  ✓ PASS
+
+====== TASK 5: Invalid Login ======
+  Error shown  : true
+  Error message: Invalid credentials
+  ✓ PASS
+
+Browser closed ✓</pre>
+  </div>
+</div>
+
+<!-- S14 -->
+<div class="section" id="s14">
+  <div class="section-header"><div class="section-num">14</div><h2>Common Mistakes</h2></div>
+  <div class="mistake-grid">
+    <div class="mistake-card"><div class="mt">&#10060; By.className with spaces</div><p><code>By.className("class1 class2")</code> throws InvalidSelectorException. Use only ONE class name. For multiple: <code>By.cssSelector(".class1.class2")</code></p></div>
+    <div class="mistake-card"><div class="mt">&#10060; Using dynamic IDs</div><p>IDs like <code>id="input_1712345678"</code> change on every page load. Using them as locators creates tests that fail randomly. Always check if the ID is stable.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; By.tagName for findElement()</div><p><code>findElement(By.tagName("input"))</code> returns the FIRST input on the page — which may not be what you want. Use with findElements() or add more specificity.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; linkText case sensitivity</div><p><code>By.linkText("forgot your password?")</code> fails if actual link text is "Forgot your password?" (capital F). linkText is case-sensitive AND whitespace-sensitive.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; Not testing locator before coding</div><p>Writing Java with a locator that doesn't work, then debugging for 30 minutes. Always test in browser console first. Saves massive time.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; Locator returns multiple elements</div><p>findElement() with a non-unique locator grabs the first match — could be a hidden element or the wrong one. Verify your locator returns exactly 1 result in console.</p></div>
+  </div>
+</div>
+
+<!-- S15 -->
+<div class="section" id="s15">
+  <div class="section-header"><div class="section-num">15</div><h2>End of Day Checklist + Resources</h2></div>
+  <div class="checklist">
+    <div class="checklist-title">&#10022; End of Day 14 Checklist</div>
+    <div class="check-item"><div class="check-box"></div>I know all 8 locator types and when to use each</div>
+    <div class="check-item"><div class="check-box"></div>My locator priority: id → name → cssSelector → xpath → className</div>
+    <div class="check-item"><div class="check-box"></div>I know By.className only takes ONE class name (no spaces)</div>
+    <div class="check-item"><div class="check-box"></div>I use By.tagName with findElements(), not findElement()</div>
+    <div class="check-item"><div class="check-box"></div>I test locators in browser console before writing Java</div>
+    <div class="check-item"><div class="check-box"></div>I store locators as constants (By type) not hardcoded strings</div>
+    <div class="check-item"><div class="check-box"></div>I know the OrangeHRM login page locators from memory</div>
+    <div class="check-item"><div class="check-box"></div>Practice task runs — all 5 tasks correct output</div>
+    <div class="check-item"><div class="check-box"></div>I can explain why dynamic IDs are bad locators</div>
+  </div>
+  <h3>Resources</h3>
+  <ul class="resource-list">
+    <li><span>&#128214;</span><strong>Selenium Docs:&nbsp;</strong><a href="https://www.selenium.dev/documentation/webdriver/elements/locators/" target="_blank">Selenium — Locator Strategies</a> &nbsp;<span style="color:var(--muted);font-size:12px">All 8 locator types with examples.</span></li>
+    <li><span>&#127947;</span><strong>Practice:&nbsp;</strong><a href="https://demoqa.com/text-box" target="_blank">DemoQA — Text Box</a> &nbsp;<span style="color:var(--muted);font-size:12px">Practice locating and interacting with all field types.</span></li>
+  </ul>
+  <div class="callout tip">
+    <span class="callout-icon">&#128640;</span>
+    <div class="callout-body">
+      <div class="callout-title">Day 15 Preview — XPath Deep Dive</div>
+      <p>Tomorrow: <strong>XPath</strong> — the most powerful locator strategy. Absolute vs relative XPath, XPath axes (parent, sibling, following), text() functions, contains(), and building XPaths for complex elements that have no id or name. After Day 15, no element on any page can hide from you.</p>
+    </div>
+  </div>
+</div>
+
+</div>
+<div class="footer">
+  <span>Day 14 of 65</span> &nbsp;&middot;&nbsp; Selenium + Java Automation Roadmap &nbsp;&middot;&nbsp; Phase 2 &mdash; Core Selenium &nbsp;&middot;&nbsp; <span>Next: Day 15 &mdash; XPath Deep Dive</span>
+</div>
+</body>
+</html>

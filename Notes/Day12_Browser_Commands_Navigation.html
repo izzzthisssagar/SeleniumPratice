@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 12 — Browser Commands & Navigation</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Sora:wght@400;600;700;800&display=swap');
+:root{--bg:#0d1117;--bg2:#161b22;--bg3:#1e2530;--border:#30363d;--accent:#f0a500;--accent2:#58a6ff;--accent3:#3fb950;--accent4:#ff7b72;--accent5:#d2a8ff;--text:#e6edf3;--muted:#8b949e;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);line-height:1.75;font-size:15px;}
+.hero{background:linear-gradient(135deg,#0d1117,#161b22,#1a1200);border-bottom:2px solid var(--accent);padding:48px 40px 36px;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:0;right:0;width:400px;height:400px;background:radial-gradient(circle,rgba(240,165,0,0.06),transparent 70%);pointer-events:none;}
+.hero-tag{display:inline-block;background:rgba(240,165,0,0.12);border:1px solid rgba(240,165,0,0.3);color:var(--accent);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;padding:4px 12px;border-radius:20px;margin-bottom:16px;}
+.hero h1{font-size:34px;font-weight:800;line-height:1.2;margin-bottom:10px;}
+.hero h1 span{color:var(--accent);}
+.hero-sub{color:var(--muted);font-size:14px;display:flex;gap:24px;flex-wrap:wrap;margin-top:16px;}
+.hero-sub span{display:flex;align-items:center;gap:6px;}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--accent);display:inline-block;}
+.container{max-width:980px;margin:0 auto;padding:40px 32px 80px;}
+.toc{background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:8px;padding:24px 28px;margin-bottom:48px;}
+.toc-title{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:14px;}
+.toc ol{padding-left:20px;}.toc li{margin-bottom:6px;}
+.toc a{color:var(--muted);text-decoration:none;font-size:14px;}.toc a:hover{color:var(--accent);}
+.section{margin-bottom:56px;}
+.section-header{display:flex;align-items:center;gap:14px;margin-bottom:24px;padding-bottom:14px;border-bottom:1px solid var(--border);}
+.section-num{background:var(--accent);color:#000;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:12px;width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.section h2{font-size:22px;font-weight:700;}
+h3{font-size:16px;font-weight:600;color:var(--accent);margin:28px 0 12px;display:flex;align-items:center;gap:8px;}
+h3::before{content:'▸';color:var(--accent2);font-size:12px;}
+p{color:var(--muted);margin-bottom:14px;line-height:1.8;}strong{color:var(--text);font-weight:600;}
+.code-block{background:#010409;border:1px solid var(--border);border-radius:10px;margin:20px 0;overflow:hidden;}
+.code-header{background:var(--bg2);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
+.code-lang{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent);letter-spacing:1px;text-transform:uppercase;font-weight:600;}
+.code-file{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);}
+pre{font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.85;padding:20px;overflow-x:auto;color:#e6edf3;}
+.kw{color:#ff7b72;font-weight:500;}.ty{color:#ffa657;}.st{color:#a5d6ff;}.cm{color:#6e7681;font-style:italic;}
+.nm{color:#79c0ff;}.nu{color:#79c0ff;}.fn{color:#d2a8ff;}.op{color:#ff7b72;}.bool{color:#3fb950;}
+code{font-family:'JetBrains Mono',monospace;font-size:12.5px;background:rgba(240,165,0,0.1);border:1px solid rgba(240,165,0,0.2);color:var(--accent);padding:1px 7px;border-radius:4px;}
+.callout{border-radius:8px;padding:16px 20px;margin:20px 0;display:flex;gap:14px;align-items:flex-start;}
+.callout-icon{font-size:18px;flex-shrink:0;margin-top:1px;}.callout-body{flex:1;}
+.callout-title{font-weight:700;font-size:13px;margin-bottom:4px;}.callout p{margin-bottom:0;font-size:13.5px;}
+.note{background:rgba(88,166,255,0.07);border-left:3px solid var(--accent2);}.note .callout-title{color:var(--accent2);}
+.tip{background:rgba(63,185,80,0.07);border-left:3px solid var(--accent3);}.tip .callout-title{color:var(--accent3);}
+.warn{background:rgba(240,165,0,0.07);border-left:3px solid var(--accent);}.warn .callout-title{color:var(--accent);}
+.error{background:rgba(255,123,114,0.07);border-left:3px solid var(--accent4);}.error .callout-title{color:var(--accent4);}
+.purple{background:rgba(210,168,255,0.07);border-left:3px solid var(--accent5);}.purple .callout-title{color:var(--accent5);}
+.table-wrap{overflow-x:auto;margin:20px 0;}
+table{width:100%;border-collapse:collapse;font-size:13.5px;}
+thead tr{background:var(--bg2);border-bottom:2px solid var(--accent);}
+th{padding:12px 16px;text-align:left;font-weight:700;font-size:12px;letter-spacing:0.5px;text-transform:uppercase;color:var(--accent);}
+td{padding:11px 16px;border-bottom:1px solid var(--border);color:var(--muted);}
+tr:hover td{background:rgba(255,255,255,0.02);}
+td:first-child{font-family:'JetBrains Mono',monospace;color:var(--accent2);font-size:13px;}
+.diagram-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:28px 24px;margin:24px 0;overflow:hidden;}
+.diagram-title{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:20px;text-align:center;}
+.hour-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(240,165,0,0.1);border:1px solid rgba(240,165,0,0.25);color:var(--accent);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:1px;padding:5px 14px;border-radius:20px;margin-bottom:18px;margin-top:30px;}
+.mistake-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:20px 0;}
+.mistake-card{background:rgba(255,123,114,0.05);border:1px solid rgba(255,123,114,0.2);border-radius:8px;padding:16px;}
+.mistake-card .mt{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent4);font-weight:700;margin-bottom:8px;}
+.mistake-card p{font-size:13px;margin:0;}
+.checklist{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:24px 28px;margin:24px 0;}
+.checklist-title{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent3);letter-spacing:1.5px;text-transform:uppercase;font-weight:700;margin-bottom:16px;}
+.check-item{display:flex;align-items:flex-start;gap:12px;padding:9px 0;border-bottom:1px solid rgba(48,54,61,0.5);font-size:14px;color:var(--muted);}
+.check-item:last-child{border-bottom:none;}
+.check-box{width:18px;height:18px;border:2px solid var(--accent3);border-radius:4px;flex-shrink:0;margin-top:2px;}
+.resource-list{list-style:none;padding:0;margin:12px 0;}
+.resource-list li{padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;margin-bottom:8px;font-size:13.5px;display:flex;gap:10px;align-items:center;}
+.resource-list li a{color:var(--accent2);text-decoration:none;}
+.footer{background:var(--bg2);border-top:1px solid var(--border);padding:24px 40px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);}
+.footer span{color:var(--accent);}
+::-webkit-scrollbar{width:6px;height:6px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+@media(max-width:640px){.hero{padding:32px 20px 24px;}.hero h1{font-size:24px;}.container{padding:24px 16px 60px;}}
+</style>
+</head>
+<body>
+<div class="hero">
+  <div class="hero-tag">Phase 2 &middot; Day 12 of 65</div>
+  <h1>Browser Commands <span>&amp; Navigation</span></h1>
+  <div class="hero-sub">
+    <span><span class="dot"></span>2 Hours</span>
+    <span><span class="dot"></span>Window Handles &middot; Multiple Tabs &middot; Page Load Strategy &middot; BrowserUtils &middot; Navigation Deep Dive</span>
+  </div>
+</div>
+<div class="container">
+
+<div class="toc">
+  <div class="toc-title">// Table of Contents</div>
+  <ol>
+    <li><a href="#s1">What You're Covering Today</a></li>
+    <li><a href="#s2">Browser Navigation — Full Reference</a></li>
+    <li><a href="#s3">Window Handles — Managing Multiple Tabs</a></li>
+    <li><a href="#s4">Opening &amp; Switching New Tabs</a></li>
+    <li><a href="#s5">Closing Specific Tabs</a></li>
+    <li><a href="#s6">Page Load Strategy</a></li>
+    <li><a href="#s7">JavaScript Executor — Basics</a></li>
+    <li><a href="#s8">Browser Logs</a></li>
+    <li><a href="#s9">BrowserUtils — Reusable Utility Class</a></li>
+    <li><a href="#s10">Full Script — Multi-Tab Automation</a></li>
+    <li><a href="#s11">Practice Task + Expected Output</a></li>
+    <li><a href="#s12">Common Mistakes</a></li>
+    <li><a href="#s13">End of Day Checklist + Resources</a></li>
+  </ol>
+</div>
+
+<!-- S1 -->
+<div class="section" id="s1">
+  <div class="section-header"><div class="section-num">01</div><h2>What You're Covering Today</h2></div>
+  <div class="hour-badge">&#9200; Hour 1 — Navigation &amp; Window Handles (60 mins)</div>
+  <p>Days 9–11 gave you the foundation: setup, WebDriver interface, and your first real login script. Today you go deeper into browser control — managing multiple tabs, understanding page load strategies, using JavaScript execution, and building a reusable <strong>BrowserUtils</strong> class that wraps common operations cleanly.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Topic</th><th>Why It Matters in Selenium</th></tr></thead>
+      <tbody>
+        <tr><td>Window Handles</td><td>Many apps open links in new tabs. Tests must switch tabs to interact with new content.</td></tr>
+        <tr><td>Page Load Strategy</td><td>Controls when driver.get() returns — "normal" waits for full page, "eager" returns sooner.</td></tr>
+        <tr><td>JavascriptExecutor</td><td>Click elements that Selenium can't reach normally, scroll page, read hidden properties.</td></tr>
+        <tr><td>BrowserUtils</td><td>Wrap common operations in reusable methods so all test classes share clean helper code.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- S2 -->
+<div class="section" id="s2">
+  <div class="section-header"><div class="section-num">02</div><h2>Browser Navigation — Full Reference</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">Navigation_FullRef.java</span></div>
+    <pre><span class="kw">import</span> java.time.Duration;
+
+<span class="cm">// ── URL Loading ───────────────────────────────────────────────</span>
+driver.<span class="fn">get</span>(<span class="st">"https://site.com"</span>);             <span class="cm">// loads URL, waits for page</span>
+driver.<span class="fn">navigate</span>().<span class="fn">to</span>(<span class="st">"https://site.com"</span>); <span class="cm">// same result</span>
+
+<span class="cm">// ── History ───────────────────────────────────────────────────</span>
+driver.<span class="fn">navigate</span>().<span class="fn">back</span>();      <span class="cm">// go back one page</span>
+driver.<span class="fn">navigate</span>().<span class="fn">forward</span>(); <span class="cm">// go forward one page</span>
+driver.<span class="fn">navigate</span>().<span class="fn">refresh</span>(); <span class="cm">// reload current page</span>
+
+<span class="cm">// ── Get Page Info ────────────────────────────────────────────</span>
+<span class="ty">String</span> <span class="nm">title</span>  <span class="op">=</span> driver.<span class="fn">getTitle</span>();           <span class="cm">// text in browser tab</span>
+<span class="ty">String</span> <span class="nm">url</span>    <span class="op">=</span> driver.<span class="fn">getCurrentUrl</span>();      <span class="cm">// full URL with query params</span>
+<span class="ty">String</span> <span class="nm">source</span> <span class="op">=</span> driver.<span class="fn">getPageSource</span>();     <span class="cm">// full page HTML string</span>
+
+<span class="cm">// ── Window Management ────────────────────────────────────────</span>
+driver.<span class="fn">manage</span>().<span class="fn">window</span>().<span class="fn">maximize</span>();
+driver.<span class="fn">manage</span>().<span class="fn">window</span>().<span class="fn">minimize</span>();
+driver.<span class="fn">manage</span>().<span class="fn">window</span>().<span class="fn">fullscreen</span>();
+driver.<span class="fn">manage</span>().<span class="fn">window</span>().<span class="fn">setSize</span>(<span class="kw">new</span> Dimension(<span class="nu">1920</span>, <span class="nu">1080</span>));
+
+<span class="cm">// ── Close vs Quit ─────────────────────────────────────────────</span>
+driver.<span class="fn">close</span>();  <span class="cm">// closes CURRENT TAB only — driver still running</span>
+driver.<span class="fn">quit</span>();   <span class="cm">// closes ALL TABS + kills driver process</span>
+
+<span class="cm">// ── Timeouts (reminder) ───────────────────────────────────────</span>
+driver.<span class="fn">manage</span>().<span class="fn">timeouts</span>().<span class="fn">implicitlyWait</span>(Duration.<span class="fn">ofSeconds</span>(<span class="nu">10</span>));
+driver.<span class="fn">manage</span>().<span class="fn">timeouts</span>().<span class="fn">pageLoadTimeout</span>(Duration.<span class="fn">ofSeconds</span>(<span class="nu">30</span>));</pre>
+  </div>
+</div>
+
+<!-- S3 -->
+<div class="section" id="s3">
+  <div class="section-header"><div class="section-num">03</div><h2>Window Handles — Managing Multiple Tabs</h2></div>
+  <p>Every browser tab has a unique <strong>window handle</strong> — a random string ID like <code>CDwindow-4321ABCD</code>. When a new tab opens, you must switch to it before interacting with its content. Selenium doesn't auto-switch.</p>
+
+  <div class="diagram-wrap">
+    <div class="diagram-title">// Window Handle Flow — Tab 1 opens Tab 2</div>
+    <svg viewBox="0 0 700 180" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:700px;display:block;margin:0 auto">
+      <defs><marker id="wa" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0L0,6L8,3z" fill="#f0a500"/></marker></defs>
+      <!-- Tab 1 -->
+      <rect x="10" y="20" width="200" height="110" rx="8" fill="#0d1117" stroke="#3fb950" stroke-width="2"/>
+      <rect x="10" y="20" width="200" height="26" rx="8" fill="rgba(63,185,80,0.12)"/>
+      <rect x="10" y="34" width="200" height="12" fill="rgba(63,185,80,0.12)"/>
+      <text x="110" y="36" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#3fb950" font-weight="700">TAB 1 (original)</text>
+      <text x="110" y="58" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#8b949e">handle = "CDwindow-A"</text>
+      <text x="110" y="74" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#8b949e">driver starts here</text>
+      <text x="110" y="90" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#f0a500">user clicks link →</text>
+      <text x="110" y="106" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#f0a500">opens new tab</text>
+      <text x="110" y="122" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#6e7681">driver.getWindowHandle()</text>
+
+      <!-- Arrow -->
+      <line x1="210" y1="75" x2="255" y2="75" stroke="#f0a500" stroke-width="1.5" marker-end="url(#wa)"/>
+      <text x="232" y="68" text-anchor="middle" font-family="Sora,sans-serif" font-size="8" fill="#f0a500">new tab opens</text>
+
+      <!-- Tab 2 -->
+      <rect x="255" y="20" width="200" height="110" rx="8" fill="#0d1117" stroke="#58a6ff" stroke-width="2"/>
+      <rect x="255" y="20" width="200" height="26" rx="8" fill="rgba(88,166,255,0.12)"/>
+      <rect x="255" y="34" width="200" height="12" fill="rgba(88,166,255,0.12)"/>
+      <text x="355" y="36" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#58a6ff" font-weight="700">TAB 2 (new)</text>
+      <text x="355" y="58" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#8b949e">handle = "CDwindow-B"</text>
+      <text x="355" y="74" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#ff7b72">driver NOT here yet!</text>
+      <text x="355" y="90" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#3fb950">switchTo().window("CDwindow-B")</text>
+      <text x="355" y="106" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#3fb950">NOW driver is here</text>
+      <text x="355" y="122" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#6e7681">can interact with Tab 2</text>
+
+      <!-- Code box -->
+      <rect x="490" y="10" width="200" height="155" rx="8" fill="#161b22" stroke="#30363d"/>
+      <text x="505" y="30" font-family="JetBrains Mono,monospace" font-size="9" fill="#f0a500" font-weight="700">Key methods:</text>
+      <text x="505" y="50" font-family="JetBrains Mono,monospace" font-size="9" fill="#d2a8ff">getWindowHandle()</text>
+      <text x="505" y="64" font-family="Sora,sans-serif" font-size="9" fill="#6e7681">current tab's handle</text>
+      <text x="505" y="84" font-family="JetBrains Mono,monospace" font-size="9" fill="#d2a8ff">getWindowHandles()</text>
+      <text x="505" y="98" font-family="Sora,sans-serif" font-size="9" fill="#6e7681">Set of ALL open tabs</text>
+      <text x="505" y="118" font-family="JetBrains Mono,monospace" font-size="9" fill="#d2a8ff">switchTo().window(h)</text>
+      <text x="505" y="132" font-family="Sora,sans-serif" font-size="9" fill="#6e7681">move driver to tab h</text>
+      <text x="505" y="152" font-family="Sora,sans-serif" font-size="9" fill="#ff7b72">driver.close() closes</text>
+      <text x="505" y="162" font-family="Sora,sans-serif" font-size="9" fill="#ff7b72">only current tab</text>
+    </svg>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">WindowHandles.java</span></div>
+    <pre><span class="kw">import</span> java.util.Set;
+<span class="kw">import</span> java.util.ArrayList;
+
+<span class="cm">// Get current (main) tab handle — save it to return later</span>
+<span class="ty">String</span> <span class="nm">mainTab</span> <span class="op">=</span> driver.<span class="fn">getWindowHandle</span>();
+<span class="fn">System.out.println</span>(<span class="st">"Main tab: "</span> <span class="op">+</span> mainTab);
+
+<span class="cm">// Perform action that opens new tab (e.g., click link with target="_blank")</span>
+<span class="cm">// driver.findElement(By.linkText("Click here")).click();</span>
+<span class="cm">// Or open new tab via JavaScript (see Section 4)</span>
+
+<span class="cm">// Get ALL open tab handles</span>
+Set&lt;<span class="ty">String</span>&gt; <span class="nm">allHandles</span> <span class="op">=</span> driver.<span class="fn">getWindowHandles</span>();
+<span class="fn">System.out.println</span>(<span class="st">"Total tabs: "</span> <span class="op">+</span> allHandles.<span class="fn">size</span>());
+
+<span class="cm">// Switch to NEW tab (the one that isn't the main tab)</span>
+<span class="kw">for</span> (<span class="ty">String</span> <span class="nm">handle</span> : allHandles) {
+    <span class="kw">if</span> (!handle.<span class="fn">equals</span>(mainTab)) {
+        driver.<span class="fn">switchTo</span>().<span class="fn">window</span>(handle);
+        <span class="kw">break</span>;
+    }
+}
+<span class="fn">System.out.println</span>(<span class="st">"New tab title: "</span> <span class="op">+</span> driver.<span class="fn">getTitle</span>());
+
+<span class="cm">// Do work on new tab...</span>
+<span class="cm">// driver.findElement(...).click();</span>
+
+<span class="cm">// Close new tab and go back to main tab</span>
+driver.<span class="fn">close</span>();                          <span class="cm">// close current (new) tab</span>
+driver.<span class="fn">switchTo</span>().<span class="fn">window</span>(mainTab);      <span class="cm">// switch back to main tab</span>
+<span class="fn">System.out.println</span>(<span class="st">"Back to: "</span> <span class="op">+</span> driver.<span class="fn">getTitle</span>());</pre>
+  </div>
+</div>
+
+<!-- S4 -->
+<div class="section" id="s4">
+  <div class="section-header"><div class="section-num">04</div><h2>Opening &amp; Switching New Tabs</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">OpenNewTab.java</span></div>
+    <pre><span class="cm">// Method 1: Selenium 4 native new tab (recommended)</span>
+driver.<span class="fn">switchTo</span>().<span class="fn">newWindow</span>(WindowType.TAB);
+driver.<span class="fn">get</span>(<span class="st">"https://www.google.com"</span>);
+<span class="fn">System.out.println</span>(<span class="st">"New tab: "</span> <span class="op">+</span> driver.<span class="fn">getTitle</span>());
+
+<span class="cm">// Method 2: JavaScript to open new tab (works in all Selenium versions)</span>
+((JavascriptExecutor) driver).<span class="fn">executeScript</span>(<span class="st">"window.open(arguments[0])"</span>,
+    <span class="st">"https://www.google.com"</span>);
+
+<span class="cm">// After JS open — switch to newest tab</span>
+<span class="nm">ArrayList</span>&lt;<span class="ty">String</span>&gt; <span class="nm">tabs</span> <span class="op">=</span> <span class="kw">new</span> ArrayList&lt;&gt;(driver.<span class="fn">getWindowHandles</span>());
+driver.<span class="fn">switchTo</span>().<span class="fn">window</span>(tabs.<span class="fn">get</span>(tabs.<span class="fn">size</span>() <span class="op">-</span> <span class="nu">1</span>)); <span class="cm">// last = newest</span>
+<span class="fn">System.out.println</span>(<span class="st">"Switched to: "</span> <span class="op">+</span> driver.<span class="fn">getTitle</span>());
+
+<span class="cm">// Method 3: Selenium 4 new window (separate browser window)</span>
+driver.<span class="fn">switchTo</span>().<span class="fn">newWindow</span>(WindowType.WINDOW);
+driver.<span class="fn">get</span>(<span class="st">"https://demoqa.com"</span>);
+
+<span class="cm">// Helper method — switch to tab by its title</span>
+<span class="kw">public static</span> <span class="ty">boolean</span> <span class="fn">switchToTabByTitle</span>(WebDriver <span class="nm">driver</span>, <span class="ty">String</span> <span class="nm">title</span>) {
+    <span class="kw">for</span> (<span class="ty">String</span> <span class="nm">handle</span> : driver.<span class="fn">getWindowHandles</span>()) {
+        driver.<span class="fn">switchTo</span>().<span class="fn">window</span>(handle);
+        <span class="kw">if</span> (driver.<span class="fn">getTitle</span>().<span class="fn">contains</span>(title)) {
+            <span class="kw">return</span> <span class="bool">true</span>;
+        }
+    }
+    <span class="kw">return</span> <span class="bool">false</span>;  <span class="cm">// tab not found</span>
+}</pre>
+  </div>
+</div>
+
+<!-- S5 -->
+<div class="section" id="s5">
+  <div class="section-header"><div class="section-num">05</div><h2>Closing Specific Tabs</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">CloseTabs.java</span></div>
+    <pre><span class="cm">// Scenario: 3 tabs open, close the middle one, stay on main</span>
+
+<span class="ty">String</span> <span class="nm">mainTab</span> <span class="op">=</span> driver.<span class="fn">getWindowHandle</span>();
+
+<span class="cm">// Open 2 more tabs</span>
+driver.<span class="fn">switchTo</span>().<span class="fn">newWindow</span>(WindowType.TAB);
+driver.<span class="fn">get</span>(<span class="st">"https://www.google.com"</span>);
+<span class="ty">String</span> <span class="nm">googleTab</span> <span class="op">=</span> driver.<span class="fn">getWindowHandle</span>();
+
+driver.<span class="fn">switchTo</span>().<span class="fn">newWindow</span>(WindowType.TAB);
+driver.<span class="fn">get</span>(<span class="st">"https://demoqa.com"</span>);
+
+<span class="fn">System.out.println</span>(<span class="st">"Total tabs: "</span> <span class="op">+</span> driver.<span class="fn">getWindowHandles</span>().<span class="fn">size</span>()); <span class="cm">// 3</span>
+
+<span class="cm">// Switch to Google tab and close it</span>
+driver.<span class="fn">switchTo</span>().<span class="fn">window</span>(googleTab);
+driver.<span class="fn">close</span>();  <span class="cm">// closes Google tab only</span>
+
+<span class="cm">// After closing a tab, switch to another — driver is in limbo</span>
+driver.<span class="fn">switchTo</span>().<span class="fn">window</span>(mainTab);  <span class="cm">// MUST switch after close()</span>
+<span class="fn">System.out.println</span>(<span class="st">"Total tabs now: "</span> <span class="op">+</span> driver.<span class="fn">getWindowHandles</span>().<span class="fn">size</span>()); <span class="cm">// 2</span>
+<span class="fn">System.out.println</span>(<span class="st">"Current: "</span> <span class="op">+</span> driver.<span class="fn">getTitle</span>());</pre>
+  </div>
+  <div class="callout error">
+    <span class="callout-icon">&#128680;</span>
+    <div class="callout-body">
+      <div class="callout-title">Always switchTo() after driver.close()</div>
+      <p>After <code>driver.close()</code>, the driver has no active tab. Any command throws <code>NoSuchWindowException</code>. You MUST immediately <code>driver.switchTo().window(someHandle)</code> to a surviving tab before doing anything else.</p>
+    </div>
+  </div>
+</div>
+
+<!-- S6 -->
+<div class="section" id="s6">
+  <div class="section-header"><div class="section-num">06</div><h2>Page Load Strategy</h2></div>
+  <p>Page Load Strategy controls when <code>driver.get()</code> returns after navigation. It's set via ChromeOptions and affects how fast your tests run vs how stable they are.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Strategy</th><th>When driver.get() Returns</th><th>Speed</th><th>Use When</th></tr></thead>
+      <tbody>
+        <tr><td>normal (default)</td><td>When document.readyState = "complete" (all resources loaded)</td><td>Slowest but safest</td><td>Always start with this</td></tr>
+        <tr><td>eager</td><td>When document.readyState = "interactive" (DOM ready, resources still loading)</td><td>Faster</td><td>Pages with heavy images/ads you don't need</td></tr>
+        <tr><td>none</td><td>Immediately after initial request sent</td><td>Fastest</td><td>Only if you manage all waits manually</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">PageLoadStrategy.java</span></div>
+    <pre><span class="kw">import</span> org.openqa.selenium.PageLoadStrategy;
+
+<span class="cm">// Set page load strategy via ChromeOptions</span>
+<span class="nm">ChromeOptions</span> <span class="nm">options</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">ChromeOptions</span>();
+options.<span class="fn">setPageLoadStrategy</span>(PageLoadStrategy.NORMAL);  <span class="cm">// default — use this</span>
+<span class="cm">// options.setPageLoadStrategy(PageLoadStrategy.EAGER);    // faster</span>
+<span class="cm">// options.setPageLoadStrategy(PageLoadStrategy.NONE);     // manual waits only</span>
+
+WebDriverManager.<span class="fn">chromedriver</span>().<span class="fn">setup</span>();
+WebDriver <span class="nm">driver</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">ChromeDriver</span>(options);
+
+<span class="cm">// Check current page load state via JavaScript</span>
+<span class="ty">String</span> <span class="nm">readyState</span> <span class="op">=</span> ((<span class="nm">JavascriptExecutor</span>) driver)
+    .<span class="fn">executeScript</span>(<span class="st">"return document.readyState"</span>)
+    .<span class="fn">toString</span>();
+<span class="fn">System.out.println</span>(<span class="st">"Page state: "</span> <span class="op">+</span> readyState); <span class="cm">// "complete"</span></pre>
+  </div>
+</div>
+
+<!-- S7 -->
+<div class="section" id="s7">
+  <div class="section-header"><div class="section-num">07</div><h2>JavaScript Executor — Basics</h2></div>
+  <p><code>JavascriptExecutor</code> lets you run raw JavaScript in the browser context. Use it when Selenium's standard methods can't reach an element, or when you need browser-level operations like scrolling.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">JavaScriptExecutor.java</span></div>
+    <pre><span class="kw">import</span> org.openqa.selenium.JavascriptExecutor;
+
+<span class="cm">// Cast driver to JavascriptExecutor</span>
+<span class="nm">JavascriptExecutor</span> <span class="nm">js</span> <span class="op">=</span> (<span class="nm">JavascriptExecutor</span>) driver;
+
+<span class="cm">// ── Scroll Operations ─────────────────────────────────────────</span>
+<span class="cm">// Scroll to bottom of page</span>
+js.<span class="fn">executeScript</span>(<span class="st">"window.scrollTo(0, document.body.scrollHeight)"</span>);
+
+<span class="cm">// Scroll to top</span>
+js.<span class="fn">executeScript</span>(<span class="st">"window.scrollTo(0, 0)"</span>);
+
+<span class="cm">// Scroll to specific element</span>
+WebElement <span class="nm">element</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">id</span>(<span class="st">"footer"</span>));
+js.<span class="fn">executeScript</span>(<span class="st">"arguments[0].scrollIntoView(true)"</span>, element);
+
+<span class="cm">// Scroll by pixels</span>
+js.<span class="fn">executeScript</span>(<span class="st">"window.scrollBy(0, 500)"</span>); <span class="cm">// down 500px</span>
+
+<span class="cm">// ── Click via JS (when normal click fails) ────────────────────</span>
+WebElement <span class="nm">btn</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">id</span>(<span class="st">"hiddenBtn"</span>));
+js.<span class="fn">executeScript</span>(<span class="st">"arguments[0].click()"</span>, btn);
+
+<span class="cm">// ── Type via JS ───────────────────────────────────────────────</span>
+WebElement <span class="nm">input</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">id</span>(<span class="st">"username"</span>));
+js.<span class="fn">executeScript</span>(<span class="st">"arguments[0].value = arguments[1]"</span>, input, <span class="st">"Admin"</span>);
+
+<span class="cm">// ── Read values ───────────────────────────────────────────────</span>
+<span class="ty">String</span> <span class="nm">title</span> <span class="op">=</span> (String) js.<span class="fn">executeScript</span>(<span class="st">"return document.title"</span>);
+<span class="ty">String</span> <span class="nm">url</span>   <span class="op">=</span> (String) js.<span class="fn">executeScript</span>(<span class="st">"return window.location.href"</span>);
+<span class="ty">Long</span> <span class="nm">height</span>  <span class="op">=</span> (Long)   js.<span class="fn">executeScript</span>(<span class="st">"return document.body.scrollHeight"</span>);
+
+<span class="fn">System.out.println</span>(<span class="st">"Title : "</span> <span class="op">+</span> title);
+<span class="fn">System.out.println</span>(<span class="st">"URL   : "</span> <span class="op">+</span> url);
+<span class="fn">System.out.println</span>(<span class="st">"Height: "</span> <span class="op">+</span> height);
+
+<span class="cm">// ── Highlight element (useful for debugging) ──────────────────</span>
+<span class="kw">public static void</span> <span class="fn">highlight</span>(WebDriver <span class="nm">driver</span>, WebElement <span class="nm">el</span>) {
+    (<span class="nm">JavascriptExecutor</span>) driver).<span class="fn">executeScript</span>(
+        <span class="st">"arguments[0].style.border='3px solid red'"</span>, el);
+}</pre>
+  </div>
+</div>
+
+<!-- S8 -->
+<div class="section" id="s8">
+  <div class="section-header"><div class="section-num">08</div><h2>Browser Logs</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">BrowserLogs.java</span></div>
+    <pre><span class="kw">import</span> org.openqa.selenium.logging.*;
+<span class="kw">import</span> java.util.logging.Level;
+
+<span class="cm">// Enable logging in ChromeOptions (must be done before driver creation)</span>
+<span class="nm">ChromeOptions</span> <span class="nm">options</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">ChromeOptions</span>();
+<span class="nm">LoggingPreferences</span> <span class="nm">logPrefs</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">LoggingPreferences</span>();
+logPrefs.<span class="fn">enable</span>(LogType.BROWSER, Level.ALL);
+options.<span class="fn">setCapability</span>(<span class="st">"goog:loggingPrefs"</span>, logPrefs);
+
+WebDriver <span class="nm">driver</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">ChromeDriver</span>(options);
+driver.<span class="fn">get</span>(<span class="st">"https://opensource-demo.orangehrmlive.com"</span>);
+
+<span class="cm">// Read browser console logs</span>
+LogEntries <span class="nm">logs</span> <span class="op">=</span> driver.<span class="fn">manage</span>().<span class="fn">logs</span>().<span class="fn">get</span>(LogType.BROWSER);
+<span class="fn">System.out.println</span>(<span class="st">"Browser console logs: "</span> <span class="op">+</span> logs.<span class="fn">getAll</span>().<span class="fn">size</span>());
+
+<span class="kw">for</span> (LogEntry <span class="nm">entry</span> : logs.<span class="fn">getAll</span>()) {
+    <span class="fn">System.out.printf</span>(<span class="st">"  [%s] %s%n"</span>,
+        entry.<span class="fn">getLevel</span>(), entry.<span class="fn">getMessage</span>());
+}
+
+<span class="cm">// Useful for: detecting JS errors, 404s, security warnings on page</span></pre>
+  </div>
+</div>
+
+<!-- S9 -->
+<div class="section" id="s9">
+  <div class="section-header"><div class="section-num">09</div><h2>BrowserUtils — Reusable Utility Class</h2></div>
+  <div class="hour-badge">&#9200; Hour 2 — BrowserUtils &amp; Full Script (60 mins)</div>
+  <p>Stop copy-pasting the same code in every test. Put common operations in a <code>BrowserUtils</code> class. Every test calls these one-liners instead of repeating 4–5 lines of boilerplate.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">BrowserUtils.java — utils/BrowserUtils.java</span></div>
+    <pre><span class="kw">package</span> com.qaautomation.utils;
+
+<span class="kw">import</span> org.openqa.selenium.*;
+<span class="kw">import</span> org.openqa.selenium.support.ui.*;
+<span class="kw">import</span> java.time.Duration;
+<span class="kw">import</span> java.util.*;
+
+<span class="kw">public class</span> <span class="nm">BrowserUtils</span> {
+
+    <span class="cm">// ── Navigation ────────────────────────────────────────────</span>
+    <span class="kw">public static void</span> <span class="fn">navigateTo</span>(WebDriver <span class="nm">driver</span>, <span class="ty">String</span> <span class="nm">url</span>) {
+        driver.<span class="fn">get</span>(url);
+    }
+
+    <span class="kw">public static</span> <span class="ty">String</span> <span class="fn">getTitle</span>(WebDriver <span class="nm">driver</span>) {
+        <span class="kw">return</span> driver.<span class="fn">getTitle</span>();
+    }
+
+    <span class="kw">public static</span> <span class="ty">String</span> <span class="fn">getCurrentUrl</span>(WebDriver <span class="nm">driver</span>) {
+        <span class="kw">return</span> driver.<span class="fn">getCurrentUrl</span>();
+    }
+
+    <span class="cm">// ── Tab Management ────────────────────────────────────────</span>
+    <span class="kw">public static</span> <span class="ty">String</span> <span class="fn">getMainTab</span>(WebDriver <span class="nm">driver</span>) {
+        <span class="kw">return</span> driver.<span class="fn">getWindowHandle</span>();
+    }
+
+    <span class="kw">public static void</span> <span class="fn">switchToNewTab</span>(WebDriver <span class="nm">driver</span>, <span class="ty">String</span> <span class="nm">mainTab</span>) {
+        <span class="kw">for</span> (<span class="ty">String</span> <span class="nm">h</span> : driver.<span class="fn">getWindowHandles</span>()) {
+            <span class="kw">if</span> (!h.<span class="fn">equals</span>(mainTab)) {
+                driver.<span class="fn">switchTo</span>().<span class="fn">window</span>(h);
+                <span class="kw">return</span>;
+            }
+        }
+        <span class="kw">throw</span> <span class="kw">new</span> <span class="fn">RuntimeException</span>(<span class="st">"No new tab found"</span>);
+    }
+
+    <span class="kw">public static void</span> <span class="fn">switchToTabByTitle</span>(WebDriver <span class="nm">driver</span>, <span class="ty">String</span> <span class="nm">title</span>) {
+        <span class="kw">for</span> (<span class="ty">String</span> <span class="nm">h</span> : driver.<span class="fn">getWindowHandles</span>()) {
+            driver.<span class="fn">switchTo</span>().<span class="fn">window</span>(h);
+            <span class="kw">if</span> (driver.<span class="fn">getTitle</span>().<span class="fn">contains</span>(title)) <span class="kw">return</span>;
+        }
+        <span class="kw">throw</span> <span class="kw">new</span> <span class="fn">RuntimeException</span>(<span class="st">"Tab not found: "</span> <span class="op">+</span> title);
+    }
+
+    <span class="kw">public static void</span> <span class="fn">closeCurrentAndSwitch</span>(WebDriver <span class="nm">driver</span>, <span class="ty">String</span> <span class="nm">switchTo</span>) {
+        driver.<span class="fn">close</span>();
+        driver.<span class="fn">switchTo</span>().<span class="fn">window</span>(switchTo);
+    }
+
+    <span class="cm">// ── Scroll ────────────────────────────────────────────────</span>
+    <span class="kw">public static void</span> <span class="fn">scrollToBottom</span>(WebDriver <span class="nm">driver</span>) {
+        ((<span class="nm">JavascriptExecutor</span>) driver)
+            .<span class="fn">executeScript</span>(<span class="st">"window.scrollTo(0, document.body.scrollHeight)"</span>);
+    }
+
+    <span class="kw">public static void</span> <span class="fn">scrollToTop</span>(WebDriver <span class="nm">driver</span>) {
+        ((<span class="nm">JavascriptExecutor</span>) driver).<span class="fn">executeScript</span>(<span class="st">"window.scrollTo(0, 0)"</span>);
+    }
+
+    <span class="kw">public static void</span> <span class="fn">scrollToElement</span>(WebDriver <span class="nm">driver</span>, WebElement <span class="nm">el</span>) {
+        ((<span class="nm">JavascriptExecutor</span>) driver)
+            .<span class="fn">executeScript</span>(<span class="st">"arguments[0].scrollIntoView(true)"</span>, el);
+    }
+
+    <span class="cm">// ── Page State ────────────────────────────────────────────</span>
+    <span class="kw">public static</span> <span class="ty">boolean</span> <span class="fn">isPageLoaded</span>(WebDriver <span class="nm">driver</span>) {
+        <span class="kw">return</span> ((<span class="nm">JavascriptExecutor</span>) driver)
+            .<span class="fn">executeScript</span>(<span class="st">"return document.readyState"</span>)
+            .<span class="fn">equals</span>(<span class="st">"complete"</span>);
+    }
+
+    <span class="kw">public static</span> <span class="ty">boolean</span> <span class="fn">urlContains</span>(WebDriver <span class="nm">driver</span>, <span class="ty">String</span> <span class="nm">text</span>) {
+        <span class="kw">return</span> driver.<span class="fn">getCurrentUrl</span>().<span class="fn">contains</span>(text);
+    }
+
+    <span class="kw">public static</span> <span class="ty">boolean</span> <span class="fn">titleEquals</span>(WebDriver <span class="nm">driver</span>, <span class="ty">String</span> <span class="nm">expected</span>) {
+        <span class="kw">return</span> driver.<span class="fn">getTitle</span>().<span class="fn">equals</span>(expected);
+    }
+
+    <span class="cm">// ── Sleep (temporary — remove after Day 20) ───────────────</span>
+    <span class="kw">public static void</span> <span class="fn">pause</span>(<span class="ty">int</span> <span class="nm">ms</span>) {
+        <span class="kw">try</span> { Thread.<span class="fn">sleep</span>(ms); }
+        <span class="kw">catch</span> (InterruptedException <span class="nm">e</span>) { Thread.<span class="fn">currentThread</span>().<span class="fn">interrupt</span>(); }
+    }
+}</pre>
+  </div>
+</div>
+
+<!-- S10 -->
+<div class="section" id="s10">
+  <div class="section-header"><div class="section-num">10</div><h2>Full Script — Multi-Tab Automation</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">MultiTabTest.java</span></div>
+    <pre><span class="kw">package</span> com.qaautomation.tests;
+
+<span class="kw">import</span> com.qaautomation.utils.BrowserUtils;
+<span class="kw">import</span> com.qaautomation.utils.DriverFactory;
+<span class="kw">import</span> org.openqa.selenium.*;
+
+<span class="kw">public class</span> <span class="nm">MultiTabTest</span> {
+
+    <span class="kw">public static void</span> <span class="fn">main</span>(<span class="ty">String</span>[] args) {
+
+        WebDriver <span class="nm">driver</span> <span class="op">=</span> DriverFactory.<span class="fn">getDriver</span>(<span class="st">"chrome"</span>);
+
+        <span class="kw">try</span> {
+            <span class="cm">// ── Tab 1: OrangeHRM ─────────────────────────────────</span>
+            driver.<span class="fn">get</span>(<span class="st">"https://opensource-demo.orangehrmlive.com"</span>);
+            <span class="ty">String</span> <span class="nm">mainTab</span> <span class="op">=</span> BrowserUtils.<span class="fn">getMainTab</span>(driver);
+            <span class="fn">System.out.println</span>(<span class="st">"[Tab1] Title: "</span> <span class="op">+</span> driver.<span class="fn">getTitle</span>());
+
+            <span class="cm">// ── Open Tab 2: Selenium website ─────────────────────</span>
+            driver.<span class="fn">switchTo</span>().<span class="fn">newWindow</span>(WindowType.TAB);
+            driver.<span class="fn">get</span>(<span class="st">"https://www.selenium.dev"</span>);
+            <span class="ty">String</span> <span class="nm">tab2</span> <span class="op">=</span> driver.<span class="fn">getWindowHandle</span>();
+            <span class="fn">System.out.println</span>(<span class="st">"[Tab2] Title: "</span> <span class="op">+</span> driver.<span class="fn">getTitle</span>());
+
+            <span class="cm">// ── Open Tab 3: DemoQA ────────────────────────────────</span>
+            driver.<span class="fn">switchTo</span>().<span class="fn">newWindow</span>(WindowType.TAB);
+            driver.<span class="fn">get</span>(<span class="st">"https://demoqa.com"</span>);
+            <span class="fn">System.out.println</span>(<span class="st">"[Tab3] Title: "</span> <span class="op">+</span> driver.<span class="fn">getTitle</span>());
+
+            <span class="cm">// ── Print all open tabs ───────────────────────────────</span>
+            <span class="fn">System.out.println</span>(<span class="st">"\nAll open tabs: "</span> <span class="op">+</span> driver.<span class="fn">getWindowHandles</span>().<span class="fn">size</span>());
+
+            <span class="cm">// ── Switch back to Tab 1 ─────────────────────────────</span>
+            driver.<span class="fn">switchTo</span>().<span class="fn">window</span>(mainTab);
+            <span class="fn">System.out.println</span>(<span class="st">"\nBack to Tab1: "</span> <span class="op">+</span> driver.<span class="fn">getTitle</span>());
+
+            <span class="cm">// ── Close Tab 2 ───────────────────────────────────────</span>
+            driver.<span class="fn">switchTo</span>().<span class="fn">window</span>(tab2);
+            <span class="fn">System.out.println</span>(<span class="st">"Closing Tab2: "</span> <span class="op">+</span> driver.<span class="fn">getTitle</span>());
+            BrowserUtils.<span class="fn">closeCurrentAndSwitch</span>(driver, mainTab);
+
+            <span class="fn">System.out.println</span>(<span class="st">"Tabs remaining: "</span> <span class="op">+</span> driver.<span class="fn">getWindowHandles</span>().<span class="fn">size</span>());
+            <span class="fn">System.out.println</span>(<span class="st">"Current tab: "</span> <span class="op">+</span> driver.<span class="fn">getTitle</span>());
+
+            <span class="cm">// ── Scroll on current page ────────────────────────────</span>
+            BrowserUtils.<span class="fn">scrollToBottom</span>(driver);
+            BrowserUtils.<span class="fn">pause</span>(<span class="nu">500</span>);
+            BrowserUtils.<span class="fn">scrollToTop</span>(driver);
+            <span class="fn">System.out.println</span>(<span class="st">"Scrolled down and back up"</span>);
+
+            <span class="cm">// ── Page state check ──────────────────────────────────</span>
+            <span class="fn">System.out.println</span>(<span class="st">"Page loaded: "</span> <span class="op">+</span> BrowserUtils.<span class="fn">isPageLoaded</span>(driver));
+            <span class="fn">System.out.println</span>(<span class="st">"URL check  : "</span> <span class="op">+</span> BrowserUtils.<span class="fn">urlContains</span>(driver, <span class="st">"orangehrm"</span>));
+
+        } <span class="kw">catch</span> (Exception <span class="nm">e</span>) {
+            <span class="fn">System.out.println</span>(<span class="st">"Error: "</span> <span class="op">+</span> e.<span class="fn">getMessage</span>());
+        } <span class="kw">finally</span> {
+            driver.<span class="fn">quit</span>();
+            <span class="fn">System.out.println</span>(<span class="st">"Browser closed ✓"</span>);
+        }
+    }
+}</pre>
+  </div>
+  <h3>Expected Output</h3>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Output</span><span class="code-file">Console</span></div>
+    <pre>[Tab1] Title: OrangeHRM
+[Tab2] Title: Selenium
+[Tab3] Title: DEMOQA
+
+All open tabs: 3
+Back to Tab1: OrangeHRM
+Closing Tab2: Selenium
+Tabs remaining: 2
+Current tab: OrangeHRM
+Scrolled down and back up
+Page loaded: true
+URL check  : true
+Browser closed ✓</pre>
+  </div>
+</div>
+
+<!-- S11 -->
+<div class="section" id="s11">
+  <div class="section-header"><div class="section-num">11</div><h2>Practice Task + Expected Output</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">Day12Practice.java</span></div>
+    <pre><span class="kw">package</span> com.qaautomation.tests;
+
+<span class="kw">import</span> com.qaautomation.utils.*;
+<span class="kw">import</span> org.openqa.selenium.*;
+<span class="kw">import java.util.*;
+
+<span class="kw">public class</span> <span class="nm">Day12Practice</span> {
+
+    <span class="kw">public static void</span> <span class="fn">main</span>(<span class="ty">String</span>[] args) {
+
+        WebDriver <span class="nm">driver</span> <span class="op">=</span> DriverFactory.<span class="fn">getDriver</span>(<span class="st">"chrome"</span>);
+        <span class="ty">String</span> <span class="nm">mainTab</span> <span class="op">=</span> BrowserUtils.<span class="fn">getMainTab</span>(driver);
+
+        <span class="kw">try</span> {
+            <span class="cm">// Task 1: Navigation history</span>
+            <span class="fn">System.out.println</span>(<span class="st">"====== TASK 1: Navigation ======"</span>);
+            driver.<span class="fn">get</span>(<span class="st">"https://opensource-demo.orangehrmlive.com"</span>);
+            <span class="fn">System.out.println</span>(<span class="st">"  1: "</span> <span class="op">+</span> driver.<span class="fn">getTitle</span>());
+            driver.<span class="fn">navigate</span>().<span class="fn">to</span>(<span class="st">"https://www.selenium.dev"</span>);
+            <span class="fn">System.out.println</span>(<span class="st">"  2: "</span> <span class="op">+</span> driver.<span class="fn">getTitle</span>());
+            driver.<span class="fn">navigate</span>().<span class="fn">back</span>();
+            <span class="fn">System.out.println</span>(<span class="st">"  Back: "</span> <span class="op">+</span> driver.<span class="fn">getTitle</span>());
+            driver.<span class="fn">navigate</span>().<span class="fn">forward</span>();
+            <span class="fn">System.out.println</span>(<span class="st">"  Fwd: "</span> <span class="op">+</span> driver.<span class="fn">getTitle</span>());
+            driver.<span class="fn">navigate</span>().<span class="fn">refresh</span>();
+            <span class="fn">System.out.println</span>(<span class="st">"  Refresh: OK"</span>);
+
+            <span class="cm">// Task 2: Multi-tab</span>
+            <span class="fn">System.out.println</span>(<span class="st">"\n====== TASK 2: Multi-Tab ======"</span>);
+            driver.<span class="fn">switchTo</span>().<span class="fn">newWindow</span>(WindowType.TAB);
+            driver.<span class="fn">get</span>(<span class="st">"https://demoqa.com"</span>);
+            <span class="fn">System.out.println</span>(<span class="st">"  New tab: "</span> <span class="op">+</span> driver.<span class="fn">getTitle</span>());
+            <span class="fn">System.out.println</span>(<span class="st">"  Total  : "</span> <span class="op">+</span> driver.<span class="fn">getWindowHandles</span>().<span class="fn">size</span>());
+            BrowserUtils.<span class="fn">closeCurrentAndSwitch</span>(driver, mainTab);
+            <span class="fn">System.out.println</span>(<span class="st">"  Back to: "</span> <span class="op">+</span> driver.<span class="fn">getTitle</span>());
+
+            <span class="cm">// Task 3: JS executor</span>
+            <span class="fn">System.out.println</span>(<span class="st">"\n====== TASK 3: JS Executor ======"</span>);
+            driver.<span class="fn">get</span>(<span class="st">"https://opensource-demo.orangehrmlive.com"</span>);
+            JavascriptExecutor <span class="nm">js</span> <span class="op">=</span> (JavascriptExecutor) driver;
+            <span class="ty">String</span> <span class="nm">state</span> <span class="op">=</span> js.<span class="fn">executeScript</span>(<span class="st">"return document.readyState"</span>).<span class="fn">toString</span>();
+            <span class="ty">String</span> <span class="nm">jsTitle</span> <span class="op">=</span> js.<span class="fn">executeScript</span>(<span class="st">"return document.title"</span>).<span class="fn">toString</span>();
+            <span class="fn">System.out.println</span>(<span class="st">"  readyState: "</span> <span class="op">+</span> state);
+            <span class="fn">System.out.println</span>(<span class="st">"  JS title  : "</span> <span class="op">+</span> jsTitle);
+            js.<span class="fn">executeScript</span>(<span class="st">"window.scrollTo(0, 300)"</span>);
+            <span class="fn">System.out.println</span>(<span class="st">"  Scrolled 300px down"</span>);
+
+            <span class="cm">// Task 4: Page assertions using BrowserUtils</span>
+            <span class="fn">System.out.println</span>(<span class="st">"\n====== TASK 4: Assertions ======"</span>);
+            <span class="fn">System.out.println</span>(<span class="st">"  titleEquals OrangeHRM: "</span> <span class="op">+</span> BrowserUtils.<span class="fn">titleEquals</span>(driver, <span class="st">"OrangeHRM"</span>));
+            <span class="fn">System.out.println</span>(<span class="st">"  URL has 'login'      : "</span> <span class="op">+</span> BrowserUtils.<span class="fn">urlContains</span>(driver, <span class="st">"login"</span>));
+            <span class="fn">System.out.println</span>(<span class="st">"  Page fully loaded    : "</span> <span class="op">+</span> BrowserUtils.<span class="fn">isPageLoaded</span>(driver));
+
+        } <span class="kw">catch</span> (Exception <span class="nm">e</span>) {
+            <span class="fn">System.out.println</span>(<span class="st">"Error: "</span> <span class="op">+</span> e.<span class="fn">getMessage</span>());
+        } <span class="kw">finally</span> {
+            driver.<span class="fn">quit</span>();
+            <span class="fn">System.out.println</span>(<span class="st">"\nBrowser closed ✓"</span>);
+        }
+    }
+}</pre>
+  </div>
+  <h3>Expected Output</h3>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Output</span><span class="code-file">Console</span></div>
+    <pre>====== TASK 1: Navigation ======
+  1: OrangeHRM
+  2: Selenium
+  Back: OrangeHRM
+  Fwd: Selenium
+  Refresh: OK
+
+====== TASK 2: Multi-Tab ======
+  New tab: DEMOQA
+  Total  : 2
+  Back to: Selenium
+
+====== TASK 3: JS Executor ======
+  readyState: complete
+  JS title  : Selenium
+  Scrolled 300px down
+
+====== TASK 4: Assertions ======
+  titleEquals OrangeHRM: false
+  URL has 'login'      : false
+  Page fully loaded    : true
+
+Browser closed ✓</pre>
+  </div>
+  <div class="callout note">
+    <span class="callout-icon">&#128204;</span>
+    <div class="callout-body">
+      <div class="callout-title">Note on Task 4 output</div>
+      <p>The assertions in Task 4 run against the current page (which is Selenium.dev after Task 2 navigation). So titleEquals("OrangeHRM") = false and urlContains("login") = false. That's correct and expected. This is real assertion behavior — you must be on the right page when you assert.</p>
+    </div>
+  </div>
+</div>
+
+<!-- S12 -->
+<div class="section" id="s12">
+  <div class="section-header"><div class="section-num">12</div><h2>Common Mistakes</h2></div>
+  <div class="mistake-grid">
+    <div class="mistake-card"><div class="mt">&#10060; Not saving mainTab handle</div><p>Opening a new tab without saving the original handle means you can't get back. Always <code>String mainTab = driver.getWindowHandle()</code> before opening new tabs.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; No switchTo after driver.close()</div><p>After closing any tab with <code>close()</code>, driver is in limbo. Immediately call <code>driver.switchTo().window(someHandle)</code> or next command throws NoSuchWindowException.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; WindowType import missing</div><p><code>WindowType.TAB</code> is in <code>org.openqa.selenium.WindowType</code>. If IntelliJ can't resolve it, make sure selenium-java version is 4.x (not 3.x) in pom.xml.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; JS executeScript returns Object, not String</div><p><code>executeScript</code> returns <code>Object</code>. Always cast: <code>(String) js.executeScript(...)</code> or call <code>.toString()</code> on the result. Null check if element might not exist.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; getWindowHandles() Set has no order</div><p><code>getWindowHandles()</code> returns a <code>Set</code> which has no guaranteed order. To get "newest" tab, convert to List and take last element, or loop and find the one that isn't mainTab.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; scrollIntoView before element loads</div><p>Calling scrollToElement() before the element exists throws NoSuchElementException. Always find the element successfully before scrolling to it.</p></div>
+  </div>
+</div>
+
+<!-- S13 -->
+<div class="section" id="s13">
+  <div class="section-header"><div class="section-num">13</div><h2>End of Day Checklist + Resources</h2></div>
+  <div class="checklist">
+    <div class="checklist-title">&#10022; End of Day 12 Checklist</div>
+    <div class="check-item"><div class="check-box"></div>I understand window handles — every tab has a unique String ID</div>
+    <div class="check-item"><div class="check-box"></div>I can save mainTab handle and switch back to it after new tab operations</div>
+    <div class="check-item"><div class="check-box"></div>I know driver.close() closes current tab only, driver.quit() closes all</div>
+    <div class="check-item"><div class="check-box"></div>I always switchTo() after close() — never leave driver in limbo</div>
+    <div class="check-item"><div class="check-box"></div>I can open new tabs with driver.switchTo().newWindow(WindowType.TAB)</div>
+    <div class="check-item"><div class="check-box"></div>I know the 3 page load strategies: normal, eager, none</div>
+    <div class="check-item"><div class="check-box"></div>I can use JavascriptExecutor for scroll, click, and reading page properties</div>
+    <div class="check-item"><div class="check-box"></div>BrowserUtils.java created in utils package with all helper methods</div>
+    <div class="check-item"><div class="check-box"></div>Practice task runs — all 4 sections correct</div>
+  </div>
+  <h3>Resources</h3>
+  <ul class="resource-list">
+    <li><span>&#128214;</span><strong>Selenium Docs:&nbsp;</strong><a href="https://www.selenium.dev/documentation/webdriver/interactions/windows/" target="_blank">Selenium — Windows and Tabs</a> &nbsp;<span style="color:var(--muted);font-size:12px">Official docs on window handles, new tab/window, switching.</span></li>
+    <li><span>&#128214;</span><strong>Selenium Docs:&nbsp;</strong><a href="https://www.selenium.dev/documentation/webdriver/interactions/windows/#create-new-window-or-new-tab-and-switch" target="_blank">Selenium — New Window/Tab (Selenium 4)</a> &nbsp;<span style="color:var(--muted);font-size:12px">WindowType.TAB and WindowType.WINDOW explained.</span></li>
+  </ul>
+  <div class="callout tip">
+    <span class="callout-icon">&#128640;</span>
+    <div class="callout-body">
+      <div class="callout-title">Day 13 Preview — WebDriver Interface &amp; Browser Commands</div>
+      <p>Tomorrow: <strong>Browser Commands Deep Dive</strong> — managing cookies in full detail, handling SSL certificate errors, configuring proxy settings, and handling browser dialogs (before Day 21's dedicated Alerts section). Plus revisiting the complete WebDriver method table with examples of every single method.</p>
+    </div>
+  </div>
+</div>
+
+</div>
+<div class="footer">
+  <span>Day 12 of 65</span> &nbsp;&middot;&nbsp; Selenium + Java Automation Roadmap &nbsp;&middot;&nbsp; Phase 2 &mdash; Core Selenium &nbsp;&middot;&nbsp; <span>Next: Day 13 &mdash; Browser Commands Deep Dive</span>
+</div>
+</body>
+</html>

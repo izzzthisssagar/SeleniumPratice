@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 13 — Browser Commands Deep Dive</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Sora:wght@400;600;700;800&display=swap');
+:root{--bg:#0d1117;--bg2:#161b22;--bg3:#1e2530;--border:#30363d;--accent:#f0a500;--accent2:#58a6ff;--accent3:#3fb950;--accent4:#ff7b72;--accent5:#d2a8ff;--text:#e6edf3;--muted:#8b949e;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);line-height:1.75;font-size:15px;}
+.hero{background:linear-gradient(135deg,#0d1117,#161b22,#150d1a);border-bottom:2px solid var(--accent5);padding:48px 40px 36px;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:0;right:0;width:400px;height:400px;background:radial-gradient(circle,rgba(210,168,255,0.06),transparent 70%);pointer-events:none;}
+.hero-tag{display:inline-block;background:rgba(210,168,255,0.12);border:1px solid rgba(210,168,255,0.3);color:var(--accent5);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;padding:4px 12px;border-radius:20px;margin-bottom:16px;}
+.hero h1{font-size:34px;font-weight:800;line-height:1.2;margin-bottom:10px;}
+.hero h1 span{color:var(--accent5);}
+.hero-sub{color:var(--muted);font-size:14px;display:flex;gap:24px;flex-wrap:wrap;margin-top:16px;}
+.hero-sub span{display:flex;align-items:center;gap:6px;}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--accent5);display:inline-block;}
+.container{max-width:980px;margin:0 auto;padding:40px 32px 80px;}
+.toc{background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--accent5);border-radius:8px;padding:24px 28px;margin-bottom:48px;}
+.toc-title{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--accent5);margin-bottom:14px;}
+.toc ol{padding-left:20px;}.toc li{margin-bottom:6px;}
+.toc a{color:var(--muted);text-decoration:none;font-size:14px;}.toc a:hover{color:var(--accent5);}
+.section{margin-bottom:56px;}
+.section-header{display:flex;align-items:center;gap:14px;margin-bottom:24px;padding-bottom:14px;border-bottom:1px solid var(--border);}
+.section-num{background:var(--accent5);color:#000;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:12px;width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.section h2{font-size:22px;font-weight:700;}
+h3{font-size:16px;font-weight:600;color:var(--accent5);margin:28px 0 12px;display:flex;align-items:center;gap:8px;}
+h3::before{content:'▸';color:var(--accent);font-size:12px;}
+p{color:var(--muted);margin-bottom:14px;line-height:1.8;}strong{color:var(--text);font-weight:600;}
+.code-block{background:#010409;border:1px solid var(--border);border-radius:10px;margin:20px 0;overflow:hidden;}
+.code-header{background:var(--bg2);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
+.code-lang{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent5);letter-spacing:1px;text-transform:uppercase;font-weight:600;}
+.code-file{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);}
+pre{font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.85;padding:20px;overflow-x:auto;color:#e6edf3;}
+.kw{color:#ff7b72;font-weight:500;}.ty{color:#ffa657;}.st{color:#a5d6ff;}.cm{color:#6e7681;font-style:italic;}
+.nm{color:#79c0ff;}.nu{color:#79c0ff;}.fn{color:#d2a8ff;}.op{color:#ff7b72;}.bool{color:#3fb950;}
+code{font-family:'JetBrains Mono',monospace;font-size:12.5px;background:rgba(210,168,255,0.1);border:1px solid rgba(210,168,255,0.2);color:var(--accent5);padding:1px 7px;border-radius:4px;}
+.callout{border-radius:8px;padding:16px 20px;margin:20px 0;display:flex;gap:14px;align-items:flex-start;}
+.callout-icon{font-size:18px;flex-shrink:0;margin-top:1px;}.callout-body{flex:1;}
+.callout-title{font-weight:700;font-size:13px;margin-bottom:4px;}.callout p{margin-bottom:0;font-size:13.5px;}
+.note{background:rgba(88,166,255,0.07);border-left:3px solid var(--accent2);}.note .callout-title{color:var(--accent2);}
+.tip{background:rgba(63,185,80,0.07);border-left:3px solid var(--accent3);}.tip .callout-title{color:var(--accent3);}
+.warn{background:rgba(240,165,0,0.07);border-left:3px solid var(--accent);}.warn .callout-title{color:var(--accent);}
+.error{background:rgba(255,123,114,0.07);border-left:3px solid var(--accent4);}.error .callout-title{color:var(--accent4);}
+.purple{background:rgba(210,168,255,0.07);border-left:3px solid var(--accent5);}.purple .callout-title{color:var(--accent5);}
+.table-wrap{overflow-x:auto;margin:20px 0;}
+table{width:100%;border-collapse:collapse;font-size:13.5px;}
+thead tr{background:var(--bg2);border-bottom:2px solid var(--accent5);}
+th{padding:12px 16px;text-align:left;font-weight:700;font-size:12px;letter-spacing:0.5px;text-transform:uppercase;color:var(--accent5);}
+td{padding:11px 16px;border-bottom:1px solid var(--border);color:var(--muted);}
+tr:hover td{background:rgba(255,255,255,0.02);}
+td:first-child{font-family:'JetBrains Mono',monospace;color:var(--accent2);font-size:13px;}
+.diagram-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:28px 24px;margin:24px 0;overflow:hidden;}
+.diagram-title{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:20px;text-align:center;}
+.hour-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(210,168,255,0.1);border:1px solid rgba(210,168,255,0.25);color:var(--accent5);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:1px;padding:5px 14px;border-radius:20px;margin-bottom:18px;margin-top:30px;}
+.mistake-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:20px 0;}
+.mistake-card{background:rgba(255,123,114,0.05);border:1px solid rgba(255,123,114,0.2);border-radius:8px;padding:16px;}
+.mistake-card .mt{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent4);font-weight:700;margin-bottom:8px;}
+.mistake-card p{font-size:13px;margin:0;}
+.checklist{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:24px 28px;margin:24px 0;}
+.checklist-title{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent3);letter-spacing:1.5px;text-transform:uppercase;font-weight:700;margin-bottom:16px;}
+.check-item{display:flex;align-items:flex-start;gap:12px;padding:9px 0;border-bottom:1px solid rgba(48,54,61,0.5);font-size:14px;color:var(--muted);}
+.check-item:last-child{border-bottom:none;}
+.check-box{width:18px;height:18px;border:2px solid var(--accent3);border-radius:4px;flex-shrink:0;margin-top:2px;}
+.resource-list{list-style:none;padding:0;margin:12px 0;}
+.resource-list li{padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;margin-bottom:8px;font-size:13.5px;display:flex;gap:10px;align-items:center;}
+.resource-list li a{color:var(--accent2);text-decoration:none;}
+.footer{background:var(--bg2);border-top:1px solid var(--border);padding:24px 40px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);}
+.footer span{color:var(--accent5);}
+::-webkit-scrollbar{width:6px;height:6px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+@media(max-width:640px){.hero{padding:32px 20px 24px;}.hero h1{font-size:24px;}.container{padding:24px 16px 60px;}}
+</style>
+</head>
+<body>
+<div class="hero">
+  <div class="hero-tag">Phase 2 &middot; Day 13 of 65</div>
+  <h1>Browser Commands <span>Deep Dive</span></h1>
+  <div class="hero-sub">
+    <span><span class="dot"></span>2 Hours</span>
+    <span><span class="dot"></span>SSL Certificates &middot; Proxy &middot; Browser Dialogs &middot; Full WebDriver Reference &middot; ScreenshotUtils</span>
+  </div>
+</div>
+<div class="container">
+
+<div class="toc">
+  <div class="toc-title">// Table of Contents</div>
+  <ol>
+    <li><a href="#s1">Complete WebDriver Method Reference</a></li>
+    <li><a href="#s2">Handling SSL Certificate Errors</a></li>
+    <li><a href="#s3">Proxy Configuration</a></li>
+    <li><a href="#s4">Browser Dialog Handling (Basic)</a></li>
+    <li><a href="#s5">Advanced Cookie Operations</a></li>
+    <li><a href="#s6">Advanced JavascriptExecutor</a></li>
+    <li><a href="#s7">ScreenshotUtils — Full Implementation</a></li>
+    <li><a href="#s8">ConfigReader — Reading from Properties File</a></li>
+    <li><a href="#s9">Complete Utility Layer Summary</a></li>
+    <li><a href="#s10">Practice Task + Expected Output</a></li>
+    <li><a href="#s11">Common Mistakes</a></li>
+    <li><a href="#s12">End of Day Checklist + Resources</a></li>
+  </ol>
+</div>
+
+<!-- S1 -->
+<div class="section" id="s1">
+  <div class="section-header"><div class="section-num">01</div><h2>Complete WebDriver Method Reference</h2></div>
+  <div class="hour-badge">&#9200; Hour 1 — Advanced Browser Control (60 mins)</div>
+  <p>This is the complete reference for everything available on the <code>driver</code> object. Bookmark it — you'll refer to this constantly through Phase 2 and 3.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Category</th><th>Method</th><th>Returns</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>Navigation</td><td>driver.get(url)</td><td>void</td><td>Load URL, wait for page</td></tr>
+        <tr><td>Navigation</td><td>driver.navigate().to(url)</td><td>void</td><td>Same as get()</td></tr>
+        <tr><td>Navigation</td><td>driver.navigate().back()</td><td>void</td><td>Browser back</td></tr>
+        <tr><td>Navigation</td><td>driver.navigate().forward()</td><td>void</td><td>Browser forward</td></tr>
+        <tr><td>Navigation</td><td>driver.navigate().refresh()</td><td>void</td><td>Reload page</td></tr>
+        <tr><td>Page Info</td><td>driver.getTitle()</td><td>String</td><td>Tab title text</td></tr>
+        <tr><td>Page Info</td><td>driver.getCurrentUrl()</td><td>String</td><td>Full current URL</td></tr>
+        <tr><td>Page Info</td><td>driver.getPageSource()</td><td>String</td><td>Full HTML of page</td></tr>
+        <tr><td>Elements</td><td>driver.findElement(By)</td><td>WebElement</td><td>First match or exception</td></tr>
+        <tr><td>Elements</td><td>driver.findElements(By)</td><td>List&lt;WebElement&gt;</td><td>All matches or empty list</td></tr>
+        <tr><td>Window</td><td>driver.getWindowHandle()</td><td>String</td><td>Current tab handle</td></tr>
+        <tr><td>Window</td><td>driver.getWindowHandles()</td><td>Set&lt;String&gt;</td><td>All tab handles</td></tr>
+        <tr><td>Window</td><td>driver.manage().window().maximize()</td><td>void</td><td>Maximize window</td></tr>
+        <tr><td>Window</td><td>driver.manage().window().setSize(Dim)</td><td>void</td><td>Set exact size</td></tr>
+        <tr><td>Switch</td><td>driver.switchTo().window(handle)</td><td>WebDriver</td><td>Switch to tab</td></tr>
+        <tr><td>Switch</td><td>driver.switchTo().newWindow(type)</td><td>WebDriver</td><td>Open new tab/window</td></tr>
+        <tr><td>Switch</td><td>driver.switchTo().alert()</td><td>Alert</td><td>Switch to alert (Day 21)</td></tr>
+        <tr><td>Switch</td><td>driver.switchTo().frame(name)</td><td>WebDriver</td><td>Switch to iframe (Day 23)</td></tr>
+        <tr><td>Switch</td><td>driver.switchTo().defaultContent()</td><td>WebDriver</td><td>Exit iframe back to main</td></tr>
+        <tr><td>Cookies</td><td>driver.manage().getCookies()</td><td>Set&lt;Cookie&gt;</td><td>All cookies</td></tr>
+        <tr><td>Cookies</td><td>driver.manage().getCookieNamed(n)</td><td>Cookie</td><td>Cookie by name</td></tr>
+        <tr><td>Cookies</td><td>driver.manage().addCookie(c)</td><td>void</td><td>Add cookie</td></tr>
+        <tr><td>Cookies</td><td>driver.manage().deleteCookieNamed(n)</td><td>void</td><td>Delete one cookie</td></tr>
+        <tr><td>Cookies</td><td>driver.manage().deleteAllCookies()</td><td>void</td><td>Clear all cookies</td></tr>
+        <tr><td>Timeouts</td><td>driver.manage().timeouts().implicitlyWait(d)</td><td>void</td><td>Global element wait</td></tr>
+        <tr><td>Timeouts</td><td>driver.manage().timeouts().pageLoadTimeout(d)</td><td>void</td><td>Max page load time</td></tr>
+        <tr><td>Close</td><td>driver.close()</td><td>void</td><td>Close current tab</td></tr>
+        <tr><td>Close</td><td>driver.quit()</td><td>void</td><td>Close all + kill driver</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- S2 -->
+<div class="section" id="s2">
+  <div class="section-header"><div class="section-num">02</div><h2>Handling SSL Certificate Errors</h2></div>
+  <p>Test environments often use self-signed SSL certificates that Chrome blocks with "Your connection is not private" error. Tell ChromeDriver to accept insecure certificates before creating the driver.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">SSLCertificate.java</span></div>
+    <pre><span class="kw">import</span> org.openqa.selenium.chrome.ChromeOptions;
+
+<span class="cm">// Method 1: Accept insecure certs via ChromeOptions (recommended)</span>
+<span class="nm">ChromeOptions</span> <span class="nm">options</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">ChromeOptions</span>();
+options.<span class="fn">setAcceptInsecureCerts</span>(<span class="bool">true</span>);  <span class="cm">// accept self-signed certs</span>
+
+WebDriverManager.<span class="fn">chromedriver</span>().<span class="fn">setup</span>();
+WebDriver <span class="nm">driver</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">ChromeDriver</span>(options);
+
+<span class="cm">// Method 2: Via command-line args (alternative)</span>
+options.<span class="fn">addArguments</span>(<span class="st">"--ignore-certificate-errors"</span>);
+options.<span class="fn">addArguments</span>(<span class="st">"--allow-insecure-localhost"</span>);
+
+<span class="cm">// Add to DriverFactory in the chrome case:</span>
+<span class="kw">case</span> <span class="st">"chrome"</span>:
+    WebDriverManager.<span class="fn">chromedriver</span>().<span class="fn">setup</span>();
+    <span class="nm">ChromeOptions</span> <span class="nm">chromeOpts</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">ChromeOptions</span>();
+    chromeOpts.<span class="fn">setAcceptInsecureCerts</span>(<span class="bool">true</span>);
+    chromeOpts.<span class="fn">addArguments</span>(<span class="st">"--disable-notifications"</span>);
+    chromeOpts.<span class="fn">addArguments</span>(<span class="st">"--disable-infobars"</span>);
+    driver <span class="op">=</span> <span class="kw">new</span> <span class="fn">ChromeDriver</span>(chromeOpts);
+    <span class="kw">break</span>;</pre>
+  </div>
+</div>
+
+<!-- S3 -->
+<div class="section" id="s3">
+  <div class="section-header"><div class="section-num">03</div><h2>Proxy Configuration</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">ProxyConfig.java</span></div>
+    <pre><span class="kw">import</span> org.openqa.selenium.Proxy;
+
+<span class="cm">// Configure proxy (corporate networks, testing through Fiddler/Charles)</span>
+<span class="nm">Proxy</span> <span class="nm">proxy</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">Proxy</span>();
+proxy.<span class="fn">setHttpProxy</span>(<span class="st">"proxy.company.com:8080"</span>);
+proxy.<span class="fn">setSslProxy</span>(<span class="st">"proxy.company.com:8080"</span>);
+
+<span class="nm">ChromeOptions</span> <span class="nm">options</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">ChromeOptions</span>();
+options.<span class="fn">setProxy</span>(proxy);
+
+<span class="cm">// No proxy (bypass proxy for local testing)</span>
+<span class="nm">Proxy</span> <span class="nm">noProxy</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">Proxy</span>();
+noProxy.<span class="fn">setProxyType</span>(Proxy.ProxyType.DIRECT);
+options.<span class="fn">setProxy</span>(noProxy);
+
+<span class="cm">// Proxy via Chrome argument</span>
+options.<span class="fn">addArguments</span>(<span class="st">"--proxy-server=http://proxy.host:port"</span>);
+
+WebDriver <span class="nm">driver</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">ChromeDriver</span>(options);</pre>
+  </div>
+</div>
+
+<!-- S4 -->
+<div class="section" id="s4">
+  <div class="section-header"><div class="section-num">04</div><h2>Browser Dialog Handling (Basic)</h2></div>
+  <p>JavaScript dialogs (alert, confirm, prompt) block the browser. Selenium's <code>Alert</code> interface handles them. Full coverage on <strong>Day 21</strong> — here's the essential pattern you need now.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">BasicAlerts.java</span></div>
+    <pre><span class="kw">import</span> org.openqa.selenium.Alert;
+<span class="kw">import</span> org.openqa.selenium.NoAlertPresentException;
+
+<span class="cm">// Check if alert is present (safe check)</span>
+<span class="kw">public static</span> <span class="ty">boolean</span> <span class="fn">isAlertPresent</span>(WebDriver <span class="nm">driver</span>) {
+    <span class="kw">try</span> {
+        driver.<span class="fn">switchTo</span>().<span class="fn">alert</span>();
+        <span class="kw">return</span> <span class="bool">true</span>;
+    } <span class="kw">catch</span> (<span class="nm">NoAlertPresentException</span> <span class="nm">e</span>) {
+        <span class="kw">return</span> <span class="bool">false</span>;
+    }
+}
+
+<span class="cm">// Accept (OK) an alert</span>
+<span class="kw">public static void</span> <span class="fn">acceptAlert</span>(WebDriver <span class="nm">driver</span>) {
+    <span class="nm">Alert</span> <span class="nm">alert</span> <span class="op">=</span> driver.<span class="fn">switchTo</span>().<span class="fn">alert</span>();
+    <span class="fn">System.out.println</span>(<span class="st">"Alert text: "</span> <span class="op">+</span> alert.<span class="fn">getText</span>());
+    alert.<span class="fn">accept</span>();
+}
+
+<span class="cm">// Dismiss (Cancel) a confirm dialog</span>
+<span class="kw">public static void</span> <span class="fn">dismissAlert</span>(WebDriver <span class="nm">driver</span>) {
+    driver.<span class="fn">switchTo</span>().<span class="fn">alert</span>().<span class="fn">dismiss</span>();
+}
+
+<span class="cm">// Type into a prompt dialog</span>
+<span class="kw">public static void</span> <span class="fn">typeInAlert</span>(WebDriver <span class="nm">driver</span>, <span class="ty">String</span> <span class="nm">text</span>) {
+    <span class="nm">Alert</span> <span class="nm">alert</span> <span class="op">=</span> driver.<span class="fn">switchTo</span>().<span class="fn">alert</span>();
+    alert.<span class="fn">sendKeys</span>(text);
+    alert.<span class="fn">accept</span>();
+}
+
+<span class="cm">// Pattern: trigger alert, then handle it</span>
+((<span class="nm">JavascriptExecutor</span>) driver).<span class="fn">executeScript</span>(<span class="st">"alert('Test Alert!')"</span>);
+BrowserUtils.<span class="fn">pause</span>(<span class="nu">500</span>);
+<span class="kw">if</span> (<span class="fn">isAlertPresent</span>(driver)) {
+    <span class="fn">acceptAlert</span>(driver);
+    <span class="fn">System.out.println</span>(<span class="st">"Alert accepted"</span>);
+}</pre>
+  </div>
+</div>
+
+<!-- S5 -->
+<div class="section" id="s5">
+  <div class="section-header"><div class="section-num">05</div><h2>Advanced Cookie Operations</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">AdvancedCookies.java</span></div>
+    <pre><span class="kw">import</span> org.openqa.selenium.Cookie;
+<span class="kw">import</span> java.util.*;
+
+<span class="cm">// Full cookie creation with all properties</span>
+Cookie <span class="nm">fullCookie</span> <span class="op">=</span> <span class="kw">new</span> Cookie.Builder(<span class="st">"sessionToken"</span>, <span class="st">"abc123xyz"</span>)
+    .<span class="fn">domain</span>(<span class="st">"opensource-demo.orangehrmlive.com"</span>)
+    .<span class="fn">path</span>(<span class="st">"/"</span>)
+    .<span class="fn">isSecure</span>(<span class="bool">true</span>)
+    .<span class="fn">isHttpOnly</span>(<span class="bool">false</span>)
+    .<span class="fn">build</span>();
+driver.<span class="fn">manage</span>().<span class="fn">addCookie</span>(fullCookie);
+
+<span class="cm">// Save all cookies to a Map (simulate "remember login" pattern)</span>
+Map&lt;<span class="ty">String</span>, <span class="ty">String</span>&gt; <span class="nm">savedCookies</span> <span class="op">=</span> <span class="kw">new</span> HashMap&lt;&gt;();
+<span class="kw">for</span> (Cookie <span class="nm">c</span> : driver.<span class="fn">manage</span>().<span class="fn">getCookies</span>()) {
+    savedCookies.<span class="fn">put</span>(c.<span class="fn">getName</span>(), c.<span class="fn">getValue</span>());
+}
+<span class="fn">System.out.println</span>(<span class="st">"Saved "</span> <span class="op">+</span> savedCookies.<span class="fn">size</span>() <span class="op">+</span> <span class="st">" cookies"</span>);
+
+<span class="cm">// Restore cookies to new session (bypass login in tests)</span>
+driver.<span class="fn">get</span>(<span class="st">"https://opensource-demo.orangehrmlive.com"</span>); <span class="cm">// must visit domain first</span>
+<span class="kw">for</span> (Map.Entry&lt;<span class="ty">String</span>, <span class="ty">String</span>&gt; <span class="nm">entry</span> : savedCookies.<span class="fn">entrySet</span>()) {
+    driver.<span class="fn">manage</span>().<span class="fn">addCookie</span>(<span class="kw">new</span> <span class="fn">Cookie</span>(entry.<span class="fn">getKey</span>(), entry.<span class="fn">getValue</span>()));
+}
+driver.<span class="fn">navigate</span>().<span class="fn">refresh</span>();  <span class="cm">// refresh to apply cookies</span>
+
+<span class="cm">// Print cookie table</span>
+<span class="fn">System.out.println</span>(<span class="st">"\n--- Cookies on current page ---"</span>);
+<span class="fn">System.out.printf</span>(<span class="st">"%-25s %-30s %-15s%n"</span>, <span class="st">"NAME"</span>, <span class="st">"VALUE"</span>, <span class="st">"SECURE"</span>);
+<span class="fn">System.out.println</span>(<span class="st">"-".repeat(72)</span>);
+<span class="kw">for</span> (Cookie <span class="nm">c</span> : driver.<span class="fn">manage</span>().<span class="fn">getCookies</span>()) {
+    <span class="ty">String</span> <span class="nm">val</span> <span class="op">=</span> c.<span class="fn">getValue</span>() <span class="op">!=</span> <span class="kw">null</span> <span class="op">&amp;&amp;</span> c.<span class="fn">getValue</span>().<span class="fn">length</span>() <span class="op">&gt;</span> <span class="nu">28</span>
+        <span class="op">?</span> c.<span class="fn">getValue</span>().<span class="fn">substring</span>(<span class="nu">0</span>, <span class="nu">25</span>) <span class="op">+</span> <span class="st">"..."</span> : c.<span class="fn">getValue</span>();
+    <span class="fn">System.out.printf</span>(<span class="st">"%-25s %-30s %-15s%n"</span>, c.<span class="fn">getName</span>(), val, c.<span class="fn">isSecure</span>());
+}</pre>
+  </div>
+</div>
+
+<!-- S6 -->
+<div class="section" id="s6">
+  <div class="section-header"><div class="section-num">06</div><h2>Advanced JavascriptExecutor</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">AdvancedJS.java</span></div>
+    <pre><span class="nm">JavascriptExecutor</span> <span class="nm">js</span> <span class="op">=</span> (<span class="nm">JavascriptExecutor</span>) driver;
+
+<span class="cm">// ── Get element properties ────────────────────────────────────</span>
+WebElement <span class="nm">el</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">name</span>(<span class="st">"username"</span>));
+
+<span class="cm">// Get computed style</span>
+<span class="ty">String</span> <span class="nm">color</span> <span class="op">=</span> (String) js.<span class="fn">executeScript</span>(
+    <span class="st">"return window.getComputedStyle(arguments[0]).color"</span>, el);
+<span class="fn">System.out.println</span>(<span class="st">"Text color: "</span> <span class="op">+</span> color);
+
+<span class="cm">// Get element dimensions via JS</span>
+<span class="nm">Map</span>&lt;<span class="ty">String</span>, Object&gt; <span class="nm">rect</span> <span class="op">=</span> (Map) js.<span class="fn">executeScript</span>(
+    <span class="st">"var r = arguments[0].getBoundingClientRect(); "</span>
+    <span class="op">+</span> <span class="st">"return {top:r.top, left:r.left, width:r.width, height:r.height}"</span>, el);
+<span class="fn">System.out.println</span>(<span class="st">"Element bounds: "</span> <span class="op">+</span> rect);
+
+<span class="cm">// ── Modify DOM via JS ─────────────────────────────────────────</span>
+<span class="cm">// Make hidden element visible</span>
+js.<span class="fn">executeScript</span>(<span class="st">"arguments[0].style.display='block'"</span>, el);
+
+<span class="cm">// Remove an element</span>
+js.<span class="fn">executeScript</span>(<span class="st">"arguments[0].remove()"</span>, el);
+
+<span class="cm">// Change element text</span>
+js.<span class="fn">executeScript</span>(<span class="st">"arguments[0].innerText='New Text'"</span>, el);
+
+<span class="cm">// ── Page interaction ──────────────────────────────────────────</span>
+<span class="cm">// Get total page height</span>
+<span class="ty">Long</span> <span class="nm">height</span> <span class="op">=</span> (Long) js.<span class="fn">executeScript</span>(<span class="st">"return document.body.scrollHeight"</span>);
+<span class="fn">System.out.println</span>(<span class="st">"Page height: "</span> <span class="op">+</span> height <span class="op">+</span> <span class="st">"px"</span>);
+
+<span class="cm">// Get current scroll position</span>
+<span class="ty">Long</span> <span class="nm">scrollY</span> <span class="op">=</span> (Long) js.<span class="fn">executeScript</span>(<span class="st">"return window.pageYOffset"</span>);
+<span class="fn">System.out.println</span>(<span class="st">"Scroll Y: "</span> <span class="op">+</span> scrollY);
+
+<span class="cm">// Open new tab via JS</span>
+js.<span class="fn">executeScript</span>(<span class="st">"window.open()"</span>);
+
+<span class="cm">// ── Async script ──────────────────────────────────────────────</span>
+<span class="cm">// executeAsyncScript — useful for waiting on async operations</span>
+js.<span class="fn">executeAsyncScript</span>(
+    <span class="st">"var cb = arguments[arguments.length-1]; "</span>
+    <span class="op">+</span> <span class="st">"setTimeout(function(){ cb('done'); }, 1000);"</span>
+);
+<span class="fn">System.out.println</span>(<span class="st">"Async complete"</span>);</pre>
+  </div>
+</div>
+
+<!-- S7 -->
+<div class="section" id="s7">
+  <div class="section-header"><div class="section-num">07</div><h2>ScreenshotUtils — Full Implementation</h2></div>
+  <div class="hour-badge">&#9200; Hour 2 — Utility Classes (60 mins)</div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">ScreenshotUtils.java — utils/ScreenshotUtils.java</span></div>
+    <pre><span class="kw">package</span> com.qaautomation.utils;
+
+<span class="kw">import</span> org.openqa.selenium.*;
+<span class="kw">import</span> org.apache.commons.io.FileUtils;
+<span class="kw">import</span> java.io.File;
+<span class="kw">import</span> java.io.IOException;
+<span class="kw">import</span> java.text.SimpleDateFormat;
+<span class="kw">import</span> java.util.Date;
+
+<span class="kw">public class</span> <span class="nm">ScreenshotUtils</span> {
+
+    <span class="kw">private static final</span> <span class="ty">String</span> <span class="nm">SCREENSHOT_DIR</span> <span class="op">=</span> <span class="st">"screenshots/"</span>;
+
+    <span class="cm">// Ensure folder exists</span>
+    <span class="kw">static</span> {
+        <span class="kw">new</span> <span class="fn">File</span>(SCREENSHOT_DIR).<span class="fn">mkdirs</span>();
+    }
+
+    <span class="cm">// Take screenshot with timestamp in filename</span>
+    <span class="kw">public static</span> <span class="ty">String</span> <span class="fn">take</span>(WebDriver <span class="nm">driver</span>, <span class="ty">String</span> <span class="nm">testName</span>) {
+        <span class="ty">String</span> <span class="nm">timestamp</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">SimpleDateFormat</span>(<span class="st">"yyyyMMdd_HHmmss"</span>).<span class="fn">format</span>(<span class="kw">new</span> <span class="fn">Date</span>());
+        <span class="ty">String</span> <span class="nm">fileName</span>  <span class="op">=</span> testName <span class="op">+</span> <span class="st">"_"</span> <span class="op">+</span> timestamp <span class="op">+</span> <span class="st">".png"</span>;
+        <span class="ty">String</span> <span class="nm">filePath</span>  <span class="op">=</span> SCREENSHOT_DIR <span class="op">+</span> fileName;
+
+        <span class="kw">try</span> {
+            File <span class="nm">src</span>  <span class="op">=</span> ((<span class="nm">TakesScreenshot</span>) driver).<span class="fn">getScreenshotAs</span>(OutputType.FILE);
+            File <span class="nm">dest</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">File</span>(filePath);
+            FileUtils.<span class="fn">copyFile</span>(src, dest);
+            <span class="fn">System.out.println</span>(<span class="st">"[SCRN] Saved: "</span> <span class="op">+</span> dest.<span class="fn">getAbsolutePath</span>());
+            <span class="kw">return</span> dest.<span class="fn">getAbsolutePath</span>();
+        } <span class="kw">catch</span> (IOException <span class="nm">e</span>) {
+            <span class="fn">System.out.println</span>(<span class="st">"[SCRN] Failed: "</span> <span class="op">+</span> e.<span class="fn">getMessage</span>());
+            <span class="kw">return</span> <span class="kw">null</span>;
+        }
+    }
+
+    <span class="cm">// Take screenshot as Base64 (for HTML reports)</span>
+    <span class="kw">public static</span> <span class="ty">String</span> <span class="fn">takeAsBase64</span>(WebDriver <span class="nm">driver</span>) {
+        <span class="kw">return</span> ((<span class="nm">TakesScreenshot</span>) driver).<span class="fn">getScreenshotAs</span>(OutputType.BASE64);
+    }
+
+    <span class="cm">// Screenshot element only (not whole page)</span>
+    <span class="kw">public static</span> <span class="ty">String</span> <span class="fn">takeElement</span>(WebElement <span class="nm">element</span>, <span class="ty">String</span> <span class="nm">name</span>) {
+        <span class="ty">String</span> <span class="nm">timestamp</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">SimpleDateFormat</span>(<span class="st">"yyyyMMdd_HHmmss"</span>).<span class="fn">format</span>(<span class="kw">new</span> <span class="fn">Date</span>());
+        <span class="ty">String</span> <span class="nm">filePath</span>  <span class="op">=</span> SCREENSHOT_DIR <span class="op">+</span> name <span class="op">+</span> <span class="st">"_"</span> <span class="op">+</span> timestamp <span class="op">+</span> <span class="st">".png"</span>;
+        <span class="kw">try</span> {
+            File <span class="nm">src</span>  <span class="op">=</span> element.<span class="fn">getScreenshotAs</span>(OutputType.FILE);
+            FileUtils.<span class="fn">copyFile</span>(src, <span class="kw">new</span> <span class="fn">File</span>(filePath));
+            <span class="fn">System.out.println</span>(<span class="st">"[SCRN] Element saved: "</span> <span class="op">+</span> filePath);
+            <span class="kw">return</span> filePath;
+        } <span class="kw">catch</span> (IOException <span class="nm">e</span>) {
+            <span class="fn">System.out.println</span>(<span class="st">"[SCRN] Element screenshot failed"</span>);
+            <span class="kw">return</span> <span class="kw">null</span>;
+        }
+    }
+}
+
+<span class="cm">// Add commons-io to pom.xml:</span>
+<span class="cm">// &lt;dependency&gt;</span>
+<span class="cm">//   &lt;groupId&gt;commons-io&lt;/groupId&gt;</span>
+<span class="cm">//   &lt;artifactId&gt;commons-io&lt;/artifactId&gt;</span>
+<span class="cm">//   &lt;version&gt;2.15.1&lt;/version&gt;</span>
+<span class="cm">// &lt;/dependency&gt;</span></pre>
+  </div>
+</div>
+
+<!-- S8 -->
+<div class="section" id="s8">
+  <div class="section-header"><div class="section-num">08</div><h2>ConfigReader — Reading from Properties File</h2></div>
+  <p>Hard-coding URLs, usernames, and passwords directly in test code is bad practice. Store them in a <code>config.properties</code> file and read with ConfigReader. Swap environments (staging → production) by changing one file.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Properties</span><span class="code-file">src/main/resources/config.properties</span></div>
+    <pre>browser=chrome
+base.url=https://opensource-demo.orangehrmlive.com
+username=Admin
+password=admin123
+implicit.wait=10
+page.load.timeout=30</pre>
+  </div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">ConfigReader.java — utils/ConfigReader.java</span></div>
+    <pre><span class="kw">package</span> com.qaautomation.utils;
+
+<span class="kw">import</span> java.io.*;
+<span class="kw">import</span> java.util.Properties;
+
+<span class="kw">public class</span> <span class="nm">ConfigReader</span> {
+
+    <span class="kw">private static</span> Properties <span class="nm">properties</span>;
+
+    <span class="cm">// Static block — load once when class is first used</span>
+    <span class="kw">static</span> {
+        properties <span class="op">=</span> <span class="kw">new</span> <span class="fn">Properties</span>();
+        <span class="kw">try</span> {
+            FileInputStream <span class="nm">fis</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">FileInputStream</span>(
+                <span class="st">"src/main/resources/config.properties"</span>);
+            properties.<span class="fn">load</span>(fis);
+        } <span class="kw">catch</span> (IOException <span class="nm">e</span>) {
+            <span class="kw">throw</span> <span class="kw">new</span> <span class="fn">RuntimeException</span>(<span class="st">"Cannot load config.properties"</span>, e);
+        }
+    }
+
+    <span class="cm">// Get any property by key</span>
+    <span class="kw">public static</span> <span class="ty">String</span> <span class="fn">get</span>(<span class="ty">String</span> <span class="nm">key</span>) {
+        <span class="ty">String</span> <span class="nm">value</span> <span class="op">=</span> properties.<span class="fn">getProperty</span>(key);
+        <span class="kw">if</span> (value <span class="op">==</span> <span class="kw">null</span>) {
+            <span class="kw">throw</span> <span class="kw">new</span> <span class="fn">RuntimeException</span>(<span class="st">"Property not found: "</span> <span class="op">+</span> key);
+        }
+        <span class="kw">return</span> value.<span class="fn">trim</span>();
+    }
+
+    <span class="cm">// Convenience getters</span>
+    <span class="kw">public static</span> <span class="ty">String</span> <span class="fn">getBrowser</span>()     { <span class="kw">return</span> <span class="fn">get</span>(<span class="st">"browser"</span>); }
+    <span class="kw">public static</span> <span class="ty">String</span> <span class="fn">getBaseUrl</span>()     { <span class="kw">return</span> <span class="fn">get</span>(<span class="st">"base.url"</span>); }
+    <span class="kw">public static</span> <span class="ty">String</span> <span class="fn">getUsername</span>()    { <span class="kw">return</span> <span class="fn">get</span>(<span class="st">"username"</span>); }
+    <span class="kw">public static</span> <span class="ty">String</span> <span class="fn">getPassword</span>()    { <span class="kw">return</span> <span class="fn">get</span>(<span class="st">"password"</span>); }
+    <span class="kw">public static</span> <span class="ty">int</span>    <span class="fn">getImplicitWait</span>() { <span class="kw">return</span> Integer.<span class="fn">parseInt</span>(<span class="fn">get</span>(<span class="st">"implicit.wait"</span>)); }
+    <span class="kw">public static</span> <span class="ty">int</span>    <span class="fn">getPageLoadTimeout</span>() { <span class="kw">return</span> Integer.<span class="fn">parseInt</span>(<span class="fn">get</span>(<span class="st">"page.load.timeout"</span>)); }
+}
+
+<span class="cm">// Usage in any class:</span>
+<span class="ty">String</span> <span class="nm">url</span>  <span class="op">=</span> ConfigReader.<span class="fn">getBaseUrl</span>();   <span class="cm">// https://opensource-demo.orangehrmlive.com</span>
+<span class="ty">String</span> <span class="nm">user</span> <span class="op">=</span> ConfigReader.<span class="fn">getUsername</span>();  <span class="cm">// Admin</span>
+<span class="ty">String</span> <span class="nm">pass</span> <span class="op">=</span> ConfigReader.<span class="fn">getPassword</span>();  <span class="cm">// admin123</span></pre>
+  </div>
+
+  <div class="callout purple">
+    <span class="callout-icon">&#127775;</span>
+    <div class="callout-body">
+      <div class="callout-title">Update DriverFactory to use ConfigReader</div>
+      <p>Now update your DriverFactory to read browser type and timeouts from config.properties instead of hardcoding: <code>String browser = ConfigReader.getBrowser();</code>. This is how professional frameworks separate test data from test logic.</p>
+    </div>
+  </div>
+</div>
+
+<!-- S9 -->
+<div class="section" id="s9">
+  <div class="section-header"><div class="section-num">09</div><h2>Complete Utility Layer Summary</h2></div>
+  <p>Here's the current state of your utils package after Days 10–13. This is the foundation every test class builds on.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Structure</span><span class="code-file">src/main/java/com/qaautomation/utils/</span></div>
+    <pre>utils/
+├── DriverFactory.java    ← Creates WebDriver for any browser
+│                            reads ConfigReader for defaults
+├── BrowserUtils.java     ← Common browser operations
+│                            navigate, tabs, scroll, JS, assertions
+├── ScreenshotUtils.java  ← Full/element/base64 screenshots
+│                            auto-timestamped filenames
+└── ConfigReader.java     ← Reads config.properties
+                             base URL, credentials, timeouts
+
+tests/
+└── BaseTest.java         ← Parent for all test classes
+                             setUp() creates driver from DriverFactory
+                             tearDown() calls driver.quit() in finally</pre>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Class</th><th>Responsibility</th><th>Used By</th></tr></thead>
+      <tbody>
+        <tr><td>ConfigReader</td><td>Read config.properties — single source of truth for all config values</td><td>DriverFactory, all test classes</td></tr>
+        <tr><td>DriverFactory</td><td>Create and configure WebDriver — handles browser selection, options, timeouts</td><td>BaseTest.setUp()</td></tr>
+        <tr><td>BrowserUtils</td><td>Common browser actions — navigation, tabs, scroll, JS, assertions</td><td>All test classes via inheritance</td></tr>
+        <tr><td>ScreenshotUtils</td><td>Capture screenshots — on failure, on demand, element-level</td><td>BaseTest.tearDown() on failure</td></tr>
+        <tr><td>BaseTest</td><td>Driver lifecycle — setUp() and tearDown() in one place</td><td>All test classes via extends</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- S10 -->
+<div class="section" id="s10">
+  <div class="section-header"><div class="section-num">10</div><h2>Practice Task + Expected Output</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">Day13Practice.java</span></div>
+    <pre><span class="kw">package</span> com.qaautomation.tests;
+
+<span class="kw">import</span> com.qaautomation.utils.*;
+<span class="kw">import</span> org.openqa.selenium.*;
+
+<span class="kw">public class</span> <span class="nm">Day13Practice</span> {
+
+    <span class="kw">public static void</span> <span class="fn">main</span>(<span class="ty">String</span>[] args) {
+
+        <span class="cm">// Read config</span>
+        <span class="fn">System.out.println</span>(<span class="st">"====== CONFIG ======"</span>);
+        <span class="fn">System.out.println</span>(<span class="st">"  Browser : "</span> <span class="op">+</span> ConfigReader.<span class="fn">getBrowser</span>());
+        <span class="fn">System.out.println</span>(<span class="st">"  Base URL: "</span> <span class="op">+</span> ConfigReader.<span class="fn">getBaseUrl</span>());
+        <span class="fn">System.out.println</span>(<span class="st">"  User    : "</span> <span class="op">+</span> ConfigReader.<span class="fn">getUsername</span>());
+
+        WebDriver <span class="nm">driver</span> <span class="op">=</span> DriverFactory.<span class="fn">getDriver</span>(ConfigReader.<span class="fn">getBrowser</span>());
+
+        <span class="kw">try</span> {
+            <span class="cm">// Task 1: Navigate and screenshot</span>
+            <span class="fn">System.out.println</span>(<span class="st">"\n====== TASK 1: Navigate + Screenshot ======"</span>);
+            driver.<span class="fn">get</span>(ConfigReader.<span class="fn">getBaseUrl</span>());
+            <span class="fn">System.out.println</span>(<span class="st">"  Title: "</span> <span class="op">+</span> driver.<span class="fn">getTitle</span>());
+            <span class="ty">String</span> <span class="nm">scrn</span> <span class="op">=</span> ScreenshotUtils.<span class="fn">take</span>(driver, <span class="st">"day13_loginPage"</span>);
+            <span class="fn">System.out.println</span>(<span class="st">"  Screenshot: "</span> <span class="op">+</span> (scrn <span class="op">!=</span> <span class="kw">null</span> <span class="op">?</span> <span class="st">"saved"</span> <span class="op">:</span> <span class="st">"failed"</span>));
+
+            <span class="cm">// Task 2: Cookies</span>
+            <span class="fn">System.out.println</span>(<span class="st">"\n====== TASK 2: Cookies ======"</span>);
+            <span class="fn">System.out.println</span>(<span class="st">"  Cookie count before: "</span> <span class="op">+</span> driver.<span class="fn">manage</span>().<span class="fn">getCookies</span>().<span class="fn">size</span>());
+            driver.<span class="fn">manage</span>().<span class="fn">addCookie</span>(<span class="kw">new</span> <span class="fn">Cookie</span>(<span class="st">"testSession"</span>, <span class="st">"day13run"</span>));
+            Cookie <span class="nm">tc</span> <span class="op">=</span> driver.<span class="fn">manage</span>().<span class="fn">getCookieNamed</span>(<span class="st">"testSession"</span>);
+            <span class="fn">System.out.println</span>(<span class="st">"  testSession: "</span> <span class="op">+</span> (tc <span class="op">!=</span> <span class="kw">null</span> <span class="op">?</span> tc.<span class="fn">getValue</span>() <span class="op">:</span> <span class="st">"null"</span>));
+            driver.<span class="fn">manage</span>().<span class="fn">deleteAllCookies</span>();
+            <span class="fn">System.out.println</span>(<span class="st">"  Cookie count after clear: "</span> <span class="op">+</span> driver.<span class="fn">manage</span>().<span class="fn">getCookies</span>().<span class="fn">size</span>());
+
+            <span class="cm">// Task 3: JS Executor</span>
+            <span class="fn">System.out.println</span>(<span class="st">"\n====== TASK 3: JavaScript ======"</span>);
+            JavascriptExecutor <span class="nm">js</span> <span class="op">=</span> (JavascriptExecutor) driver;
+            <span class="ty">String</span> <span class="nm">state</span>  <span class="op">=</span> js.<span class="fn">executeScript</span>(<span class="st">"return document.readyState"</span>).<span class="fn">toString</span>();
+            <span class="ty">Long</span> <span class="nm">height</span>   <span class="op">=</span> (Long) js.<span class="fn">executeScript</span>(<span class="st">"return document.body.scrollHeight"</span>);
+            <span class="ty">String</span> <span class="nm">jsTitle</span> <span class="op">=</span> js.<span class="fn">executeScript</span>(<span class="st">"return document.title"</span>).<span class="fn">toString</span>();
+            <span class="fn">System.out.println</span>(<span class="st">"  readyState : "</span> <span class="op">+</span> state);
+            <span class="fn">System.out.println</span>(<span class="st">"  page height: "</span> <span class="op">+</span> height <span class="op">+</span> <span class="st">"px"</span>);
+            <span class="fn">System.out.println</span>(<span class="st">"  JS title   : "</span> <span class="op">+</span> jsTitle);
+            BrowserUtils.<span class="fn">scrollToBottom</span>(driver);
+            BrowserUtils.<span class="fn">pause</span>(<span class="nu">300</span>);
+            BrowserUtils.<span class="fn">scrollToTop</span>(driver);
+            <span class="fn">System.out.println</span>(<span class="st">"  Scrolled up and down"</span>);
+
+            <span class="cm">// Task 4: Alert via JS</span>
+            <span class="fn">System.out.println</span>(<span class="st">"\n====== TASK 4: Alert ======"</span>);
+            js.<span class="fn">executeScript</span>(<span class="st">"alert('Day 13 Test!')"</span>);
+            BrowserUtils.<span class="fn">pause</span>(<span class="nu">500</span>);
+            Alert <span class="nm">alert</span> <span class="op">=</span> driver.<span class="fn">switchTo</span>().<span class="fn">alert</span>();
+            <span class="fn">System.out.println</span>(<span class="st">"  Alert text : "</span> <span class="op">+</span> alert.<span class="fn">getText</span>());
+            alert.<span class="fn">accept</span>();
+            <span class="fn">System.out.println</span>(<span class="st">"  Alert accepted"</span>);
+
+            <span class="cm">// Task 5: BrowserUtils assertions</span>
+            <span class="fn">System.out.println</span>(<span class="st">"\n====== TASK 5: Assertions ======"</span>);
+            <span class="fn">System.out.println</span>(<span class="st">"  titleEquals    : "</span> <span class="op">+</span> BrowserUtils.<span class="fn">titleEquals</span>(driver, <span class="st">"OrangeHRM"</span>));
+            <span class="fn">System.out.println</span>(<span class="st">"  urlContains    : "</span> <span class="op">+</span> BrowserUtils.<span class="fn">urlContains</span>(driver, <span class="st">"orangehrm"</span>));
+            <span class="fn">System.out.println</span>(<span class="st">"  isPageLoaded   : "</span> <span class="op">+</span> BrowserUtils.<span class="fn">isPageLoaded</span>(driver));
+
+        } <span class="kw">catch</span> (Exception <span class="nm">e</span>) {
+            ScreenshotUtils.<span class="fn">take</span>(driver, <span class="st">"day13_error"</span>);
+            <span class="fn">System.out.println</span>(<span class="st">"Error: "</span> <span class="op">+</span> e.<span class="fn">getMessage</span>());
+        } <span class="kw">finally</span> {
+            driver.<span class="fn">quit</span>();
+            <span class="fn">System.out.println</span>(<span class="st">"\nBrowser closed ✓"</span>);
+        }
+    }
+}</pre>
+  </div>
+  <h3>Expected Output</h3>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Output</span><span class="code-file">Console</span></div>
+    <pre>====== CONFIG ======
+  Browser : chrome
+  Base URL: https://opensource-demo.orangehrmlive.com
+  User    : Admin
+
+====== TASK 1: Navigate + Screenshot ======
+  Title: OrangeHRM
+  [SCRN] Saved: /path/to/screenshots/day13_loginPage_20240315_143022.png
+  Screenshot: saved
+
+====== TASK 2: Cookies ======
+  Cookie count before: 2
+  testSession: day13run
+  Cookie count after clear: 0
+
+====== TASK 3: JavaScript ======
+  readyState : complete
+  page height: 678px
+  JS title   : OrangeHRM
+  Scrolled up and down
+
+====== TASK 4: Alert ======
+  Alert text : Day 13 Test!
+  Alert accepted
+
+====== TASK 5: Assertions ======
+  titleEquals    : true
+  urlContains    : true
+  isPageLoaded   : true
+
+Browser closed ✓</pre>
+  </div>
+</div>
+
+<!-- S11 -->
+<div class="section" id="s11">
+  <div class="section-header"><div class="section-num">11</div><h2>Common Mistakes</h2></div>
+  <div class="mistake-grid">
+    <div class="mistake-card"><div class="mt">&#10060; config.properties path wrong</div><p>If you get "Cannot load config.properties", the path must be relative to project root: <code>src/main/resources/config.properties</code>. Create the resources folder first.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; Screenshots folder not created</div><p>If screenshots/ folder doesn't exist, FileUtils.copyFile() throws IOException. The static block in ScreenshotUtils handles this with <code>new File(SCREENSHOT_DIR).mkdirs()</code>. Don't remove it.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; Switching to alert before it appears</div><p><code>driver.switchTo().alert()</code> immediately after triggering JS throws NoAlertPresentException if the alert hasn't rendered yet. Add a small pause or use explicit wait (Day 20).</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; JS executeScript casting</div><p><code>executeScript</code> returns <code>Object</code>. If you try to cast to wrong type (e.g., cast Long to String), ClassCastException. Always match the type to what the JS actually returns.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; setAcceptInsecureCerts after driver created</div><p>SSL options must be set in ChromeOptions BEFORE <code>new ChromeDriver(options)</code>. You can't change them after the driver is launched.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; ConfigReader property not found</div><p>If a key doesn't exist in config.properties, ConfigReader throws RuntimeException. Verify the exact key spelling — property names are case-sensitive.</p></div>
+  </div>
+</div>
+
+<!-- S12 -->
+<div class="section" id="s12">
+  <div class="section-header"><div class="section-num">12</div><h2>End of Day Checklist + Resources</h2></div>
+  <div class="checklist">
+    <div class="checklist-title">&#10022; End of Day 13 Checklist</div>
+    <div class="check-item"><div class="check-box"></div>I know all WebDriver methods — can recall navigate, window, switch, cookies, timeouts</div>
+    <div class="check-item"><div class="check-box"></div>SSL errors handled with setAcceptInsecureCerts(true) in ChromeOptions</div>
+    <div class="check-item"><div class="check-box"></div>Basic alert handling works: switchTo().alert(), getText(), accept(), dismiss()</div>
+    <div class="check-item"><div class="check-box"></div>ScreenshotUtils.java created — take(), takeAsBase64(), takeElement() all implemented</div>
+    <div class="check-item"><div class="check-box"></div>config.properties file created in src/main/resources/</div>
+    <div class="check-item"><div class="check-box"></div>ConfigReader.java created — reads all config values cleanly</div>
+    <div class="check-item"><div class="check-box"></div>DriverFactory updated to use ConfigReader for browser and timeout values</div>
+    <div class="check-item"><div class="check-box"></div>Practice task runs — all 5 sections print correct output</div>
+    <div class="check-item"><div class="check-box"></div>Screenshot file actually created in screenshots/ folder</div>
+  </div>
+  <h3>Resources</h3>
+  <ul class="resource-list">
+    <li><span>&#128214;</span><strong>Selenium Docs:&nbsp;</strong><a href="https://www.selenium.dev/documentation/webdriver/interactions/alerts/" target="_blank">Selenium — Alerts</a> &nbsp;<span style="color:var(--muted);font-size:12px">Alert, confirm, prompt handling official docs.</span></li>
+    <li><span>&#128214;</span><strong>Selenium Docs:&nbsp;</strong><a href="https://www.selenium.dev/documentation/webdriver/drivers/options/" target="_blank">Selenium — Browser Options</a> &nbsp;<span style="color:var(--muted);font-size:12px">SSL certs, proxy, and all ChromeOptions settings.</span></li>
+    <li><span>&#128214;</span><strong>Java Docs:&nbsp;</strong><a href="https://docs.oracle.com/javase/8/docs/api/java/util/Properties.html" target="_blank">Java Properties Class</a> &nbsp;<span style="color:var(--muted);font-size:12px">How to read .properties files in Java.</span></li>
+  </ul>
+  <div class="callout tip">
+    <span class="callout-icon">&#128640;</span>
+    <div class="callout-body">
+      <div class="callout-title">Day 14 Preview — Locators (ID, Name, ClassName, TagName)</div>
+      <p>Tomorrow begins the <strong>Locators Deep Dive</strong> — the most important skill in Selenium. Day 14 covers the 4 simple locators: ID, Name, ClassName, and TagName. Days 15–16 cover XPath and CSS Selectors in full detail. After Day 16, you can locate ANY element on any page. This is what separates juniors from professionals.</p>
+    </div>
+  </div>
+</div>
+
+</div>
+<div class="footer">
+  <span>Day 13 of 65</span> &nbsp;&middot;&nbsp; Selenium + Java Automation Roadmap &nbsp;&middot;&nbsp; Phase 2 &mdash; Core Selenium &nbsp;&middot;&nbsp; <span>Next: Day 14 &mdash; Locators: ID, Name, ClassName, TagName</span>
+</div>
+</body>
+</html>

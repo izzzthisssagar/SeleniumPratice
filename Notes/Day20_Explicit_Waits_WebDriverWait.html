@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 20 — Explicit Waits (WebDriverWait)</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Sora:wght@400;600;700;800&display=swap');
+:root{--bg:#0d1117;--bg2:#161b22;--bg3:#1e2530;--border:#30363d;--accent:#f0a500;--accent2:#58a6ff;--accent3:#3fb950;--accent4:#ff7b72;--accent5:#d2a8ff;--text:#e6edf3;--muted:#8b949e;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);line-height:1.75;font-size:15px;}
+.hero{background:linear-gradient(135deg,#0d1117,#0a1a0d,#161b22);border-bottom:3px solid var(--accent3);padding:48px 40px 36px;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:0;right:0;width:400px;height:400px;background:radial-gradient(circle,rgba(63,185,80,0.09),transparent 70%);pointer-events:none;}
+.hero-tag{display:inline-block;background:rgba(63,185,80,0.12);border:1px solid rgba(63,185,80,0.3);color:var(--accent3);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;padding:4px 12px;border-radius:20px;margin-bottom:16px;}
+.hero h1{font-size:34px;font-weight:800;line-height:1.2;margin-bottom:10px;}
+.hero h1 span{color:var(--accent3);}
+.hero-sub{color:var(--muted);font-size:14px;display:flex;gap:24px;flex-wrap:wrap;margin-top:16px;}
+.hero-sub span{display:flex;align-items:center;gap:6px;}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--accent3);display:inline-block;}
+.container{max-width:980px;margin:0 auto;padding:40px 32px 80px;}
+.toc{background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--accent3);border-radius:8px;padding:24px 28px;margin-bottom:48px;}
+.toc-title{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--accent3);margin-bottom:14px;}
+.toc ol{padding-left:20px;}.toc li{margin-bottom:6px;}
+.toc a{color:var(--muted);text-decoration:none;font-size:14px;}.toc a:hover{color:var(--accent3);}
+.section{margin-bottom:56px;}
+.section-header{display:flex;align-items:center;gap:14px;margin-bottom:24px;padding-bottom:14px;border-bottom:1px solid var(--border);}
+.section-num{background:var(--accent3);color:#000;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:12px;width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.section h2{font-size:22px;font-weight:700;}
+h3{font-size:16px;font-weight:600;color:var(--accent3);margin:28px 0 12px;display:flex;align-items:center;gap:8px;}
+h3::before{content:'▸';color:var(--accent);font-size:12px;}
+p{color:var(--muted);margin-bottom:14px;line-height:1.8;}strong{color:var(--text);font-weight:600;}
+.code-block{background:#010409;border:1px solid var(--border);border-radius:10px;margin:20px 0;overflow:hidden;}
+.code-header{background:var(--bg2);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
+.code-lang{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent3);letter-spacing:1px;text-transform:uppercase;font-weight:600;}
+.code-file{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);}
+pre{font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.85;padding:20px;overflow-x:auto;color:#e6edf3;}
+.kw{color:#ff7b72;font-weight:500;}.ty{color:#ffa657;}.st{color:#a5d6ff;}.cm{color:#6e7681;font-style:italic;}
+.nm{color:#79c0ff;}.nu{color:#79c0ff;}.fn{color:#d2a8ff;}.op{color:#ff7b72;}.bool{color:#3fb950;}
+code{font-family:'JetBrains Mono',monospace;font-size:12.5px;background:rgba(63,185,80,0.1);border:1px solid rgba(63,185,80,0.2);color:var(--accent3);padding:1px 7px;border-radius:4px;}
+.callout{border-radius:8px;padding:16px 20px;margin:20px 0;display:flex;gap:14px;align-items:flex-start;}
+.callout-icon{font-size:18px;flex-shrink:0;margin-top:1px;}.callout-body{flex:1;}
+.callout-title{font-weight:700;font-size:13px;margin-bottom:4px;}.callout p{margin-bottom:0;font-size:13.5px;}
+.note{background:rgba(88,166,255,0.07);border-left:3px solid var(--accent2);}.note .callout-title{color:var(--accent2);}
+.tip{background:rgba(63,185,80,0.07);border-left:3px solid var(--accent3);}.tip .callout-title{color:var(--accent3);}
+.warn{background:rgba(240,165,0,0.07);border-left:3px solid var(--accent);}.warn .callout-title{color:var(--accent);}
+.error{background:rgba(255,123,114,0.07);border-left:3px solid var(--accent4);}.error .callout-title{color:var(--accent4);}
+.purple{background:rgba(210,168,255,0.07);border-left:3px solid var(--accent5);}.purple .callout-title{color:var(--accent5);}
+.table-wrap{overflow-x:auto;margin:20px 0;}
+table{width:100%;border-collapse:collapse;font-size:13.5px;}
+thead tr{background:var(--bg2);border-bottom:2px solid var(--accent3);}
+th{padding:12px 16px;text-align:left;font-weight:700;font-size:12px;letter-spacing:0.5px;text-transform:uppercase;color:var(--accent3);}
+td{padding:11px 16px;border-bottom:1px solid var(--border);color:var(--muted);}
+tr:hover td{background:rgba(255,255,255,0.02);}
+td:first-child{font-family:'JetBrains Mono',monospace;color:var(--accent2);font-size:13px;}
+.diagram-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:28px 24px;margin:24px 0;overflow:hidden;}
+.diagram-title{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:20px;text-align:center;}
+.hour-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(63,185,80,0.1);border:1px solid rgba(63,185,80,0.25);color:var(--accent3);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:1px;padding:5px 14px;border-radius:20px;margin-bottom:18px;margin-top:30px;}
+.ec-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin:20px 0;}
+.ec-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:16px;}
+.ec-card .ecn{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent3);font-weight:700;margin-bottom:8px;}
+.ec-card p{font-size:12.5px;margin:0;color:var(--muted);}
+.mistake-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:20px 0;}
+.mistake-card{background:rgba(255,123,114,0.05);border:1px solid rgba(255,123,114,0.2);border-radius:8px;padding:16px;}
+.mistake-card .mt{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent4);font-weight:700;margin-bottom:8px;}
+.mistake-card p{font-size:13px;margin:0;}
+.checklist{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:24px 28px;margin:24px 0;}
+.checklist-title{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent3);letter-spacing:1.5px;text-transform:uppercase;font-weight:700;margin-bottom:16px;}
+.check-item{display:flex;align-items:flex-start;gap:12px;padding:9px 0;border-bottom:1px solid rgba(48,54,61,0.5);font-size:14px;color:var(--muted);}
+.check-item:last-child{border-bottom:none;}
+.check-box{width:18px;height:18px;border:2px solid var(--accent3);border-radius:4px;flex-shrink:0;margin-top:2px;}
+.resource-list{list-style:none;padding:0;margin:12px 0;}
+.resource-list li{padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;margin-bottom:8px;font-size:13.5px;display:flex;gap:10px;align-items:center;}
+.resource-list li a{color:var(--accent2);text-decoration:none;}
+.footer{background:var(--bg2);border-top:1px solid var(--border);padding:24px 40px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);}
+.footer span{color:var(--accent3);}
+::-webkit-scrollbar{width:6px;height:6px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+@media(max-width:640px){.hero{padding:32px 20px 24px;}.hero h1{font-size:24px;}.container{padding:24px 16px 60px;}}
+</style>
+</head>
+<body>
+<div class="hero">
+  <div class="hero-tag">Phase 2 &middot; Day 20 of 65 &middot; Game Changer</div>
+  <h1>Explicit Waits <span>(WebDriverWait)</span></h1>
+  <div class="hero-sub">
+    <span><span class="dot"></span>2 Hours</span>
+    <span><span class="dot"></span>WebDriverWait &middot; ExpectedConditions &middot; FluentWait &middot; Remove ALL Thread.sleep</span>
+  </div>
+</div>
+<div class="container">
+
+<div class="toc">
+  <div class="toc-title">// Table of Contents</div>
+  <ol>
+    <li><a href="#s1">Why This Day Changes Everything</a></li>
+    <li><a href="#s2">Wait Types Compared — sleep vs implicit vs explicit</a></li>
+    <li><a href="#s3">WebDriverWait — Syntax &amp; How It Works</a></li>
+    <li><a href="#s4">ExpectedConditions — Full Reference</a></li>
+    <li><a href="#s5">Visibility Conditions</a></li>
+    <li><a href="#s6">Clickability &amp; Element State</a></li>
+    <li><a href="#s7">URL &amp; Title Conditions</a></li>
+    <li><a href="#s8">Custom ExpectedConditions</a></li>
+    <li><a href="#s9">FluentWait — Advanced Configuration</a></li>
+    <li><a href="#s10">Replacing ALL Thread.sleep — Before &amp; After</a></li>
+    <li><a href="#s11">WaitUtils — Reusable Wait Helper</a></li>
+    <li><a href="#s12">Updated BaseTest with Waits</a></li>
+    <li><a href="#s13">Practice Task — Full Login Script With Explicit Waits</a></li>
+    <li><a href="#s14">Common Mistakes</a></li>
+    <li><a href="#s15">End of Day Checklist + Resources</a></li>
+  </ol>
+</div>
+
+<!-- S1 -->
+<div class="section" id="s1">
+  <div class="section-header"><div class="section-num">01</div><h2>Why This Day Changes Everything</h2></div>
+  <div class="hour-badge">&#9200; Hour 1 — Explicit Wait Fundamentals (60 mins)</div>
+  <p>Every <code>Thread.sleep(2000)</code> in your code is a lie — you're guessing that 2 seconds is enough. Sometimes it's too short (flaky test). Sometimes it's too long (slow suite). Explicit waits solve both problems: they wait <strong>exactly as long as needed</strong> — no more, no less.</p>
+  <div class="callout purple">
+    <span class="callout-icon">&#127775;</span>
+    <div class="callout-body">
+      <div class="callout-title">The transformation from junior to senior QA automation engineer</div>
+      <p>Junior: uses Thread.sleep everywhere → tests take 10 minutes, fail randomly.<br>
+      Senior: uses explicit waits everywhere → tests take 3 minutes, pass consistently.<br>
+      After today, you write senior-level wait code. Every Thread.sleep you had from Days 11–19 gets deleted.</p>
+    </div>
+  </div>
+</div>
+
+<!-- S2 -->
+<div class="section" id="s2">
+  <div class="section-header"><div class="section-num">02</div><h2>Wait Types Compared</h2></div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Wait Type</th><th>How it works</th><th>Speed</th><th>Reliability</th><th>Use</th></tr></thead>
+      <tbody>
+        <tr><td>Thread.sleep(ms)</td><td>Hard pause — always waits full time</td><td>Slowest</td><td>Flaky (too long or short)</td><td>&#10060; Never in production</td></tr>
+        <tr><td>Implicit Wait</td><td>Global setting — waits for findElement() globally</td><td>Medium</td><td>OK</td><td>&#9888; Set once as safety net only</td></tr>
+        <tr><td>Explicit Wait</td><td>Waits for specific condition, polls every 500ms</td><td>Fastest</td><td>Most reliable</td><td>&#9989; Use for everything</td></tr>
+        <tr><td>Fluent Wait</td><td>Explicit wait with custom polling interval + exception ignoring</td><td>Configurable</td><td>Most flexible</td><td>&#9989; For tricky dynamic elements</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="diagram-wrap">
+    <div class="diagram-title">// Thread.sleep vs Explicit Wait — Same scenario</div>
+    <svg viewBox="0 0 700 160" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:700px;display:block;margin:0 auto">
+      <!-- Thread.sleep timeline -->
+      <text x="10" y="20" font-family="JetBrains Mono,monospace" font-size="11" fill="#ff7b72" font-weight="700">Thread.sleep(3000) — always 3 seconds</text>
+      <rect x="10" y="30" width="300" height="28" rx="4" fill="rgba(255,123,114,0.15)" stroke="#ff7b72" stroke-width="1.5"/>
+      <text x="160" y="49" text-anchor="middle" font-family="Sora,sans-serif" font-size="10" fill="#ff7b72">WAITING... WAITING... WAITING... (3s always)</text>
+      <text x="320" y="49" font-family="Sora,sans-serif" font-size="10" fill="#ff7b72">← wasted 2.5s</text>
+      <text x="10" y="75" font-family="Sora,sans-serif" font-size="10" fill="#6e7681">Element appears at 500ms — but you waited 3000ms. Wasted 2.5 seconds.</text>
+      <line x1="85" y1="30" x2="85" y2="58" stroke="#3fb950" stroke-width="2" stroke-dasharray="4,2"/>
+      <text x="88" y="42" font-family="Sora,sans-serif" font-size="9" fill="#3fb950">element appeared here</text>
+
+      <!-- Explicit wait timeline -->
+      <text x="10" y="100" font-family="JetBrains Mono,monospace" font-size="11" fill="#3fb950" font-weight="700">WebDriverWait — polls every 500ms, stops when ready</text>
+      <rect x="10" y="110" width="80" height="28" rx="4" fill="rgba(63,185,80,0.15)" stroke="#3fb950" stroke-width="1.5"/>
+      <text x="50" y="129" text-anchor="middle" font-family="Sora,sans-serif" font-size="10" fill="#3fb950">check→found!</text>
+      <text x="100" y="129" font-family="Sora,sans-serif" font-size="10" fill="#3fb950">← proceeds immediately at 500ms</text>
+      <text x="10" y="155" font-family="Sora,sans-serif" font-size="10" fill="#6e7681">Element appears at 500ms — explicit wait found it, moved on instantly. 2.5 seconds saved.</text>
+    </svg>
+  </div>
+</div>
+
+<!-- S3 -->
+<div class="section" id="s3">
+  <div class="section-header"><div class="section-num">03</div><h2>WebDriverWait — Syntax &amp; How It Works</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">WebDriverWait_Syntax.java</span></div>
+    <pre><span class="kw">import</span> org.openqa.selenium.support.ui.WebDriverWait;
+<span class="kw">import</span> org.openqa.selenium.support.ui.ExpectedConditions;
+<span class="kw">import</span> java.time.Duration;
+
+<span class="cm">// Create wait object — max wait = 10 seconds</span>
+WebDriverWait <span class="nm">wait</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">WebDriverWait</span>(driver, Duration.<span class="fn">ofSeconds</span>(<span class="nu">10</span>));
+
+<span class="cm">// Wait until element is visible, then return it</span>
+WebElement <span class="nm">element</span> <span class="op">=</span> wait.<span class="fn">until</span>(
+    ExpectedConditions.<span class="fn">visibilityOfElementLocated</span>(By.<span class="fn">name</span>(<span class="st">"username"</span>)));
+
+<span class="cm">// How it works internally:</span>
+<span class="cm">// 1. Checks condition immediately</span>
+<span class="cm">// 2. If true → returns result immediately</span>
+<span class="cm">// 3. If false → waits 500ms, checks again</span>
+<span class="cm">// 4. Repeats until timeout (10s) or condition met</span>
+<span class="cm">// 5. If 10s passes without condition → TimeoutException</span>
+
+<span class="cm">// Basic pattern every time:</span>
+WebDriverWait <span class="nm">wait10</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">WebDriverWait</span>(driver, Duration.<span class="fn">ofSeconds</span>(<span class="nu">10</span>));
+WebDriverWait <span class="nm">wait5</span>  <span class="op">=</span> <span class="kw">new</span> <span class="fn">WebDriverWait</span>(driver, Duration.<span class="fn">ofSeconds</span>(<span class="nu">5</span>));
+WebDriverWait <span class="nm">wait30</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">WebDriverWait</span>(driver, Duration.<span class="fn">ofSeconds</span>(<span class="nu">30</span>));
+
+<span class="cm">// Use shorter waits for fast operations, longer for page loads</span>
+<span class="cm">// 5-10s: element appearance after click</span>
+<span class="cm">// 10-15s: page navigation</span>
+<span class="cm">// 30s: file upload, PDF generation</span></pre>
+  </div>
+</div>
+
+<!-- S4 -->
+<div class="section" id="s4">
+  <div class="section-header"><div class="section-num">04</div><h2>ExpectedConditions — Full Reference</h2></div>
+  <div class="ec-grid">
+    <div class="ec-card"><div class="ecn">visibilityOfElementLocated(By)</div><p>Wait until element exists in DOM AND is visible. Returns WebElement. Most used condition.</p></div>
+    <div class="ec-card"><div class="ecn">elementToBeClickable(By)</div><p>Wait until element is visible AND enabled. Use before click() or sendKeys().</p></div>
+    <div class="ec-card"><div class="ecn">presenceOfElementLocated(By)</div><p>Wait until element exists in DOM — may not be visible. Faster than visibility check.</p></div>
+    <div class="ec-card"><div class="ecn">invisibilityOfElementLocated(By)</div><p>Wait until element is gone or hidden. Use for loading spinners.</p></div>
+    <div class="ec-card"><div class="ecn">textToBePresentInElement(el, text)</div><p>Wait until element's text contains the specified string.</p></div>
+    <div class="ec-card"><div class="ecn">urlContains(text)</div><p>Wait until current URL contains the text. Use after navigation.</p></div>
+    <div class="ec-card"><div class="ecn">urlToBe(fullUrl)</div><p>Wait until URL exactly matches. Strict version of urlContains.</p></div>
+    <div class="ec-card"><div class="ecn">titleContains(text)</div><p>Wait until page title contains the text.</p></div>
+    <div class="ec-card"><div class="ecn">alertIsPresent()</div><p>Wait until a JavaScript alert appears.</p></div>
+    <div class="ec-card"><div class="ecn">frameToBeAvailable(nameOrId)</div><p>Wait until iframe is available and switch into it.</p></div>
+    <div class="ec-card"><div class="ecn">numberOfWindowsToBe(n)</div><p>Wait until n browser tabs/windows are open.</p></div>
+    <div class="ec-card"><div class="ecn">stalenessOf(element)</div><p>Wait until element becomes stale (page refreshed). Use before re-finding.</p></div>
+  </div>
+</div>
+
+<!-- S5 -->
+<div class="section" id="s5">
+  <div class="section-header"><div class="section-num">05</div><h2>Visibility Conditions</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">VisibilityConditions.java</span></div>
+    <pre><span class="nm">WebDriverWait</span> <span class="nm">wait</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">WebDriverWait</span>(driver, Duration.<span class="fn">ofSeconds</span>(<span class="nu">10</span>));
+
+<span class="cm">// ── visibilityOfElementLocated — by locator ───────────────────</span>
+<span class="cm">// Waits for element to be in DOM AND visible</span>
+WebElement <span class="nm">userField</span> <span class="op">=</span> wait.<span class="fn">until</span>(
+    ExpectedConditions.<span class="fn">visibilityOfElementLocated</span>(By.<span class="fn">name</span>(<span class="st">"username"</span>)));
+userField.<span class="fn">sendKeys</span>(<span class="st">"Admin"</span>);
+
+<span class="cm">// ── visibilityOf — by WebElement reference ────────────────────</span>
+WebElement <span class="nm">raw</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">name</span>(<span class="st">"username"</span>));
+WebElement <span class="nm">visible</span> <span class="op">=</span> wait.<span class="fn">until</span>(ExpectedConditions.<span class="fn">visibilityOf</span>(raw));
+
+<span class="cm">// ── visibilityOfAllElementsLocatedBy — list ───────────────────</span>
+List&lt;WebElement&gt; <span class="nm">rows</span> <span class="op">=</span> wait.<span class="fn">until</span>(
+    ExpectedConditions.<span class="fn">visibilityOfAllElementsLocatedBy</span>(
+        By.<span class="fn">cssSelector</span>(<span class="st">"tbody tr"</span>)));
+<span class="fn">System.out.println</span>(<span class="st">"Rows loaded: "</span> <span class="op">+</span> rows.<span class="fn">size</span>());
+
+<span class="cm">// ── presenceOfElementLocated — in DOM (may be hidden) ─────────</span>
+WebElement <span class="nm">hiddenEl</span> <span class="op">=</span> wait.<span class="fn">until</span>(
+    ExpectedConditions.<span class="fn">presenceOfElementLocated</span>(By.<span class="fn">id</span>(<span class="st">"hiddenInput"</span>)));
+
+<span class="cm">// ── invisibilityOfElementLocated — element disappears ─────────</span>
+<span class="cm">// Wait for loading spinner to disappear</span>
+wait.<span class="fn">until</span>(ExpectedConditions.<span class="fn">invisibilityOfElementLocated</span>(
+    By.<span class="fn">cssSelector</span>(<span class="st">".loading-spinner"</span>)));
+<span class="fn">System.out.println</span>(<span class="st">"Loading complete"</span>);
+
+<span class="cm">// ── numberOfElementsToBeMoreThan — wait for list to load ──────</span>
+wait.<span class="fn">until</span>(ExpectedConditions.<span class="fn">numberOfElementsToBeMoreThan</span>(
+    By.<span class="fn">cssSelector</span>(<span class="st">"tbody tr"</span>), <span class="nu">0</span>)); <span class="cm">// at least 1 row</span></pre>
+  </div>
+</div>
+
+<!-- S6 -->
+<div class="section" id="s6">
+  <div class="section-header"><div class="section-num">06</div><h2>Clickability &amp; Element State</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">ClickabilityConditions.java</span></div>
+    <pre><span class="nm">WebDriverWait</span> <span class="nm">wait</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">WebDriverWait</span>(driver, Duration.<span class="fn">ofSeconds</span>(<span class="nu">10</span>));
+
+<span class="cm">// ── elementToBeClickable — visible AND enabled ────────────────</span>
+<span class="cm">// THE most used condition for buttons and links</span>
+WebElement <span class="nm">loginBtn</span> <span class="op">=</span> wait.<span class="fn">until</span>(
+    ExpectedConditions.<span class="fn">elementToBeClickable</span>(
+        By.<span class="fn">cssSelector</span>(<span class="st">"button[type='submit']"</span>)));
+loginBtn.<span class="fn">click</span>();
+
+<span class="cm">// Also works with existing WebElement reference</span>
+WebElement <span class="nm">btn</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">id</span>(<span class="st">"submitBtn"</span>));
+wait.<span class="fn">until</span>(ExpectedConditions.<span class="fn">elementToBeClickable</span>(btn)).<span class="fn">click</span>();
+
+<span class="cm">// ── elementToBeSelected — for checkboxes/radios ───────────────</span>
+wait.<span class="fn">until</span>(ExpectedConditions.<span class="fn">elementToBeSelected</span>(
+    driver.<span class="fn">findElement</span>(By.<span class="fn">id</span>(<span class="st">"checkboxId"</span>))));
+
+<span class="cm">// ── elementSelectionStateToBe — check/uncheck state ──────────</span>
+wait.<span class="fn">until</span>(ExpectedConditions.<span class="fn">elementSelectionStateToBe</span>(
+    driver.<span class="fn">findElement</span>(By.<span class="fn">id</span>(<span class="st">"myCheckbox"</span>)), <span class="bool">true</span>));  <span class="cm">// wait until checked</span>
+
+<span class="cm">// ── textToBePresentInElement ──────────────────────────────────</span>
+WebElement <span class="nm">errorMsg</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">cssSelector</span>(<span class="st">".error"</span>));
+wait.<span class="fn">until</span>(ExpectedConditions.<span class="fn">textToBePresentInElement</span>(errorMsg, <span class="st">"Invalid"</span>));
+<span class="fn">System.out.println</span>(<span class="st">"Error text: "</span> <span class="op">+</span> errorMsg.<span class="fn">getText</span>());
+
+<span class="cm">// ── attributeContains — wait for attribute change ─────────────</span>
+wait.<span class="fn">until</span>(ExpectedConditions.<span class="fn">attributeContains</span>(
+    By.<span class="fn">id</span>(<span class="st">"statusBadge"</span>), <span class="st">"class"</span>, <span class="st">"active"</span>)); <span class="cm">// class contains "active"</span>
+
+<span class="cm">// ── attributeToBe — exact attribute value ─────────────────────</span>
+wait.<span class="fn">until</span>(ExpectedConditions.<span class="fn">attributeToBe</span>(
+    By.<span class="fn">id</span>(<span class="st">"input1"</span>), <span class="st">"value"</span>, <span class="st">"Expected"</span>));</pre>
+  </div>
+</div>
+
+<!-- S7 -->
+<div class="section" id="s7">
+  <div class="section-header"><div class="section-num">07</div><h2>URL &amp; Title Conditions</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">URLTitleConditions.java</span></div>
+    <pre><span class="nm">WebDriverWait</span> <span class="nm">wait</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">WebDriverWait</span>(driver, Duration.<span class="fn">ofSeconds</span>(<span class="nu">15</span>));
+
+<span class="cm">// ── urlContains — wait for navigation ─────────────────────────</span>
+<span class="cm">// REPLACES: Thread.sleep(2000) after clicking Login</span>
+driver.<span class="fn">findElement</span>(By.<span class="fn">cssSelector</span>(<span class="st">"button[type='submit']"</span>)).<span class="fn">click</span>();
+wait.<span class="fn">until</span>(ExpectedConditions.<span class="fn">urlContains</span>(<span class="st">"dashboard"</span>));
+<span class="fn">System.out.println</span>(<span class="st">"On dashboard: "</span> <span class="op">+</span> driver.<span class="fn">getCurrentUrl</span>());
+
+<span class="cm">// ── urlToBe — exact URL match ──────────────────────────────────</span>
+wait.<span class="fn">until</span>(ExpectedConditions.<span class="fn">urlToBe</span>(
+    <span class="st">"https://opensource-demo.orangehrmlive.com/web/index.php/dashboard/index"</span>));
+
+<span class="cm">// ── urlMatches — regex match ───────────────────────────────────</span>
+wait.<span class="fn">until</span>(ExpectedConditions.<span class="fn">urlMatches</span>(<span class="st">".*dashboard.*"</span>));
+
+<span class="cm">// ── titleContains — wait for tab title ────────────────────────</span>
+wait.<span class="fn">until</span>(ExpectedConditions.<span class="fn">titleContains</span>(<span class="st">"OrangeHRM"</span>));
+<span class="fn">System.out.println</span>(<span class="st">"Title: "</span> <span class="op">+</span> driver.<span class="fn">getTitle</span>());
+
+<span class="cm">// ── titleIs — exact title match ───────────────────────────────</span>
+wait.<span class="fn">until</span>(ExpectedConditions.<span class="fn">titleIs</span>(<span class="st">"OrangeHRM"</span>));
+
+<span class="cm">// TYPICAL LOGIN TEST WITH WAITS (no Thread.sleep!)</span>
+driver.<span class="fn">get</span>(<span class="st">"https://opensource-demo.orangehrmlive.com"</span>);
+
+<span class="cm">// Wait for login form</span>
+wait.<span class="fn">until</span>(ExpectedConditions.<span class="fn">visibilityOfElementLocated</span>(
+    By.<span class="fn">name</span>(<span class="st">"username"</span>))).<span class="fn">sendKeys</span>(<span class="st">"Admin"</span>);
+wait.<span class="fn">until</span>(ExpectedConditions.<span class="fn">visibilityOfElementLocated</span>(
+    By.<span class="fn">name</span>(<span class="st">"password"</span>))).<span class="fn">sendKeys</span>(<span class="st">"admin123"</span>);
+wait.<span class="fn">until</span>(ExpectedConditions.<span class="fn">elementToBeClickable</span>(
+    By.<span class="fn">cssSelector</span>(<span class="st">"button[type='submit']"</span>))).<span class="fn">click</span>();
+
+<span class="cm">// Wait for navigation to dashboard</span>
+wait.<span class="fn">until</span>(ExpectedConditions.<span class="fn">urlContains</span>(<span class="st">"dashboard"</span>));
+<span class="fn">System.out.println</span>(<span class="st">"✓ Login successful"</span>);</pre>
+  </div>
+</div>
+
+<!-- S8 -->
+<div class="section" id="s8">
+  <div class="section-header"><div class="section-num">08</div><h2>Custom ExpectedConditions</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">CustomConditions.java</span></div>
+    <pre><span class="kw">import</span> org.openqa.selenium.support.ui.ExpectedCondition;
+
+<span class="cm">// ExpectedCondition is a functional interface — implement with lambda</span>
+
+<span class="cm">// Custom: wait until element has specific text</span>
+<span class="nm">ExpectedCondition</span>&lt;WebElement&gt; <span class="nm">hasText</span> <span class="op">=</span> <span class="nm">d</span> -> {
+    WebElement <span class="nm">el</span> <span class="op">=</span> d.<span class="fn">findElement</span>(By.<span class="fn">cssSelector</span>(<span class="st">".status"</span>));
+    <span class="kw">return</span> el.<span class="fn">getText</span>().<span class="fn">contains</span>(<span class="st">"Active"</span>) ? el : <span class="kw">null</span>;
+};
+WebElement <span class="nm">statusEl</span> <span class="op">=</span> wait.<span class="fn">until</span>(hasText);
+
+<span class="cm">// Custom: wait until table has at least N rows</span>
+<span class="nm">ExpectedCondition</span>&lt;Boolean&gt; <span class="nm">hasRows</span> <span class="op">=</span> <span class="nm">d</span> -> {
+    List&lt;WebElement&gt; <span class="nm">rows</span> <span class="op">=</span> d.<span class="fn">findElements</span>(By.<span class="fn">cssSelector</span>(<span class="st">"tbody tr"</span>));
+    <span class="kw">return</span> rows.<span class="fn">size</span>() <span class="op">&gt;=</span> <span class="nu">5</span>;
+};
+wait.<span class="fn">until</span>(hasRows);
+
+<span class="cm">// Custom: wait until page is fully loaded (readyState)</span>
+<span class="nm">ExpectedCondition</span>&lt;Boolean&gt; <span class="nm">pageReady</span> <span class="op">=</span> <span class="nm">d</span> ->
+    ((<span class="nm">JavascriptExecutor</span>) d)
+        .<span class="fn">executeScript</span>(<span class="st">"return document.readyState"</span>)
+        .<span class="fn">equals</span>(<span class="st">"complete"</span>);
+wait.<span class="fn">until</span>(pageReady);
+<span class="fn">System.out.println</span>(<span class="st">"Page fully loaded"</span>);
+
+<span class="cm">// Custom: wait until dropdown has options</span>
+<span class="nm">ExpectedCondition</span>&lt;List&lt;WebElement&gt;&gt; <span class="nm">hasOptions</span> <span class="op">=</span> <span class="nm">d</span> -> {
+    List&lt;WebElement&gt; <span class="nm">opts</span> <span class="op">=</span> d.<span class="fn">findElements</span>(
+        By.<span class="fn">cssSelector</span>(<span class="st">".dropdown-option"</span>));
+    <span class="kw">return</span> opts.<span class="fn">isEmpty</span>() ? <span class="kw">null</span> : opts;
+};
+List&lt;WebElement&gt; <span class="nm">options</span> <span class="op">=</span> wait.<span class="fn">until</span>(hasOptions);</pre>
+  </div>
+</div>
+
+<!-- S9 -->
+<div class="section" id="s9">
+  <div class="section-header"><div class="section-num">09</div><h2>FluentWait — Advanced Configuration</h2></div>
+  <div class="hour-badge">&#9200; Hour 2 — FluentWait, WaitUtils &amp; Practice (60 mins)</div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">FluentWait.java</span></div>
+    <pre><span class="kw">import</span> org.openqa.selenium.support.ui.FluentWait;
+<span class="kw">import</span> java.time.Duration;
+
+<span class="cm">// FluentWait gives you control over:</span>
+<span class="cm">// - Max wait time</span>
+<span class="cm">// - Polling interval (how often to check)</span>
+<span class="cm">// - Which exceptions to ignore while waiting</span>
+
+FluentWait&lt;WebDriver&gt; <span class="nm">fluentWait</span> <span class="op">=</span> <span class="kw">new</span> FluentWait&lt;&gt;(driver)
+    .<span class="fn">withTimeout</span>(Duration.<span class="fn">ofSeconds</span>(<span class="nu">20</span>))        <span class="cm">// max wait</span>
+    .<span class="fn">pollingEvery</span>(Duration.<span class="fn">ofMillis</span>(<span class="nu">500</span>))        <span class="cm">// check every 500ms</span>
+    .<span class="fn">ignoring</span>(NoSuchElementException.<span class="kw">class</span>)     <span class="cm">// ignore NoSuchElement while waiting</span>
+    .<span class="fn">ignoring</span>(StaleElementReferenceException.<span class="kw">class</span>); <span class="cm">// ignore stale while waiting</span>
+
+<span class="cm">// Use it with ExpectedConditions</span>
+WebElement <span class="nm">element</span> <span class="op">=</span> fluentWait.<span class="fn">until</span>(
+    ExpectedConditions.<span class="fn">visibilityOfElementLocated</span>(By.<span class="fn">name</span>(<span class="st">"username"</span>)));
+
+<span class="cm">// Or with custom lambda</span>
+WebElement <span class="nm">el</span> <span class="op">=</span> fluentWait.<span class="fn">until</span>(<span class="nm">d</span> ->
+    d.<span class="fn">findElement</span>(By.<span class="fn">cssSelector</span>(<span class="st">".oxd-input"</span>)));
+
+<span class="cm">// FluentWait vs WebDriverWait</span>
+<span class="cm">// WebDriverWait IS a FluentWait with 500ms polling and NoSuchElement ignored</span>
+<span class="cm">// Use WebDriverWait for 95% of cases</span>
+<span class="cm">// Use FluentWait when you need custom polling interval or additional ignored exceptions</span>
+
+<span class="cm">// Fast polling for quick animations</span>
+FluentWait&lt;WebDriver&gt; <span class="nm">fastWait</span> <span class="op">=</span> <span class="kw">new</span> FluentWait&lt;&gt;(driver)
+    .<span class="fn">withTimeout</span>(Duration.<span class="fn">ofSeconds</span>(<span class="nu">5</span>))
+    .<span class="fn">pollingEvery</span>(Duration.<span class="fn">ofMillis</span>(<span class="nu">100</span>))  <span class="cm">// check every 100ms</span>
+    .<span class="fn">ignoring</span>(NoSuchElementException.<span class="kw">class</span>);</pre>
+  </div>
+</div>
+
+<!-- S10 -->
+<div class="section" id="s10">
+  <div class="section-header"><div class="section-num">10</div><h2>Replacing ALL Thread.sleep — Before &amp; After</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">BeforeAfter.java — Transformation</span></div>
+    <pre><span class="nm">WebDriverWait</span> <span class="nm">wait</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">WebDriverWait</span>(driver, Duration.<span class="fn">ofSeconds</span>(<span class="nu">10</span>));
+
+<span class="cm">// ╔══════════════════════════════════════════════════════════════╗</span>
+<span class="cm">// ║  BEFORE — with Thread.sleep (Days 11-19)                    ║</span>
+<span class="cm">// ╚══════════════════════════════════════════════════════════════╝</span>
+driver.<span class="fn">get</span>(<span class="st">"https://site.com/login"</span>);
+Thread.<span class="fn">sleep</span>(<span class="nu">2000</span>); <span class="cm">// wait for page</span>
+driver.<span class="fn">findElement</span>(By.<span class="fn">name</span>(<span class="st">"username"</span>)).<span class="fn">sendKeys</span>(<span class="st">"Admin"</span>);
+driver.<span class="fn">findElement</span>(By.<span class="fn">name</span>(<span class="st">"password"</span>)).<span class="fn">sendKeys</span>(<span class="st">"admin123"</span>);
+driver.<span class="fn">findElement</span>(By.<span class="fn">cssSelector</span>(<span class="st">"button[type='submit']"</span>)).<span class="fn">click</span>();
+Thread.<span class="fn">sleep</span>(<span class="nu">3000</span>); <span class="cm">// wait for navigation</span>
+<span class="ty">String</span> <span class="nm">url</span> <span class="op">=</span> driver.<span class="fn">getCurrentUrl</span>();
+<span class="cm">// Total: minimum 5 seconds wasted</span>
+
+<span class="cm">// ╔══════════════════════════════════════════════════════════════╗</span>
+<span class="cm">// ║  AFTER — with Explicit Waits (Day 20+)                     ║</span>
+<span class="cm">// ╚══════════════════════════════════════════════════════════════╝</span>
+driver.<span class="fn">get</span>(<span class="st">"https://site.com/login"</span>);
+<span class="cm">// Wait for username field — then immediately type</span>
+wait.<span class="fn">until</span>(ExpectedConditions.<span class="fn">visibilityOfElementLocated</span>(
+    By.<span class="fn">name</span>(<span class="st">"username"</span>))).<span class="fn">sendKeys</span>(<span class="st">"Admin"</span>);
+<span class="cm">// Password field appears instantly after username — no wait needed</span>
+driver.<span class="fn">findElement</span>(By.<span class="fn">name</span>(<span class="st">"password"</span>)).<span class="fn">sendKeys</span>(<span class="st">"admin123"</span>);
+<span class="cm">// Wait for button to be clickable</span>
+wait.<span class="fn">until</span>(ExpectedConditions.<span class="fn">elementToBeClickable</span>(
+    By.<span class="fn">cssSelector</span>(<span class="st">"button[type='submit']"</span>))).<span class="fn">click</span>();
+<span class="cm">// Wait for URL to change to dashboard</span>
+wait.<span class="fn">until</span>(ExpectedConditions.<span class="fn">urlContains</span>(<span class="st">"dashboard"</span>));
+<span class="ty">String</span> <span class="nm">url2</span> <span class="op">=</span> driver.<span class="fn">getCurrentUrl</span>();
+<span class="cm">// Total: only as long as needed — typically &lt; 1 second!</span>
+
+<span class="cm">// Dropdown: BEFORE</span>
+driver.<span class="fn">findElement</span>(By.<span class="fn">cssSelector</span>(<span class="st">".dropdown"</span>)).<span class="fn">click</span>();
+Thread.<span class="fn">sleep</span>(<span class="nu">500</span>);
+driver.<span class="fn">findElement</span>(By.<span class="fn">cssSelector</span>(<span class="st">".option"</span>)).<span class="fn">click</span>();
+
+<span class="cm">// Dropdown: AFTER</span>
+driver.<span class="fn">findElement</span>(By.<span class="fn">cssSelector</span>(<span class="st">".dropdown"</span>)).<span class="fn">click</span>();
+wait.<span class="fn">until</span>(ExpectedConditions.<span class="fn">visibilityOfElementLocated</span>(
+    By.<span class="fn">cssSelector</span>(<span class="st">".option"</span>))).<span class="fn">click</span>();</pre>
+  </div>
+</div>
+
+<!-- S11 -->
+<div class="section" id="s11">
+  <div class="section-header"><div class="section-num">11</div><h2>WaitUtils — Reusable Wait Helper</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">WaitUtils.java — utils/WaitUtils.java</span></div>
+    <pre><span class="kw">package</span> com.qaautomation.utils;
+
+<span class="kw">import</span> org.openqa.selenium.*;
+<span class="kw">import</span> org.openqa.selenium.support.ui.*;
+<span class="kw">import</span> java.time.Duration;
+<span class="kw">import</span> java.util.List;
+
+<span class="kw">public class</span> <span class="nm">WaitUtils</span> {
+
+    <span class="kw">private static final int</span> <span class="nm">DEFAULT_TIMEOUT</span> <span class="op">=</span> <span class="nu">10</span>;
+
+    <span class="kw">private static</span> WebDriverWait <span class="fn">getWait</span>(WebDriver <span class="nm">driver</span>, <span class="ty">int</span> <span class="nm">sec</span>) {
+        <span class="kw">return</span> <span class="kw">new</span> <span class="fn">WebDriverWait</span>(driver, Duration.<span class="fn">ofSeconds</span>(sec));
+    }
+
+    <span class="cm">// Wait for element to be visible</span>
+    <span class="kw">public static</span> WebElement <span class="fn">waitVisible</span>(WebDriver <span class="nm">d</span>, By <span class="nm">loc</span>) {
+        <span class="kw">return</span> <span class="fn">getWait</span>(d, DEFAULT_TIMEOUT).<span class="fn">until</span>(
+            ExpectedConditions.<span class="fn">visibilityOfElementLocated</span>(loc));
+    }
+
+    <span class="cm">// Wait for element to be clickable</span>
+    <span class="kw">public static</span> WebElement <span class="fn">waitClickable</span>(WebDriver <span class="nm">d</span>, By <span class="nm">loc</span>) {
+        <span class="kw">return</span> <span class="fn">getWait</span>(d, DEFAULT_TIMEOUT).<span class="fn">until</span>(
+            ExpectedConditions.<span class="fn">elementToBeClickable</span>(loc));
+    }
+
+    <span class="cm">// Wait + click in one call</span>
+    <span class="kw">public static void</span> <span class="fn">waitAndClick</span>(WebDriver <span class="nm">d</span>, By <span class="nm">loc</span>) {
+        <span class="fn">waitClickable</span>(d, loc).<span class="fn">click</span>();
+    }
+
+    <span class="cm">// Wait + type in one call</span>
+    <span class="kw">public static void</span> <span class="fn">waitAndType</span>(WebDriver <span class="nm">d</span>, By <span class="nm">loc</span>, <span class="ty">String</span> <span class="nm">text</span>) {
+        WebElement <span class="nm">el</span> <span class="op">=</span> <span class="fn">waitVisible</span>(d, loc);
+        el.<span class="fn">clear</span>();
+        el.<span class="fn">sendKeys</span>(text);
+    }
+
+    <span class="cm">// Wait for URL</span>
+    <span class="kw">public static void</span> <span class="fn">waitForUrl</span>(WebDriver <span class="nm">d</span>, <span class="ty">String</span> <span class="nm">urlPart</span>) {
+        <span class="fn">getWait</span>(d, <span class="nu">15</span>).<span class="fn">until</span>(ExpectedConditions.<span class="fn">urlContains</span>(urlPart));
+    }
+
+    <span class="cm">// Wait for title</span>
+    <span class="kw">public static void</span> <span class="fn">waitForTitle</span>(WebDriver <span class="nm">d</span>, <span class="ty">String</span> <span class="nm">title</span>) {
+        <span class="fn">getWait</span>(d, <span class="nu">10</span>).<span class="fn">until</span>(ExpectedConditions.<span class="fn">titleContains</span>(title));
+    }
+
+    <span class="cm">// Wait for element to disappear</span>
+    <span class="kw">public static void</span> <span class="fn">waitInvisible</span>(WebDriver <span class="nm">d</span>, By <span class="nm">loc</span>) {
+        <span class="fn">getWait</span>(d, DEFAULT_TIMEOUT).<span class="fn">until</span>(
+            ExpectedConditions.<span class="fn">invisibilityOfElementLocated</span>(loc));
+    }
+
+    <span class="cm">// Wait for list of elements</span>
+    <span class="kw">public static</span> List&lt;WebElement&gt; <span class="fn">waitAllVisible</span>(WebDriver <span class="nm">d</span>, By <span class="nm">loc</span>) {
+        <span class="kw">return</span> <span class="fn">getWait</span>(d, DEFAULT_TIMEOUT).<span class="fn">until</span>(
+            ExpectedConditions.<span class="fn">visibilityOfAllElementsLocatedBy</span>(loc));
+    }
+
+    <span class="cm">// Wait for text in element</span>
+    <span class="kw">public static void</span> <span class="fn">waitForText</span>(WebDriver <span class="nm">d</span>, By <span class="nm">loc</span>, <span class="ty">String</span> <span class="nm">text</span>) {
+        <span class="fn">getWait</span>(d, DEFAULT_TIMEOUT).<span class="fn">until</span>(
+            ExpectedConditions.<span class="fn">textToBePresentInElementLocated</span>(loc, text));
+    }
+
+    <span class="cm">// Is element present (no exception)</span>
+    <span class="kw">public static</span> <span class="ty">boolean</span> <span class="fn">isPresent</span>(WebDriver <span class="nm">d</span>, By <span class="nm">loc</span>) {
+        <span class="kw">try</span> {
+            <span class="fn">getWait</span>(d, <span class="nu">3</span>).<span class="fn">until</span>(ExpectedConditions.<span class="fn">presenceOfElementLocated</span>(loc));
+            <span class="kw">return</span> <span class="bool">true</span>;
+        } <span class="kw">catch</span> (TimeoutException <span class="nm">e</span>) {
+            <span class="kw">return</span> <span class="bool">false</span>;
+        }
+    }
+}</pre>
+  </div>
+</div>
+
+<!-- S12 -->
+<div class="section" id="s12">
+  <div class="section-header"><div class="section-num">12</div><h2>Updated BaseTest with Waits</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">BaseTest.java — Updated with WaitUtils</span></div>
+    <pre><span class="kw">package</span> com.qaautomation.tests;
+
+<span class="kw">import</span> com.qaautomation.utils.*;
+<span class="kw">import</span> org.openqa.selenium.*;
+<span class="kw">import</span> org.openqa.selenium.support.ui.*;
+<span class="kw">import</span> java.time.Duration;
+
+<span class="kw">public class</span> <span class="nm">BaseTest</span> {
+
+    <span class="kw">protected</span> WebDriver       <span class="nm">driver</span>;
+    <span class="kw">protected</span> WebDriverWait   <span class="nm">wait</span>;
+    <span class="kw">protected</span> <span class="ty">String</span>          <span class="nm">browser</span> <span class="op">=</span> ConfigReader.<span class="fn">getBrowser</span>();
+
+    <span class="kw">public void</span> <span class="fn">setUp</span>() {
+        driver <span class="op">=</span> DriverFactory.<span class="fn">getDriver</span>(browser);
+        wait   <span class="op">=</span> <span class="kw">new</span> <span class="fn">WebDriverWait</span>(driver, Duration.<span class="fn">ofSeconds</span>(<span class="nu">10</span>));
+        <span class="fn">System.out.println</span>(<span class="st">"[SETUP] "</span> <span class="op">+</span> browser <span class="op">+</span> <span class="st">" started"</span>);
+    }
+
+    <span class="kw">public void</span> <span class="fn">tearDown</span>() {
+        <span class="kw">if</span> (driver <span class="op">!=</span> <span class="kw">null</span>) {
+            driver.<span class="fn">quit</span>();
+            <span class="fn">System.out.println</span>(<span class="st">"[QUIT] Browser closed"</span>);
+        }
+    }
+
+    <span class="cm">// Helper: wait + click</span>
+    <span class="kw">protected void</span> <span class="fn">click</span>(By <span class="nm">locator</span>) {
+        wait.<span class="fn">until</span>(ExpectedConditions.<span class="fn">elementToBeClickable</span>(locator)).<span class="fn">click</span>();
+    }
+
+    <span class="cm">// Helper: wait + type</span>
+    <span class="kw">protected void</span> <span class="fn">type</span>(By <span class="nm">locator</span>, <span class="ty">String</span> <span class="nm">text</span>) {
+        WebElement <span class="nm">el</span> <span class="op">=</span> wait.<span class="fn">until</span>(
+            ExpectedConditions.<span class="fn">visibilityOfElementLocated</span>(locator));
+        el.<span class="fn">clear</span>();
+        el.<span class="fn">sendKeys</span>(text);
+    }
+
+    <span class="cm">// Helper: wait + getText</span>
+    <span class="kw">protected</span> <span class="ty">String</span> <span class="fn">getText</span>(By <span class="nm">locator</span>) {
+        <span class="kw">return</span> wait.<span class="fn">until</span>(
+            ExpectedConditions.<span class="fn">visibilityOfElementLocated</span>(locator)).<span class="fn">getText</span>();
+    }
+
+    <span class="cm">// Helper: wait for URL</span>
+    <span class="kw">protected void</span> <span class="fn">waitForUrl</span>(<span class="ty">String</span> <span class="nm">urlPart</span>) {
+        <span class="kw">new</span> <span class="fn">WebDriverWait</span>(driver, Duration.<span class="fn">ofSeconds</span>(<span class="nu">15</span>))
+            .<span class="fn">until</span>(ExpectedConditions.<span class="fn">urlContains</span>(urlPart));
+    }
+}</pre>
+  </div>
+</div>
+
+<!-- S13 -->
+<div class="section" id="s13">
+  <div class="section-header"><div class="section-num">13</div><h2>Practice Task — Full Login Script With Explicit Waits</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">Day20Practice.java — NO Thread.sleep anywhere</span></div>
+    <pre><span class="kw">package</span> com.qaautomation.tests;
+
+<span class="kw">import</span> com.qaautomation.utils.*;
+<span class="kw">import</span> org.openqa.selenium.*;
+<span class="kw">import</span> org.openqa.selenium.support.ui.*;
+<span class="kw">import</span> java.time.Duration;
+
+<span class="kw">public class</span> <span class="nm">Day20Practice</span> {
+
+    <span class="kw">static final</span> By <span class="nm">USERNAME</span>   <span class="op">=</span> By.<span class="fn">name</span>(<span class="st">"username"</span>);
+    <span class="kw">static final</span> By <span class="nm">PASSWORD</span>   <span class="op">=</span> By.<span class="fn">name</span>(<span class="st">"password"</span>);
+    <span class="kw">static final</span> By <span class="nm">LOGIN_BTN</span>  <span class="op">=</span> By.<span class="fn">cssSelector</span>(<span class="st">"button[type='submit']"</span>);
+    <span class="kw">static final</span> By <span class="nm">ERROR_MSG</span>  <span class="op">=</span> By.<span class="fn">cssSelector</span>(<span class="st">".oxd-alert-content"</span>);
+    <span class="kw">static final</span> By <span class="nm">USER_NAME</span>  <span class="op">=</span> By.<span class="fn">cssSelector</span>(<span class="st">".oxd-userdropdown-name"</span>);
+    <span class="kw">static final</span> By <span class="nm">DASHBOARD</span>  <span class="op">=</span> By.<span class="fn">xpath</span>(<span class="st">"//h6[text()='Dashboard']"</span>);
+
+    <span class="kw">public static void</span> <span class="fn">main</span>(<span class="ty">String</span>[] args) {
+        WebDriver     <span class="nm">driver</span> <span class="op">=</span> DriverFactory.<span class="fn">getDriver</span>(<span class="st">"chrome"</span>);
+        WebDriverWait <span class="nm">wait</span>   <span class="op">=</span> <span class="kw">new</span> <span class="fn">WebDriverWait</span>(driver, Duration.<span class="fn">ofSeconds</span>(<span class="nu">10</span>));
+
+        <span class="kw">try</span> {
+            driver.<span class="fn">get</span>(ConfigReader.<span class="fn">getBaseUrl</span>());
+
+            <span class="cm">// Task 1: Valid login with explicit waits (no sleep!)</span>
+            <span class="fn">System.out.println</span>(<span class="st">"====== TASK 1: Valid Login (Explicit Waits) ======"</span>);
+            WaitUtils.<span class="fn">waitAndType</span>(driver, USERNAME, ConfigReader.<span class="fn">getUsername</span>());
+            WaitUtils.<span class="fn">waitAndType</span>(driver, PASSWORD, ConfigReader.<span class="fn">getPassword</span>());
+            WaitUtils.<span class="fn">waitAndClick</span>(driver, LOGIN_BTN);
+            WaitUtils.<span class="fn">waitForUrl</span>(driver, <span class="st">"dashboard"</span>);
+
+            <span class="ty">String</span> <span class="nm">loggedUser</span> <span class="op">=</span> WaitUtils.<span class="fn">waitVisible</span>(driver, USER_NAME).<span class="fn">getText</span>();
+            <span class="ty">boolean</span> <span class="nm">dashVis</span>   <span class="op">=</span> WaitUtils.<span class="fn">isPresent</span>(driver, DASHBOARD);
+            <span class="fn">System.out.println</span>(<span class="st">"  Logged in as  : "</span> <span class="op">+</span> loggedUser);
+            <span class="fn">System.out.println</span>(<span class="st">"  Dashboard shown: "</span> <span class="op">+</span> dashVis);
+            <span class="fn">System.out.println</span>(dashVis <span class="op">?</span> <span class="st">"  ✓ PASS"</span> <span class="op">:</span> <span class="st">"  ✗ FAIL"</span>);
+
+            <span class="cm">// Task 2: Invalid login — wait for error message</span>
+            <span class="fn">System.out.println</span>(<span class="st">"\n====== TASK 2: Invalid Login ======"</span>);
+            driver.<span class="fn">get</span>(ConfigReader.<span class="fn">getBaseUrl</span>());
+            WaitUtils.<span class="fn">waitAndType</span>(driver, USERNAME, <span class="st">"invalid_user"</span>);
+            WaitUtils.<span class="fn">waitAndType</span>(driver, PASSWORD, <span class="st">"wrong_pass"</span>);
+            WaitUtils.<span class="fn">waitAndClick</span>(driver, LOGIN_BTN);
+            <span class="cm">// Wait for error message to appear</span>
+            WaitUtils.<span class="fn">waitForText</span>(driver, ERROR_MSG, <span class="st">"Invalid"</span>);
+            <span class="ty">String</span> <span class="nm">errText</span> <span class="op">=</span> WaitUtils.<span class="fn">waitVisible</span>(driver, ERROR_MSG).<span class="fn">getText</span>();
+            <span class="fn">System.out.println</span>(<span class="st">"  Error message: "</span> <span class="op">+</span> errText);
+            <span class="fn">System.out.println</span>(errText.<span class="fn">contains</span>(<span class="st">"Invalid"</span>) <span class="op">?</span> <span class="st">"  ✓ PASS"</span> <span class="op">:</span> <span class="st">"  ✗ FAIL"</span>);
+
+            <span class="cm">// Task 3: WebDriverWait directly</span>
+            <span class="fn">System.out.println</span>(<span class="st">"\n====== TASK 3: Direct WebDriverWait ======"</span>);
+            driver.<span class="fn">get</span>(ConfigReader.<span class="fn">getBaseUrl</span>());
+            <span class="cm">// Chain: wait visible → sendKeys</span>
+            wait.<span class="fn">until</span>(ExpectedConditions.<span class="fn">visibilityOfElementLocated</span>(USERNAME))
+                .<span class="fn">sendKeys</span>(ConfigReader.<span class="fn">getUsername</span>());
+            wait.<span class="fn">until</span>(ExpectedConditions.<span class="fn">visibilityOfElementLocated</span>(PASSWORD))
+                .<span class="fn">sendKeys</span>(ConfigReader.<span class="fn">getPassword</span>());
+            wait.<span class="fn">until</span>(ExpectedConditions.<span class="fn">elementToBeClickable</span>(LOGIN_BTN))
+                .<span class="fn">click</span>();
+            wait.<span class="fn">until</span>(ExpectedConditions.<span class="fn">urlContains</span>(<span class="st">"dashboard"</span>));
+            <span class="fn">System.out.println</span>(<span class="st">"  URL: "</span> <span class="op">+</span> driver.<span class="fn">getCurrentUrl</span>());
+            <span class="fn">System.out.println</span>(<span class="st">"  ✓ PASS"</span>);
+
+            <span class="cm">// Task 4: isPresent helper</span>
+            <span class="fn">System.out.println</span>(<span class="st">"\n====== TASK 4: isPresent ======"</span>);
+            <span class="fn">System.out.println</span>(<span class="st">"  Dashboard heading present: "</span>
+                <span class="op">+</span> WaitUtils.<span class="fn">isPresent</span>(driver, DASHBOARD));
+            <span class="fn">System.out.println</span>(<span class="st">"  Error msg present       : "</span>
+                <span class="op">+</span> WaitUtils.<span class="fn">isPresent</span>(driver, ERROR_MSG));
+            <span class="fn">System.out.println</span>(<span class="st">"  ✓ PASS"</span>);
+
+        } <span class="kw">catch</span> (Exception <span class="nm">e</span>) {
+            <span class="fn">System.out.println</span>(<span class="st">"Error: "</span> <span class="op">+</span> e.<span class="fn">getMessage</span>());
+        } <span class="kw">finally</span> {
+            driver.<span class="fn">quit</span>();
+            <span class="fn">System.out.println</span>(<span class="st">"\nBrowser closed ✓"</span>);
+        }
+    }
+}</pre>
+  </div>
+  <h3>Expected Output</h3>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Output</span><span class="code-file">Console — notice no fixed delays</span></div>
+    <pre>====== TASK 1: Valid Login (Explicit Waits) ======
+  Logged in as  : Admin
+  Dashboard shown: true
+  ✓ PASS
+
+====== TASK 2: Invalid Login ======
+  Error message: Invalid credentials
+  ✓ PASS
+
+====== TASK 3: Direct WebDriverWait ======
+  URL: https://opensource-demo.orangehrmlive.com/web/index.php/dashboard/index
+  ✓ PASS
+
+====== TASK 4: isPresent ======
+  Dashboard heading present: true
+  Error msg present       : false
+  ✓ PASS
+
+Browser closed ✓</pre>
+  </div>
+</div>
+
+<!-- S14 -->
+<div class="section" id="s14">
+  <div class="section-header"><div class="section-num">14</div><h2>Common Mistakes</h2></div>
+  <div class="mistake-grid">
+    <div class="mistake-card"><div class="mt">&#10060; Mixing implicit + explicit waits</div><p>Having both <code>driver.manage().timeouts().implicitlyWait(10)</code> AND <code>new WebDriverWait</code> in the same script causes compounding timeouts. Use ONLY explicit waits (or only implicit as global safety). Never both.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; Creating WebDriverWait in every method</div><p>Creating <code>new WebDriverWait(driver, Duration.ofSeconds(10))</code> in every test method is wasteful. Create it once in setUp() or use WaitUtils. One wait object per driver instance.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; visibilityOf vs elementToBeClickable</div><p><code>visibilityOf</code> — element is visible but may be disabled. <code>elementToBeClickable</code> — visible AND enabled. Always use clickable before click(). Use visible for sendKeys and getText.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; Not handling TimeoutException</div><p>When WebDriverWait times out, it throws TimeoutException. Wrap waits in try-catch if the element's absence is a valid test scenario, not just an error.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; Waits on non-existent elements</div><p>If the element NEVER appears (wrong locator), the wait always times out after max timeout. Fix your locator first — don't increase the timeout.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; Still using Thread.sleep with waits</div><p>After implementing explicit waits, still leaving Thread.sleep calls from before. Do a project-wide search for "Thread.sleep" and delete every occurrence. Replace with the appropriate wait condition.</p></div>
+  </div>
+</div>
+
+<!-- S15 -->
+<div class="section" id="s15">
+  <div class="section-header"><div class="section-num">15</div><h2>End of Day Checklist + Resources</h2></div>
+  <div class="checklist">
+    <div class="checklist-title">&#10022; End of Day 20 Checklist — Thread.sleep is GONE</div>
+    <div class="check-item"><div class="check-box"></div>I understand why explicit waits are faster and more reliable than Thread.sleep</div>
+    <div class="check-item"><div class="check-box"></div>I know the syntax: new WebDriverWait(driver, Duration.ofSeconds(10)).until(condition)</div>
+    <div class="check-item"><div class="check-box"></div>I use visibilityOfElementLocated for sendKeys and getText</div>
+    <div class="check-item"><div class="check-box"></div>I use elementToBeClickable before every click()</div>
+    <div class="check-item"><div class="check-box"></div>I use urlContains after navigation clicks instead of Thread.sleep</div>
+    <div class="check-item"><div class="check-box"></div>I know at least 8 ExpectedConditions and when to use each</div>
+    <div class="check-item"><div class="check-box"></div>WaitUtils.java created in utils package with all helper methods</div>
+    <div class="check-item"><div class="check-box"></div>BaseTest.java updated — wait field initialized in setUp()</div>
+    <div class="check-item"><div class="check-box"></div>All Thread.sleep calls removed from Days 11-19 scripts</div>
+    <div class="check-item"><div class="check-box"></div>Practice task runs — all 4 tasks PASS with no Thread.sleep</div>
+    <div class="check-item"><div class="check-box"></div>&#127881; I never write Thread.sleep again in production test code</div>
+  </div>
+  <h3>Resources</h3>
+  <ul class="resource-list">
+    <li><span>&#128214;</span><strong>Selenium Docs:&nbsp;</strong><a href="https://www.selenium.dev/documentation/webdriver/waits/" target="_blank">Selenium — Waits</a> &nbsp;<span style="color:var(--muted);font-size:12px">Official guide covering implicit, explicit, and fluent waits.</span></li>
+    <li><span>&#128214;</span><strong>JavaDocs:&nbsp;</strong><a href="https://www.selenium.dev/selenium/docs/api/java/org/openqa/selenium/support/ui/ExpectedConditions.html" target="_blank">ExpectedConditions JavaDoc</a> &nbsp;<span style="color:var(--muted);font-size:12px">Complete list of all available expected conditions.</span></li>
+  </ul>
+  <div class="callout tip">
+    <span class="callout-icon">&#128640;</span>
+    <div class="callout-body">
+      <div class="callout-title">Days 21–26 Preview — Alerts, Frames, Windows, Screenshots</div>
+      <p>Phase 2 final stretch: <strong>Day 21</strong> — JavaScript Alerts (accept/dismiss/prompt). <strong>Day 22</strong> — Window/Tab management with explicit waits. <strong>Day 23</strong> — iFrames. <strong>Day 24</strong> — Screenshots in test reports. <strong>Day 25</strong> — JavaScript executor advanced. <strong>Day 26</strong> — Phase 2 review + mini project. Then Phase 3: TestNG + Page Object Model begins.</p>
+    </div>
+  </div>
+</div>
+
+</div>
+<div class="footer">
+  <span>Day 20 of 65</span> &nbsp;&middot;&nbsp; Selenium + Java Automation Roadmap &nbsp;&middot;&nbsp; Phase 2 &mdash; Core Selenium &nbsp;&middot;&nbsp; <span>Next: Day 21 &mdash; JavaScript Alerts</span>
+</div>
+</body>
+</html>

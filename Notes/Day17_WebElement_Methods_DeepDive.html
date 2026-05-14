@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 17 — WebElement Methods Deep Dive</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Sora:wght@400;600;700;800&display=swap');
+:root{--bg:#0d1117;--bg2:#161b22;--bg3:#1e2530;--border:#30363d;--accent:#f0a500;--accent2:#58a6ff;--accent3:#3fb950;--accent4:#ff7b72;--accent5:#d2a8ff;--text:#e6edf3;--muted:#8b949e;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);line-height:1.75;font-size:15px;}
+.hero{background:linear-gradient(135deg,#0d1117,#161b22,#150d1a);border-bottom:2px solid var(--accent5);padding:48px 40px 36px;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:0;right:0;width:400px;height:400px;background:radial-gradient(circle,rgba(210,168,255,0.06),transparent 70%);pointer-events:none;}
+.hero-tag{display:inline-block;background:rgba(210,168,255,0.12);border:1px solid rgba(210,168,255,0.3);color:var(--accent5);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;padding:4px 12px;border-radius:20px;margin-bottom:16px;}
+.hero h1{font-size:34px;font-weight:800;line-height:1.2;margin-bottom:10px;}
+.hero h1 span{color:var(--accent5);}
+.hero-sub{color:var(--muted);font-size:14px;display:flex;gap:24px;flex-wrap:wrap;margin-top:16px;}
+.hero-sub span{display:flex;align-items:center;gap:6px;}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--accent5);display:inline-block;}
+.container{max-width:980px;margin:0 auto;padding:40px 32px 80px;}
+.toc{background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--accent5);border-radius:8px;padding:24px 28px;margin-bottom:48px;}
+.toc-title{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--accent5);margin-bottom:14px;}
+.toc ol{padding-left:20px;}.toc li{margin-bottom:6px;}
+.toc a{color:var(--muted);text-decoration:none;font-size:14px;}.toc a:hover{color:var(--accent5);}
+.section{margin-bottom:56px;}
+.section-header{display:flex;align-items:center;gap:14px;margin-bottom:24px;padding-bottom:14px;border-bottom:1px solid var(--border);}
+.section-num{background:var(--accent5);color:#000;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:12px;width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.section h2{font-size:22px;font-weight:700;}
+h3{font-size:16px;font-weight:600;color:var(--accent5);margin:28px 0 12px;display:flex;align-items:center;gap:8px;}
+h3::before{content:'▸';color:var(--accent);font-size:12px;}
+p{color:var(--muted);margin-bottom:14px;line-height:1.8;}strong{color:var(--text);font-weight:600;}
+.code-block{background:#010409;border:1px solid var(--border);border-radius:10px;margin:20px 0;overflow:hidden;}
+.code-header{background:var(--bg2);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
+.code-lang{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent5);letter-spacing:1px;text-transform:uppercase;font-weight:600;}
+.code-file{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);}
+pre{font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.85;padding:20px;overflow-x:auto;color:#e6edf3;}
+.kw{color:#ff7b72;font-weight:500;}.ty{color:#ffa657;}.st{color:#a5d6ff;}.cm{color:#6e7681;font-style:italic;}
+.nm{color:#79c0ff;}.nu{color:#79c0ff;}.fn{color:#d2a8ff;}.op{color:#ff7b72;}.bool{color:#3fb950;}
+code{font-family:'JetBrains Mono',monospace;font-size:12.5px;background:rgba(210,168,255,0.1);border:1px solid rgba(210,168,255,0.2);color:var(--accent5);padding:1px 7px;border-radius:4px;}
+.callout{border-radius:8px;padding:16px 20px;margin:20px 0;display:flex;gap:14px;align-items:flex-start;}
+.callout-icon{font-size:18px;flex-shrink:0;margin-top:1px;}.callout-body{flex:1;}
+.callout-title{font-weight:700;font-size:13px;margin-bottom:4px;}.callout p{margin-bottom:0;font-size:13.5px;}
+.note{background:rgba(88,166,255,0.07);border-left:3px solid var(--accent2);}.note .callout-title{color:var(--accent2);}
+.tip{background:rgba(63,185,80,0.07);border-left:3px solid var(--accent3);}.tip .callout-title{color:var(--accent3);}
+.warn{background:rgba(240,165,0,0.07);border-left:3px solid var(--accent);}.warn .callout-title{color:var(--accent);}
+.error{background:rgba(255,123,114,0.07);border-left:3px solid var(--accent4);}.error .callout-title{color:var(--accent4);}
+.purple{background:rgba(210,168,255,0.07);border-left:3px solid var(--accent5);}.purple .callout-title{color:var(--accent5);}
+.table-wrap{overflow-x:auto;margin:20px 0;}
+table{width:100%;border-collapse:collapse;font-size:13.5px;}
+thead tr{background:var(--bg2);border-bottom:2px solid var(--accent5);}
+th{padding:12px 16px;text-align:left;font-weight:700;font-size:12px;letter-spacing:0.5px;text-transform:uppercase;color:var(--accent5);}
+td{padding:11px 16px;border-bottom:1px solid var(--border);color:var(--muted);}
+tr:hover td{background:rgba(255,255,255,0.02);}
+td:first-child{font-family:'JetBrains Mono',monospace;color:var(--accent2);font-size:13px;}
+.hour-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(210,168,255,0.1);border:1px solid rgba(210,168,255,0.25);color:var(--accent5);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:1px;padding:5px 14px;border-radius:20px;margin-bottom:18px;margin-top:30px;}
+.mistake-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:20px 0;}
+.mistake-card{background:rgba(255,123,114,0.05);border:1px solid rgba(255,123,114,0.2);border-radius:8px;padding:16px;}
+.mistake-card .mt{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent4);font-weight:700;margin-bottom:8px;}
+.mistake-card p{font-size:13px;margin:0;}
+.checklist{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:24px 28px;margin:24px 0;}
+.checklist-title{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent3);letter-spacing:1.5px;text-transform:uppercase;font-weight:700;margin-bottom:16px;}
+.check-item{display:flex;align-items:flex-start;gap:12px;padding:9px 0;border-bottom:1px solid rgba(48,54,61,0.5);font-size:14px;color:var(--muted);}
+.check-item:last-child{border-bottom:none;}
+.check-box{width:18px;height:18px;border:2px solid var(--accent3);border-radius:4px;flex-shrink:0;margin-top:2px;}
+.resource-list{list-style:none;padding:0;margin:12px 0;}
+.resource-list li{padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;margin-bottom:8px;font-size:13.5px;display:flex;gap:10px;align-items:center;}
+.resource-list li a{color:var(--accent2);text-decoration:none;}
+.footer{background:var(--bg2);border-top:1px solid var(--border);padding:24px 40px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);}
+.footer span{color:var(--accent5);}
+::-webkit-scrollbar{width:6px;height:6px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+@media(max-width:640px){.hero{padding:32px 20px 24px;}.hero h1{font-size:24px;}.container{padding:24px 16px 60px;}}
+</style>
+</head>
+<body>
+<div class="hero">
+  <div class="hero-tag">Phase 2 &middot; Day 17 of 65</div>
+  <h1>WebElement Methods <span>Deep Dive</span></h1>
+  <div class="hero-sub">
+    <span><span class="dot"></span>2 Hours</span>
+    <span><span class="dot"></span>All WebElement methods &middot; Checkboxes &middot; Radio Buttons &middot; Select Dropdowns &middot; File Upload</span>
+  </div>
+</div>
+<div class="container">
+
+<div class="toc">
+  <div class="toc-title">// Table of Contents</div>
+  <ol>
+    <li><a href="#s1">Complete WebElement Method Reference</a></li>
+    <li><a href="#s2">Text Input Interactions</a></li>
+    <li><a href="#s3">Checkboxes</a></li>
+    <li><a href="#s4">Radio Buttons</a></li>
+    <li><a href="#s5">Select Dropdowns — Select Class</a></li>
+    <li><a href="#s6">Multi-Select Dropdowns</a></li>
+    <li><a href="#s7">Custom Dropdowns (Non-select)</a></li>
+    <li><a href="#s8">File Upload</a></li>
+    <li><a href="#s9">Getting Element Properties</a></li>
+    <li><a href="#s10">Element State Checks</a></li>
+    <li><a href="#s11">Working with Tables</a></li>
+    <li><a href="#s12">Working with Lists</a></li>
+    <li><a href="#s13">ElementHelper Utility Class</a></li>
+    <li><a href="#s14">Practice Task + Expected Output</a></li>
+    <li><a href="#s15">Common Mistakes</a></li>
+    <li><a href="#s16">End of Day Checklist + Resources</a></li>
+  </ol>
+</div>
+
+<!-- S1 -->
+<div class="section" id="s1">
+  <div class="section-header"><div class="section-num">01</div><h2>Complete WebElement Method Reference</h2></div>
+  <div class="hour-badge">&#9200; Hour 1 — All WebElement Methods (60 mins)</div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Method</th><th>Returns</th><th>Description</th><th>Use When</th></tr></thead>
+      <tbody>
+        <tr><td>click()</td><td>void</td><td>Click the element</td><td>Buttons, links, checkboxes, radio, submit</td></tr>
+        <tr><td>sendKeys("text")</td><td>void</td><td>Type text into element</td><td>Input fields, textareas, search boxes</td></tr>
+        <tr><td>clear()</td><td>void</td><td>Clear existing content</td><td>Before typing in a pre-filled field</td></tr>
+        <tr><td>getText()</td><td>String</td><td>Get visible text content</td><td>Labels, buttons, paragraphs, error messages</td></tr>
+        <tr><td>getAttribute("name")</td><td>String</td><td>Get HTML attribute value</td><td>Get value, href, src, class, type, placeholder</td></tr>
+        <tr><td>getCssValue("prop")</td><td>String</td><td>Get computed CSS property</td><td>Verify color, font-size, visibility</td></tr>
+        <tr><td>isDisplayed()</td><td>boolean</td><td>Element visible on screen?</td><td>Check visibility before interacting</td></tr>
+        <tr><td>isEnabled()</td><td>boolean</td><td>Element interactable?</td><td>Check if button/input is enabled</td></tr>
+        <tr><td>isSelected()</td><td>boolean</td><td>Checkbox/radio selected?</td><td>Verify checkbox state</td></tr>
+        <tr><td>getTagName()</td><td>String</td><td>HTML tag name</td><td>Verify element type: input, button, div</td></tr>
+        <tr><td>getRect()</td><td>Rectangle</td><td>Position and size</td><td>Element coordinates for screenshots/actions</td></tr>
+        <tr><td>getSize()</td><td>Dimension</td><td>Width and height</td><td>Verify element dimensions</td></tr>
+        <tr><td>getLocation()</td><td>Point</td><td>X,Y coordinates on page</td><td>Element position for actions</td></tr>
+        <tr><td>getScreenshotAs(type)</td><td>File/Base64</td><td>Screenshot of just this element</td><td>Element-level screenshot for reports</td></tr>
+        <tr><td>submit()</td><td>void</td><td>Submit form containing element</td><td>Alternative to clicking submit button</td></tr>
+        <tr><td>findElement(By)</td><td>WebElement</td><td>Find child element</td><td>Find within element context</td></tr>
+        <tr><td>findElements(By)</td><td>List&lt;WebElement&gt;</td><td>Find all child elements</td><td>Find all matching children</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- S2 -->
+<div class="section" id="s2">
+  <div class="section-header"><div class="section-num">02</div><h2>Text Input Interactions</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">TextInput.java</span></div>
+    <pre><span class="kw">import</span> org.openqa.selenium.Keys;
+
+WebElement <span class="nm">field</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">name</span>(<span class="st">"username"</span>));
+
+<span class="cm">// Basic typing</span>
+field.<span class="fn">clear</span>();
+field.<span class="fn">sendKeys</span>(<span class="st">"Admin"</span>);
+
+<span class="cm">// Read back what was typed</span>
+<span class="ty">String</span> <span class="nm">value</span> <span class="op">=</span> field.<span class="fn">getAttribute</span>(<span class="st">"value"</span>); <span class="cm">// "Admin"</span>
+
+<span class="cm">// Type special keys using Keys enum</span>
+field.<span class="fn">sendKeys</span>(Keys.TAB);         <span class="cm">// press Tab (move focus to next field)</span>
+field.<span class="fn">sendKeys</span>(Keys.ENTER);       <span class="cm">// press Enter (submit form)</span>
+field.<span class="fn">sendKeys</span>(Keys.BACK_SPACE);  <span class="cm">// delete last character</span>
+field.<span class="fn">sendKeys</span>(Keys.CONTROL, <span class="st">"a"</span>); <span class="cm">// Ctrl+A (select all)</span>
+field.<span class="fn">sendKeys</span>(Keys.CONTROL, <span class="st">"c"</span>); <span class="cm">// Ctrl+C (copy)</span>
+field.<span class="fn">sendKeys</span>(Keys.CONTROL, <span class="st">"v"</span>); <span class="cm">// Ctrl+V (paste)</span>
+field.<span class="fn">sendKeys</span>(Keys.DELETE);       <span class="cm">// delete selected text</span>
+field.<span class="fn">sendKeys</span>(Keys.HOME);         <span class="cm">// go to beginning of line</span>
+field.<span class="fn">sendKeys</span>(Keys.END);          <span class="cm">// go to end of line</span>
+field.<span class="fn">sendKeys</span>(Keys.ARROW_DOWN);   <span class="cm">// arrow keys</span>
+field.<span class="fn">sendKeys</span>(Keys.F5);           <span class="cm">// function keys</span>
+
+<span class="cm">// Type + press Enter in one call (login shortcut)</span>
+field.<span class="fn">sendKeys</span>(<span class="st">"Admin"</span> <span class="op">+</span> Keys.ENTER);
+
+<span class="cm">// Type in a textarea (multi-line)</span>
+WebElement <span class="nm">textarea</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">tagName</span>(<span class="st">"textarea"</span>));
+textarea.<span class="fn">clear</span>();
+textarea.<span class="fn">sendKeys</span>(<span class="st">"Line 1\nLine 2\nLine 3"</span>);  <span class="cm">// \n for new line</span>
+
+<span class="cm">// Clear using Ctrl+A then Delete (when clear() doesn't work)</span>
+field.<span class="fn">sendKeys</span>(Keys.CONTROL, <span class="st">"a"</span>);
+field.<span class="fn">sendKeys</span>(Keys.DELETE);</pre>
+  </div>
+</div>
+
+<!-- S3 -->
+<div class="section" id="s3">
+  <div class="section-header"><div class="section-num">03</div><h2>Checkboxes</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">Checkboxes.java</span></div>
+    <pre><span class="cm">// HTML: &lt;input type="checkbox" id="rememberMe" name="rememberMe"&gt;</span>
+
+WebElement <span class="nm">checkbox</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">id</span>(<span class="st">"rememberMe"</span>));
+
+<span class="cm">// Check current state</span>
+<span class="ty">boolean</span> <span class="nm">isChecked</span> <span class="op">=</span> checkbox.<span class="fn">isSelected</span>();
+<span class="fn">System.out.println</span>(<span class="st">"Checked: "</span> <span class="op">+</span> isChecked);
+
+<span class="cm">// Check the box (if not already checked)</span>
+<span class="kw">if</span> (!checkbox.<span class="fn">isSelected</span>()) {
+    checkbox.<span class="fn">click</span>();
+    <span class="fn">System.out.println</span>(<span class="st">"Checkbox checked ✓"</span>);
+}
+
+<span class="cm">// Uncheck the box (if currently checked)</span>
+<span class="kw">if</span> (checkbox.<span class="fn">isSelected</span>()) {
+    checkbox.<span class="fn">click</span>();
+    <span class="fn">System.out.println</span>(<span class="st">"Checkbox unchecked ✓"</span>);
+}
+
+<span class="cm">// Toggle helper method — idempotent</span>
+<span class="kw">public static void</span> <span class="fn">setCheckbox</span>(WebElement <span class="nm">checkbox</span>, <span class="ty">boolean</span> <span class="nm">check</span>) {
+    <span class="kw">if</span> (checkbox.<span class="fn">isSelected</span>() <span class="op">!=</span> check) {
+        checkbox.<span class="fn">click</span>();
+    }
+}
+
+<span class="cm">// All checkboxes on page</span>
+List&lt;WebElement&gt; <span class="nm">allBoxes</span> <span class="op">=</span> driver.<span class="fn">findElements</span>(
+    By.<span class="fn">cssSelector</span>(<span class="st">"input[type='checkbox']"</span>));
+<span class="fn">System.out.println</span>(<span class="st">"Total checkboxes: "</span> <span class="op">+</span> allBoxes.<span class="fn">size</span>());
+
+<span class="cm">// Select all checkboxes</span>
+<span class="kw">for</span> (WebElement <span class="nm">box</span> : allBoxes) {
+    <span class="kw">if</span> (!box.<span class="fn">isSelected</span>()) box.<span class="fn">click</span>();
+}
+
+<span class="cm">// Count checked boxes</span>
+<span class="ty">long</span> <span class="nm">checkedCount</span> <span class="op">=</span> allBoxes.<span class="fn">stream</span>()
+    .<span class="fn">filter</span>(WebElement::isSelected).<span class="fn">count</span>();
+<span class="fn">System.out.println</span>(<span class="st">"Checked: "</span> <span class="op">+</span> checkedCount);</pre>
+  </div>
+</div>
+
+<!-- S4 -->
+<div class="section" id="s4">
+  <div class="section-header"><div class="section-num">04</div><h2>Radio Buttons</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">RadioButtons.java</span></div>
+    <pre><span class="cm">// HTML: &lt;input type="radio" name="gender" value="male"&gt; Male</span>
+<span class="cm">//       &lt;input type="radio" name="gender" value="female"&gt; Female</span>
+<span class="cm">//       &lt;input type="radio" name="gender" value="other"&gt; Other</span>
+
+<span class="cm">// Get all radio options in group</span>
+List&lt;WebElement&gt; <span class="nm">genderRadios</span> <span class="op">=</span> driver.<span class="fn">findElements</span>(By.<span class="fn">name</span>(<span class="st">"gender"</span>));
+<span class="fn">System.out.println</span>(<span class="st">"Options: "</span> <span class="op">+</span> genderRadios.<span class="fn">size</span>()); <span class="cm">// 3</span>
+
+<span class="cm">// Click specific option by value attribute</span>
+<span class="kw">for</span> (WebElement <span class="nm">radio</span> : genderRadios) {
+    <span class="kw">if</span> (radio.<span class="fn">getAttribute</span>(<span class="st">"value"</span>).<span class="fn">equals</span>(<span class="st">"female"</span>)) {
+        radio.<span class="fn">click</span>();
+        <span class="kw">break</span>;
+    }
+}
+
+<span class="cm">// Get the currently selected radio value</span>
+<span class="ty">String</span> <span class="nm">selectedValue</span> <span class="op">=</span> <span class="st">""</span>;
+<span class="kw">for</span> (WebElement <span class="nm">radio</span> : genderRadios) {
+    <span class="kw">if</span> (radio.<span class="fn">isSelected</span>()) {
+        selectedValue <span class="op">=</span> radio.<span class="fn">getAttribute</span>(<span class="st">"value"</span>);
+        <span class="kw">break</span>;
+    }
+}
+<span class="fn">System.out.println</span>(<span class="st">"Selected: "</span> <span class="op">+</span> selectedValue); <span class="cm">// female</span>
+
+<span class="cm">// Select by XPath (most readable)</span>
+driver.<span class="fn">findElement</span>(By.<span class="fn">xpath</span>(<span class="st">"//input[@type='radio'][@value='male']"</span>)).<span class="fn">click</span>();
+
+<span class="cm">// Helper method</span>
+<span class="kw">public static void</span> <span class="fn">selectRadio</span>(List&lt;WebElement&gt; <span class="nm">options</span>, <span class="ty">String</span> <span class="nm">value</span>) {
+    <span class="kw">for</span> (WebElement <span class="nm">r</span> : options) {
+        <span class="kw">if</span> (r.<span class="fn">getAttribute</span>(<span class="st">"value"</span>).<span class="fn">equals</span>(value)) {
+            r.<span class="fn">click</span>();
+            <span class="kw">return</span>;
+        }
+    }
+    <span class="kw">throw</span> <span class="kw">new</span> <span class="fn">IllegalArgumentException</span>(<span class="st">"Radio value not found: "</span> <span class="op">+</span> value);
+}</pre>
+  </div>
+</div>
+
+<!-- S5 -->
+<div class="section" id="s5">
+  <div class="section-header"><div class="section-num">05</div><h2>Select Dropdowns — Select Class</h2></div>
+  <p>Selenium has a dedicated <code>Select</code> class for native HTML <code>&lt;select&gt;</code> elements. Import it and use it — much cleaner than clicking options manually.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">SelectDropdown.java</span></div>
+    <pre><span class="kw">import</span> org.openqa.selenium.support.ui.Select;
+
+<span class="cm">// HTML: &lt;select id="country"&gt;</span>
+<span class="cm">//   &lt;option value="np"&gt;Nepal&lt;/option&gt;</span>
+<span class="cm">//   &lt;option value="in"&gt;India&lt;/option&gt;</span>
+<span class="cm">//   &lt;option value="us"&gt;United States&lt;/option&gt;</span>
+<span class="cm">// &lt;/select&gt;</span>
+
+WebElement <span class="nm">rawDropdown</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">id</span>(<span class="st">"country"</span>));
+<span class="nm">Select</span> <span class="nm">dropdown</span>    <span class="op">=</span> <span class="kw">new</span> <span class="fn">Select</span>(rawDropdown);
+
+<span class="cm">// ── Select options ────────────────────────────────────────────</span>
+dropdown.<span class="fn">selectByVisibleText</span>(<span class="st">"Nepal"</span>);    <span class="cm">// by the text you see in dropdown</span>
+dropdown.<span class="fn">selectByValue</span>(<span class="st">"in"</span>);            <span class="cm">// by value attribute</span>
+dropdown.<span class="fn">selectByIndex</span>(<span class="nu">0</span>);              <span class="cm">// by position (0 = first)</span>
+
+<span class="cm">// ── Get selected option ───────────────────────────────────────</span>
+WebElement <span class="nm">selected</span> <span class="op">=</span> dropdown.<span class="fn">getFirstSelectedOption</span>();
+<span class="fn">System.out.println</span>(<span class="st">"Selected text : "</span> <span class="op">+</span> selected.<span class="fn">getText</span>());
+<span class="fn">System.out.println</span>(<span class="st">"Selected value: "</span> <span class="op">+</span> selected.<span class="fn">getAttribute</span>(<span class="st">"value"</span>));
+
+<span class="cm">// ── Get all options ───────────────────────────────────────────</span>
+List&lt;WebElement&gt; <span class="nm">options</span> <span class="op">=</span> dropdown.<span class="fn">getOptions</span>();
+<span class="fn">System.out.println</span>(<span class="st">"Total options: "</span> <span class="op">+</span> options.<span class="fn">size</span>());
+<span class="kw">for</span> (WebElement <span class="nm">opt</span> : options) {
+    <span class="fn">System.out.println</span>(<span class="st">"  "</span> <span class="op">+</span> opt.<span class="fn">getText</span>() <span class="op">+</span> <span class="st">" (value="</span> <span class="op">+</span> opt.<span class="fn">getAttribute</span>(<span class="st">"value"</span>) <span class="op">+</span> <span class="st">")"</span>);
+}
+
+<span class="cm">// ── Check if multiple select ──────────────────────────────────</span>
+<span class="ty">boolean</span> <span class="nm">isMulti</span> <span class="op">=</span> dropdown.<span class="fn">isMultiple</span>();
+<span class="fn">System.out.println</span>(<span class="st">"Multi-select: "</span> <span class="op">+</span> isMulti);
+
+<span class="cm">// ── Verify option exists before selecting ─────────────────────</span>
+<span class="ty">boolean</span> <span class="nm">hasNepal</span> <span class="op">=</span> options.<span class="fn">stream</span>()
+    .<span class="fn">anyMatch</span>(<span class="nm">o</span> -> o.<span class="fn">getText</span>().<span class="fn">equals</span>(<span class="st">"Nepal"</span>));
+<span class="fn">System.out.println</span>(<span class="st">"Has Nepal: "</span> <span class="op">+</span> hasNepal);</pre>
+  </div>
+</div>
+
+<!-- S6 -->
+<div class="section" id="s6">
+  <div class="section-header"><div class="section-num">06</div><h2>Multi-Select Dropdowns</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">MultiSelect.java</span></div>
+    <pre><span class="cm">// HTML: &lt;select multiple id="skills"&gt;</span>
+<span class="cm">//   &lt;option value="java"&gt;Java&lt;/option&gt;</span>
+<span class="cm">//   &lt;option value="python"&gt;Python&lt;/option&gt;</span>
+<span class="cm">//   &lt;option value="selenium"&gt;Selenium&lt;/option&gt;</span>
+<span class="cm">// &lt;/select&gt;</span>
+
+<span class="nm">Select</span> <span class="nm">multiSelect</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">Select</span>(driver.<span class="fn">findElement</span>(By.<span class="fn">id</span>(<span class="st">"skills"</span>)));
+
+<span class="cm">// Select multiple options</span>
+multiSelect.<span class="fn">selectByValue</span>(<span class="st">"java"</span>);
+multiSelect.<span class="fn">selectByValue</span>(<span class="st">"selenium"</span>);
+multiSelect.<span class="fn">selectByVisibleText</span>(<span class="st">"Python"</span>);
+
+<span class="cm">// Get all selected</span>
+List&lt;WebElement&gt; <span class="nm">selected</span> <span class="op">=</span> multiSelect.<span class="fn">getAllSelectedOptions</span>();
+<span class="fn">System.out.println</span>(<span class="st">"Selected count: "</span> <span class="op">+</span> selected.<span class="fn">size</span>());
+selected.<span class="fn">forEach</span>(<span class="nm">o</span> -> <span class="fn">System.out.println</span>(<span class="st">"  - "</span> <span class="op">+</span> o.<span class="fn">getText</span>()));
+
+<span class="cm">// Deselect options</span>
+multiSelect.<span class="fn">deselectByValue</span>(<span class="st">"python"</span>);
+multiSelect.<span class="fn">deselectByVisibleText</span>(<span class="st">"Java"</span>);
+multiSelect.<span class="fn">deselectAll</span>();  <span class="cm">// clear all selections</span></pre>
+  </div>
+</div>
+
+<!-- S7 -->
+<div class="section" id="s7">
+  <div class="section-header"><div class="section-num">07</div><h2>Custom Dropdowns (Non-select)</h2></div>
+  <p>Many modern apps use custom div-based dropdowns instead of native <code>&lt;select&gt;</code>. OrangeHRM uses these. They need a different approach — click to open, then click option.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">CustomDropdown.java</span></div>
+    <pre><span class="cm">// OrangeHRM custom dropdown pattern (div-based, not select)</span>
+<span class="cm">// HTML: &lt;div class="oxd-select-wrapper"&gt;</span>
+<span class="cm">//   &lt;div class="oxd-select-text"&gt;-- Select --&lt;/div&gt;</span>
+<span class="cm">//   &lt;div class="oxd-select-dropdown"&gt;</span>
+<span class="cm">//     &lt;div class="oxd-select-option"&gt;Admin&lt;/div&gt;</span>
+<span class="cm">//     &lt;div class="oxd-select-option"&gt;User&lt;/div&gt;</span>
+<span class="cm">//   &lt;/div&gt;</span>
+<span class="cm">// &lt;/div&gt;</span>
+
+<span class="cm">// Step 1: Click to open dropdown</span>
+WebElement <span class="nm">dropdownTrigger</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(
+    By.<span class="fn">cssSelector</span>(<span class="st">".oxd-select-wrapper"</span>));
+dropdownTrigger.<span class="fn">click</span>();
+Thread.<span class="fn">sleep</span>(<span class="nu">500</span>); <span class="cm">// wait for options to appear</span>
+
+<span class="cm">// Step 2: Click the option you want</span>
+driver.<span class="fn">findElement</span>(By.<span class="fn">xpath</span>(<span class="st">"//div[@class='oxd-select-option'][text()='Admin']"</span>)).<span class="fn">click</span>();
+
+<span class="cm">// Alternative: click any option by index</span>
+List&lt;WebElement&gt; <span class="nm">options</span> <span class="op">=</span> driver.<span class="fn">findElements</span>(
+    By.<span class="fn">cssSelector</span>(<span class="st">".oxd-select-option"</span>));
+options.<span class="fn">get</span>(<span class="nu">1</span>).<span class="fn">click</span>(); <span class="cm">// click 2nd option</span>
+
+<span class="cm">// Helper method for custom dropdowns</span>
+<span class="kw">public static void</span> <span class="fn">selectCustomDropdown</span>(WebDriver <span class="nm">driver</span>,
+        By <span class="nm">triggerLocator</span>, By <span class="nm">optionLocator</span>, <span class="ty">String</span> <span class="nm">optionText</span>)
+        <span class="kw">throws</span> InterruptedException {
+    driver.<span class="fn">findElement</span>(triggerLocator).<span class="fn">click</span>();
+    Thread.<span class="fn">sleep</span>(<span class="nu">500</span>);
+    List&lt;WebElement&gt; <span class="nm">opts</span> <span class="op">=</span> driver.<span class="fn">findElements</span>(optionLocator);
+    <span class="kw">for</span> (WebElement <span class="nm">opt</span> : opts) {
+        <span class="kw">if</span> (opt.<span class="fn">getText</span>().<span class="fn">trim</span>().<span class="fn">equals</span>(optionText)) {
+            opt.<span class="fn">click</span>();
+            <span class="kw">return</span>;
+        }
+    }
+    <span class="kw">throw</span> <span class="kw">new</span> <span class="fn">RuntimeException</span>(<span class="st">"Option not found: "</span> <span class="op">+</span> optionText);
+}</pre>
+  </div>
+</div>
+
+<!-- S8 -->
+<div class="section" id="s8">
+  <div class="section-header"><div class="section-num">08</div><h2>File Upload</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">FileUpload.java</span></div>
+    <pre><span class="kw">import</span> java.io.File;
+
+<span class="cm">// HTML: &lt;input type="file" id="uploadFile"&gt;</span>
+
+<span class="cm">// Method 1: sendKeys with absolute file path (most reliable)</span>
+WebElement <span class="nm">fileInput</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">id</span>(<span class="st">"uploadFile"</span>));
+<span class="cm">// Build absolute path dynamically</span>
+<span class="ty">String</span> <span class="nm">filePath</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">File</span>(<span class="st">"src/test/resources/test-image.png"</span>).<span class="fn">getAbsolutePath</span>();
+fileInput.<span class="fn">sendKeys</span>(filePath);
+<span class="fn">System.out.println</span>(<span class="st">"File uploaded: "</span> <span class="op">+</span> filePath);
+
+<span class="cm">// Verify file was selected</span>
+<span class="ty">String</span> <span class="nm">uploadedFile</span> <span class="op">=</span> fileInput.<span class="fn">getAttribute</span>(<span class="st">"value"</span>);
+<span class="fn">System.out.println</span>(<span class="st">"Value: "</span> <span class="op">+</span> uploadedFile); <span class="cm">// shows filename</span>
+
+<span class="cm">// Method 2: If file input is hidden (not visible)</span>
+<span class="cm">// Make it visible via JS first, then sendKeys</span>
+<span class="nm">JavascriptExecutor</span> <span class="nm">js</span> <span class="op">=</span> (<span class="nm">JavascriptExecutor</span>) driver;
+js.<span class="fn">executeScript</span>(<span class="st">"arguments[0].style.display='block'"</span>, fileInput);
+fileInput.<span class="fn">sendKeys</span>(filePath);
+
+<span class="cm">// NOTES:</span>
+<span class="cm">// - Use absolute path, not relative</span>
+<span class="cm">// - Works WITHOUT clicking the Browse button</span>
+<span class="cm">// - Does NOT open file picker dialog</span>
+<span class="cm">// - File must exist on machine running tests</span></pre>
+  </div>
+</div>
+
+<!-- S9 -->
+<div class="section" id="s9">
+  <div class="section-header"><div class="section-num">09</div><h2>Getting Element Properties</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">ElementProperties.java</span></div>
+    <pre><span class="kw">import</span> org.openqa.selenium.Rectangle;
+<span class="kw">import</span> org.openqa.selenium.Dimension;
+<span class="kw">import</span> org.openqa.selenium.Point;
+
+WebElement <span class="nm">el</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">cssSelector</span>(<span class="st">"button[type='submit']"</span>));
+
+<span class="cm">// Text and tag</span>
+<span class="fn">System.out.println</span>(<span class="st">"Text   : "</span> <span class="op">+</span> el.<span class="fn">getText</span>());       <span class="cm">// "Login"</span>
+<span class="fn">System.out.println</span>(<span class="st">"Tag    : "</span> <span class="op">+</span> el.<span class="fn">getTagName</span>());  <span class="cm">// "button"</span>
+
+<span class="cm">// HTML attributes</span>
+<span class="fn">System.out.println</span>(<span class="st">"type   : "</span> <span class="op">+</span> el.<span class="fn">getAttribute</span>(<span class="st">"type"</span>));    <span class="cm">// "submit"</span>
+<span class="fn">System.out.println</span>(<span class="st">"class  : "</span> <span class="op">+</span> el.<span class="fn">getAttribute</span>(<span class="st">"class"</span>));   <span class="cm">// "oxd-button..."</span>
+<span class="fn">System.out.println</span>(<span class="st">"href   : "</span> <span class="op">+</span> el.<span class="fn">getAttribute</span>(<span class="st">"href"</span>));    <span class="cm">// for links</span>
+<span class="fn">System.out.println</span>(<span class="st">"value  : "</span> <span class="op">+</span> el.<span class="fn">getAttribute</span>(<span class="st">"value"</span>));   <span class="cm">// for inputs</span>
+<span class="fn">System.out.println</span>(<span class="st">"src    : "</span> <span class="op">+</span> el.<span class="fn">getAttribute</span>(<span class="st">"src"</span>));     <span class="cm">// for images</span>
+
+<span class="cm">// CSS properties (computed style)</span>
+<span class="fn">System.out.println</span>(<span class="st">"color  : "</span> <span class="op">+</span> el.<span class="fn">getCssValue</span>(<span class="st">"color"</span>));
+<span class="fn">System.out.println</span>(<span class="st">"bg     : "</span> <span class="op">+</span> el.<span class="fn">getCssValue</span>(<span class="st">"background-color"</span>));
+<span class="fn">System.out.println</span>(<span class="st">"font   : "</span> <span class="op">+</span> el.<span class="fn">getCssValue</span>(<span class="st">"font-size"</span>));
+
+<span class="cm">// Size and position</span>
+Dimension <span class="nm">size</span> <span class="op">=</span> el.<span class="fn">getSize</span>();
+<span class="fn">System.out.println</span>(<span class="st">"Width  : "</span> <span class="op">+</span> size.<span class="fn">getWidth</span>() <span class="op">+</span> <span class="st">"px"</span>);
+<span class="fn">System.out.println</span>(<span class="st">"Height : "</span> <span class="op">+</span> size.<span class="fn">getHeight</span>() <span class="op">+</span> <span class="st">"px"</span>);
+
+Point <span class="nm">loc</span> <span class="op">=</span> el.<span class="fn">getLocation</span>();
+<span class="fn">System.out.println</span>(<span class="st">"X      : "</span> <span class="op">+</span> loc.<span class="fn">getX</span>());
+<span class="fn">System.out.println</span>(<span class="st">"Y      : "</span> <span class="op">+</span> loc.<span class="fn">getY</span>());
+
+Rectangle <span class="nm">rect</span> <span class="op">=</span> el.<span class="fn">getRect</span>();
+<span class="fn">System.out.println</span>(<span class="st">"Rect   : x="</span><span class="op">+</span>rect.<span class="fn">x</span><span class="op">+</span><span class="st">" y="</span><span class="op">+</span>rect.<span class="fn">y</span><span class="op">+</span><span class="st">" w="</span><span class="op">+</span>rect.<span class="fn">width</span><span class="op">+</span><span class="st">" h="</span><span class="op">+</span>rect.<span class="fn">height</span>);</pre>
+  </div>
+</div>
+
+<!-- S10 -->
+<div class="section" id="s10">
+  <div class="section-header"><div class="section-num">10</div><h2>Element State Checks</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">ElementState.java</span></div>
+    <pre><span class="cm">// isDisplayed() — visible on screen</span>
+<span class="ty">boolean</span> <span class="nm">visible</span> <span class="op">=</span> element.<span class="fn">isDisplayed</span>();
+<span class="cm">// Returns false if: display:none, visibility:hidden, opacity:0, off-screen</span>
+<span class="cm">// Throws NoSuchElementException if element not in DOM at all</span>
+
+<span class="cm">// isEnabled() — interactable</span>
+<span class="ty">boolean</span> <span class="nm">enabled</span> <span class="op">=</span> element.<span class="fn">isEnabled</span>();
+<span class="cm">// Returns false if HTML has disabled attribute</span>
+
+<span class="cm">// isSelected() — for checkboxes and radio buttons</span>
+<span class="ty">boolean</span> <span class="nm">selected</span> <span class="op">=</span> element.<span class="fn">isSelected</span>();
+<span class="cm">// Returns true if checked/selected</span>
+
+<span class="cm">// Safe check — is element present in DOM?</span>
+<span class="ty">boolean</span> <span class="fn">isPresent</span>(WebDriver <span class="nm">driver</span>, By <span class="nm">locator</span>) {
+    <span class="kw">return</span> !driver.<span class="fn">findElements</span>(locator).<span class="fn">isEmpty</span>();
+}
+
+<span class="cm">// Safe check — is element visible?</span>
+<span class="ty">boolean</span> <span class="fn">isVisible</span>(WebDriver <span class="nm">driver</span>, By <span class="nm">locator</span>) {
+    <span class="kw">try</span> {
+        <span class="kw">return</span> driver.<span class="fn">findElement</span>(locator).<span class="fn">isDisplayed</span>();
+    } <span class="kw">catch</span> (NoSuchElementException <span class="nm">e</span>) {
+        <span class="kw">return</span> <span class="bool">false</span>;
+    }
+}
+
+<span class="cm">// Complete state check before interaction</span>
+WebElement <span class="nm">btn</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">id</span>(<span class="st">"submitBtn"</span>));
+<span class="kw">if</span> (btn.<span class="fn">isDisplayed</span>() <span class="op">&amp;&amp;</span> btn.<span class="fn">isEnabled</span>()) {
+    btn.<span class="fn">click</span>();
+    <span class="fn">System.out.println</span>(<span class="st">"Clicked button"</span>);
+} <span class="kw">else</span> {
+    <span class="fn">System.out.println</span>(<span class="st">"Button not clickable: displayed="</span> <span class="op">+</span> btn.<span class="fn">isDisplayed</span>()
+        <span class="op">+</span> <span class="st">" enabled="</span> <span class="op">+</span> btn.<span class="fn">isEnabled</span>());
+}</pre>
+  </div>
+</div>
+
+<!-- S11 -->
+<div class="section" id="s11">
+  <div class="section-header"><div class="section-num">11</div><h2>Working with Tables</h2></div>
+  <div class="hour-badge">&#9200; Hour 2 — Tables, Lists &amp; Utilities (60 mins)</div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">Tables.java</span></div>
+    <pre><span class="cm">// ── Get all data rows (skip header) ──────────────────────────</span>
+List&lt;WebElement&gt; <span class="nm">rows</span> <span class="op">=</span> driver.<span class="fn">findElements</span>(By.<span class="fn">cssSelector</span>(<span class="st">"tbody tr"</span>));
+<span class="fn">System.out.println</span>(<span class="st">"Rows: "</span> <span class="op">+</span> rows.<span class="fn">size</span>());
+
+<span class="cm">// ── Read all cells in each row ────────────────────────────────</span>
+<span class="kw">for</span> (<span class="ty">int</span> <span class="nm">r</span> <span class="op">=</span> <span class="nu">0</span>; <span class="nm">r</span> <span class="op">&lt;</span> rows.<span class="fn">size</span>(); <span class="nm">r</span>++) {
+    List&lt;WebElement&gt; <span class="nm">cells</span> <span class="op">=</span> rows.<span class="fn">get</span>(<span class="nm">r</span>).<span class="fn">findElements</span>(By.<span class="fn">tagName</span>(<span class="st">"td"</span>));
+    <span class="ty">String</span> <span class="nm">rowData</span> <span class="op">=</span> <span class="st">"Row "</span> <span class="op">+</span> (<span class="nm">r</span><span class="op">+</span><span class="nu">1</span>) <span class="op">+</span> <span class="st">": "</span>;
+    <span class="kw">for</span> (WebElement <span class="nm">cell</span> : cells) {
+        rowData <span class="op">+=</span> <span class="st">"["</span> <span class="op">+</span> cell.<span class="fn">getText</span>() <span class="op">+</span> <span class="st">"] "</span>;
+    }
+    <span class="fn">System.out.println</span>(rowData);
+}
+
+<span class="cm">// ── Get specific cell — row 2, column 3 ──────────────────────</span>
+WebElement <span class="nm">cell</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(
+    By.<span class="fn">cssSelector</span>(<span class="st">"tbody tr:nth-child(2) td:nth-child(3)"</span>));
+<span class="fn">System.out.println</span>(<span class="st">"Cell [2][3]: "</span> <span class="op">+</span> cell.<span class="fn">getText</span>());
+
+<span class="cm">// ── Find row by content then click action ─────────────────────</span>
+<span class="ty">String</span> <span class="nm">targetName</span> <span class="op">=</span> <span class="st">"John Smith"</span>;
+<span class="kw">for</span> (WebElement <span class="nm">row</span> : rows) {
+    <span class="ty">String</span> <span class="nm">rowText</span> <span class="op">=</span> row.<span class="fn">getText</span>();
+    <span class="kw">if</span> (rowText.<span class="fn">contains</span>(targetName)) {
+        <span class="cm">// Click edit button in this row</span>
+        row.<span class="fn">findElement</span>(By.<span class="fn">cssSelector</span>(<span class="st">"button[title='Edit']"</span>)).<span class="fn">click</span>();
+        <span class="fn">System.out.println</span>(<span class="st">"Clicked Edit for: "</span> <span class="op">+</span> targetName);
+        <span class="kw">break</span>;
+    }
+}
+
+<span class="cm">// ── Get header column names ───────────────────────────────────</span>
+List&lt;WebElement&gt; <span class="nm">headers</span> <span class="op">=</span> driver.<span class="fn">findElements</span>(By.<span class="fn">cssSelector</span>(<span class="st">"thead th"</span>));
+<span class="nm">headers</span>.<span class="fn">forEach</span>(<span class="nm">h</span> -> <span class="fn">System.out.print</span>(h.<span class="fn">getText</span>() <span class="op">+</span> <span class="st">" | "</span>));
+<span class="fn">System.out.println</span>();</pre>
+  </div>
+</div>
+
+<!-- S12 -->
+<div class="section" id="s12">
+  <div class="section-header"><div class="section-num">12</div><h2>Working with Lists</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">Lists.java</span></div>
+    <pre><span class="cm">// ── Get all list items ────────────────────────────────────────</span>
+List&lt;WebElement&gt; <span class="nm">items</span> <span class="op">=</span> driver.<span class="fn">findElements</span>(By.<span class="fn">cssSelector</span>(<span class="st">"ul li"</span>));
+<span class="fn">System.out.println</span>(<span class="st">"List items: "</span> <span class="op">+</span> items.<span class="fn">size</span>());
+items.<span class="fn">forEach</span>(<span class="nm">i</span> -> <span class="fn">System.out.println</span>(<span class="st">"  - "</span> <span class="op">+</span> i.<span class="fn">getText</span>()));
+
+<span class="cm">// ── Find item by text then click ──────────────────────────────</span>
+<span class="kw">for</span> (WebElement <span class="nm">item</span> : items) {
+    <span class="kw">if</span> (item.<span class="fn">getText</span>().<span class="fn">equals</span>(<span class="st">"Leave"</span>)) {
+        item.<span class="fn">click</span>();
+        <span class="fn">System.out.println</span>(<span class="st">"Clicked Leave"</span>);
+        <span class="kw">break</span>;
+    }
+}
+
+<span class="cm">// ── Extract all link texts from nav menu ──────────────────────</span>
+List&lt;WebElement&gt; <span class="nm">navLinks</span> <span class="op">=</span> driver.<span class="fn">findElements</span>(By.<span class="fn">cssSelector</span>(<span class="st">".nav-menu a"</span>));
+List&lt;String&gt; <span class="nm">linkTexts</span> <span class="op">=</span> <span class="kw">new</span> ArrayList&lt;&gt;();
+<span class="kw">for</span> (WebElement <span class="nm">link</span> : navLinks) {
+    <span class="ty">String</span> <span class="nm">text</span> <span class="op">=</span> link.<span class="fn">getText</span>().<span class="fn">trim</span>();
+    <span class="kw">if</span> (!text.<span class="fn">isEmpty</span>()) linkTexts.<span class="fn">add</span>(text);
+}
+<span class="fn">System.out.println</span>(<span class="st">"Nav items: "</span> <span class="op">+</span> linkTexts);</pre>
+  </div>
+</div>
+
+<!-- S13 -->
+<div class="section" id="s13">
+  <div class="section-header"><div class="section-num">13</div><h2>ElementHelper Utility Class</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">ElementHelper.java — utils/ElementHelper.java</span></div>
+    <pre><span class="kw">package</span> com.qaautomation.utils;
+
+<span class="kw">import</span> org.openqa.selenium.*;
+<span class="kw">import</span> org.openqa.selenium.support.ui.Select;
+<span class="kw">import</span> java.util.List;
+
+<span class="kw">public class</span> <span class="nm">ElementHelper</span> {
+
+    <span class="cm">// Type into field (clear first)</span>
+    <span class="kw">public static void</span> <span class="fn">type</span>(WebDriver <span class="nm">d</span>, By <span class="nm">locator</span>, <span class="ty">String</span> <span class="nm">text</span>) {
+        WebElement <span class="nm">el</span> <span class="op">=</span> d.<span class="fn">findElement</span>(locator);
+        el.<span class="fn">clear</span>();
+        el.<span class="fn">sendKeys</span>(text);
+    }
+
+    <span class="cm">// Click element</span>
+    <span class="kw">public static void</span> <span class="fn">click</span>(WebDriver <span class="nm">d</span>, By <span class="nm">locator</span>) {
+        d.<span class="fn">findElement</span>(locator).<span class="fn">click</span>();
+    }
+
+    <span class="cm">// Get text</span>
+    <span class="kw">public static</span> <span class="ty">String</span> <span class="fn">getText</span>(WebDriver <span class="nm">d</span>, By <span class="nm">locator</span>) {
+        <span class="kw">return</span> d.<span class="fn">findElement</span>(locator).<span class="fn">getText</span>().<span class="fn">trim</span>();
+    }
+
+    <span class="cm">// Get attribute</span>
+    <span class="kw">public static</span> <span class="ty">String</span> <span class="fn">getAttribute</span>(WebDriver <span class="nm">d</span>, By <span class="nm">locator</span>, <span class="ty">String</span> <span class="nm">attr</span>) {
+        <span class="kw">return</span> d.<span class="fn">findElement</span>(locator).<span class="fn">getAttribute</span>(attr);
+    }
+
+    <span class="cm">// Is element present?</span>
+    <span class="kw">public static</span> <span class="ty">boolean</span> <span class="fn">isPresent</span>(WebDriver <span class="nm">d</span>, By <span class="nm">locator</span>) {
+        <span class="kw">return</span> !d.<span class="fn">findElements</span>(locator).<span class="fn">isEmpty</span>();
+    }
+
+    <span class="cm">// Is element visible?</span>
+    <span class="kw">public static</span> <span class="ty">boolean</span> <span class="fn">isVisible</span>(WebDriver <span class="nm">d</span>, By <span class="nm">locator</span>) {
+        <span class="kw">try</span> { <span class="kw">return</span> d.<span class="fn">findElement</span>(locator).<span class="fn">isDisplayed</span>(); }
+        <span class="kw">catch</span> (NoSuchElementException <span class="nm">e</span>) { <span class="kw">return</span> <span class="bool">false</span>; }
+    }
+
+    <span class="cm">// Select dropdown by visible text</span>
+    <span class="kw">public static void</span> <span class="fn">selectByText</span>(WebDriver <span class="nm">d</span>, By <span class="nm">locator</span>, <span class="ty">String</span> <span class="nm">text</span>) {
+        <span class="kw">new</span> <span class="fn">Select</span>(d.<span class="fn">findElement</span>(locator)).<span class="fn">selectByVisibleText</span>(text);
+    }
+
+    <span class="cm">// Select dropdown by value</span>
+    <span class="kw">public static void</span> <span class="fn">selectByValue</span>(WebDriver <span class="nm">d</span>, By <span class="nm">locator</span>, <span class="ty">String</span> <span class="nm">value</span>) {
+        <span class="kw">new</span> <span class="fn">Select</span>(d.<span class="fn">findElement</span>(locator)).<span class="fn">selectByValue</span>(value);
+    }
+
+    <span class="cm">// Set checkbox state</span>
+    <span class="kw">public static void</span> <span class="fn">setCheckbox</span>(WebDriver <span class="nm">d</span>, By <span class="nm">locator</span>, <span class="ty">boolean</span> <span class="nm">check</span>) {
+        WebElement <span class="nm">cb</span> <span class="op">=</span> d.<span class="fn">findElement</span>(locator);
+        <span class="kw">if</span> (cb.<span class="fn">isSelected</span>() <span class="op">!=</span> check) cb.<span class="fn">click</span>();
+    }
+
+    <span class="cm">// Get all texts from element list</span>
+    <span class="kw">public static</span> List&lt;String&gt; <span class="fn">getAllTexts</span>(WebDriver <span class="nm">d</span>, By <span class="nm">locator</span>) {
+        List&lt;String&gt; <span class="nm">texts</span> <span class="op">=</span> <span class="kw">new</span> java.util.ArrayList&lt;&gt;();
+        <span class="kw">for</span> (WebElement <span class="nm">el</span> : d.<span class="fn">findElements</span>(locator))
+            texts.<span class="fn">add</span>(el.<span class="fn">getText</span>().<span class="fn">trim</span>());
+        <span class="kw">return</span> texts;
+    }
+}</pre>
+  </div>
+</div>
+
+<!-- S14 -->
+<div class="section" id="s14">
+  <div class="section-header"><div class="section-num">14</div><h2>Practice Task + Expected Output</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">Day17Practice.java</span></div>
+    <pre><span class="kw">package</span> com.qaautomation.tests;
+
+<span class="kw">import</span> com.qaautomation.utils.*;
+<span class="kw">import</span> org.openqa.selenium.*;
+<span class="kw">import</span> java.util.List;
+
+<span class="kw">public class</span> <span class="nm">Day17Practice</span> {
+
+    <span class="kw">static final</span> By <span class="nm">USERNAME</span>  <span class="op">=</span> By.<span class="fn">name</span>(<span class="st">"username"</span>);
+    <span class="kw">static final</span> By <span class="nm">PASSWORD</span>  <span class="op">=</span> By.<span class="fn">name</span>(<span class="st">"password"</span>);
+    <span class="kw">static final</span> By <span class="nm">LOGIN_BTN</span> <span class="op">=</span> By.<span class="fn">cssSelector</span>(<span class="st">"button[type='submit']"</span>);
+    <span class="kw">static final</span> By <span class="nm">USER_NAME</span> <span class="op">=</span> By.<span class="fn">cssSelector</span>(<span class="st">".oxd-userdropdown-name"</span>);
+
+    <span class="kw">public static void</span> <span class="fn">main</span>(<span class="ty">String</span>[] args) <span class="kw">throws</span> InterruptedException {
+        WebDriver <span class="nm">driver</span> <span class="op">=</span> DriverFactory.<span class="fn">getDriver</span>(<span class="st">"chrome"</span>);
+
+        <span class="kw">try</span> {
+            driver.<span class="fn">get</span>(ConfigReader.<span class="fn">getBaseUrl</span>());
+
+            <span class="cm">// Task 1: Element properties</span>
+            <span class="fn">System.out.println</span>(<span class="st">"====== TASK 1: Element Properties ======"</span>);
+            WebElement <span class="nm">uField</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(USERNAME);
+            <span class="fn">System.out.println</span>(<span class="st">"  tag       : "</span> <span class="op">+</span> uField.<span class="fn">getTagName</span>());
+            <span class="fn">System.out.println</span>(<span class="st">"  type      : "</span> <span class="op">+</span> uField.<span class="fn">getAttribute</span>(<span class="st">"type"</span>));
+            <span class="fn">System.out.println</span>(<span class="st">"  placeholder: "</span> <span class="op">+</span> uField.<span class="fn">getAttribute</span>(<span class="st">"placeholder"</span>));
+            <span class="fn">System.out.println</span>(<span class="st">"  displayed  : "</span> <span class="op">+</span> uField.<span class="fn">isDisplayed</span>());
+            <span class="fn">System.out.println</span>(<span class="st">"  enabled    : "</span> <span class="op">+</span> uField.<span class="fn">isEnabled</span>());
+
+            WebElement <span class="nm">btn</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(LOGIN_BTN);
+            Dimension <span class="nm">sz</span> <span class="op">=</span> btn.<span class="fn">getSize</span>();
+            <span class="fn">System.out.println</span>(<span class="st">"  btn size  : "</span> <span class="op">+</span> sz.<span class="fn">getWidth</span>() <span class="op">+</span> <span class="st">"x"</span> <span class="op">+</span> sz.<span class="fn">getHeight</span>());
+
+            <span class="cm">// Task 2: findElements — all inputs</span>
+            <span class="fn">System.out.println</span>(<span class="st">"\n====== TASK 2: All Inputs ======"</span>);
+            List&lt;WebElement&gt; <span class="nm">inputs</span> <span class="op">=</span> driver.<span class="fn">findElements</span>(
+                By.<span class="fn">cssSelector</span>(<span class="st">"input:not([type='hidden'])"</span>));
+            <span class="fn">System.out.println</span>(<span class="st">"  Count: "</span> <span class="op">+</span> inputs.<span class="fn">size</span>());
+            <span class="kw">for</span> (WebElement <span class="nm">i</span> : inputs)
+                <span class="fn">System.out.println</span>(<span class="st">"  → name="</span> <span class="op">+</span> i.<span class="fn">getAttribute</span>(<span class="st">"name"</span>)
+                    <span class="op">+</span> <span class="st">" displayed="</span> <span class="op">+</span> i.<span class="fn">isDisplayed</span>());
+
+            <span class="cm">// Task 3: ElementHelper usage</span>
+            <span class="fn">System.out.println</span>(<span class="st">"\n====== TASK 3: ElementHelper ======"</span>);
+            ElementHelper.<span class="fn">type</span>(driver, USERNAME, ConfigReader.<span class="fn">getUsername</span>());
+            ElementHelper.<span class="fn">type</span>(driver, PASSWORD, ConfigReader.<span class="fn">getPassword</span>());
+            ElementHelper.<span class="fn">click</span>(driver, LOGIN_BTN);
+            Thread.<span class="fn">sleep</span>(<span class="nu">2000</span>);
+
+            <span class="ty">boolean</span> <span class="nm">loggedIn</span> <span class="op">=</span> driver.<span class="fn">getCurrentUrl</span>().<span class="fn">contains</span>(<span class="st">"dashboard"</span>);
+            <span class="ty">String</span> <span class="nm">userName</span> <span class="op">=</span> ElementHelper.<span class="fn">getText</span>(driver, USER_NAME);
+            <span class="fn">System.out.println</span>(<span class="st">"  Logged in: "</span> <span class="op">+</span> loggedIn);
+            <span class="fn">System.out.println</span>(<span class="st">"  Username : "</span> <span class="op">+</span> userName);
+            <span class="fn">System.out.println</span>(loggedIn <span class="op">?</span> <span class="st">"  ✓ PASS"</span> <span class="op">:</span> <span class="st">"  ✗ FAIL"</span>);
+
+            <span class="cm">// Task 4: Link texts on page</span>
+            <span class="fn">System.out.println</span>(<span class="st">"\n====== TASK 4: All Links ======"</span>);
+            driver.<span class="fn">get</span>(ConfigReader.<span class="fn">getBaseUrl</span>());
+            List&lt;String&gt; <span class="nm">linkTxts</span> <span class="op">=</span> ElementHelper.<span class="fn">getAllTexts</span>(driver, By.<span class="fn">tagName</span>(<span class="st">"a"</span>));
+            <span class="kw">for</span> (<span class="ty">String</span> <span class="nm">t</span> : linkTxts)
+                <span class="kw">if</span> (!t.<span class="fn">isEmpty</span>()) <span class="fn">System.out.println</span>(<span class="st">"  Link: '"</span> <span class="op">+</span> t <span class="op">+</span> <span class="st">"'"</span>);
+
+            <span class="cm">// Task 5: Element state guard</span>
+            <span class="fn">System.out.println</span>(<span class="st">"\n====== TASK 5: State Checks ======"</span>);
+            WebElement <span class="nm">loginButton</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(LOGIN_BTN);
+            <span class="fn">System.out.println</span>(<span class="st">"  isDisplayed: "</span> <span class="op">+</span> loginButton.<span class="fn">isDisplayed</span>());
+            <span class="fn">System.out.println</span>(<span class="st">"  isEnabled  : "</span> <span class="op">+</span> loginButton.<span class="fn">isEnabled</span>());
+            <span class="fn">System.out.println</span>(<span class="st">"  isSelected : "</span> <span class="op">+</span> loginButton.<span class="fn">isSelected</span>());
+            <span class="fn">System.out.println</span>(<span class="st">"  isPresent  : "</span> <span class="op">+</span> ElementHelper.<span class="fn">isPresent</span>(driver, LOGIN_BTN));
+            <span class="fn">System.out.println</span>(<span class="st">"  ✓ PASS"</span>);
+
+        } <span class="kw">catch</span> (Exception <span class="nm">e</span>) {
+            <span class="fn">System.out.println</span>(<span class="st">"Error: "</span> <span class="op">+</span> e.<span class="fn">getMessage</span>());
+        } <span class="kw">finally</span> {
+            driver.<span class="fn">quit</span>();
+            <span class="fn">System.out.println</span>(<span class="st">"\nBrowser closed ✓"</span>);
+        }
+    }
+}</pre>
+  </div>
+  <h3>Expected Output</h3>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Output</span><span class="code-file">Console</span></div>
+    <pre>====== TASK 1: Element Properties ======
+  tag       : input
+  type      : text
+  placeholder: Username
+  displayed  : true
+  enabled    : true
+  btn size  : 116x36
+
+====== TASK 2: All Inputs ======
+  Count: 2
+  → name=username displayed=true
+  → name=password displayed=true
+
+====== TASK 3: ElementHelper ======
+  Logged in: true
+  Username : Admin
+  ✓ PASS
+
+====== TASK 4: All Links ======
+  Link: 'Forgot your password?'
+
+====== TASK 5: State Checks ======
+  isDisplayed: true
+  isEnabled  : true
+  isSelected : false
+  isPresent  : true
+  ✓ PASS
+
+Browser closed ✓</pre>
+  </div>
+</div>
+
+<!-- S15 -->
+<div class="section" id="s15">
+  <div class="section-header"><div class="section-num">15</div><h2>Common Mistakes</h2></div>
+  <div class="mistake-grid">
+    <div class="mistake-card"><div class="mt">&#10060; getText() vs getAttribute("value")</div><p><code>getText()</code> gets visible text between tags. <code>getAttribute("value")</code> gets the value property of form inputs. For inputs, always use getAttribute("value").</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; Not using Select class</div><p>Trying to click options inside a native &lt;select&gt; without the Select wrapper often fails. Always wrap: <code>new Select(driver.findElement(...))</code></p></div>
+    <div class="mistake-card"><div class="mt">&#10060; clear() on disabled field</div><p>Calling <code>clear()</code> on a disabled or readonly input throws ElementNotInteractableException. Always check <code>isEnabled()</code> first.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; Not clearing before sendKeys()</div><p>If a field has pre-filled text, sendKeys appends. Always <code>clear()</code> first unless intentionally appending.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; Custom dropdown treated as Select</div><p>Custom div-based dropdowns cannot use the Select class. They need click() to open + findElement to pick option.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; File upload with relative path</div><p><code>fileInput.sendKeys("test.png")</code> fails — Selenium needs an ABSOLUTE path. Use <code>new File("path").getAbsolutePath()</code>.</p></div>
+  </div>
+</div>
+
+<!-- S16 -->
+<div class="section" id="s16">
+  <div class="section-header"><div class="section-num">16</div><h2>End of Day Checklist + Resources</h2></div>
+  <div class="checklist">
+    <div class="checklist-title">&#10022; End of Day 17 Checklist</div>
+    <div class="check-item"><div class="check-box"></div>I know all 17 WebElement methods and when to use each</div>
+    <div class="check-item"><div class="check-box"></div>I can use Keys enum for special key presses (TAB, ENTER, CTRL+A)</div>
+    <div class="check-item"><div class="check-box"></div>I handle checkboxes with isSelected() + click() guard</div>
+    <div class="check-item"><div class="check-box"></div>I handle radio buttons by value attribute comparison</div>
+    <div class="check-item"><div class="check-box"></div>I use the Select class for native &lt;select&gt; dropdowns</div>
+    <div class="check-item"><div class="check-box"></div>I know custom dropdowns need click-then-pick approach</div>
+    <div class="check-item"><div class="check-box"></div>I upload files with sendKeys using absolute path</div>
+    <div class="check-item"><div class="check-box"></div>I iterate table rows with findElements on tbody tr</div>
+    <div class="check-item"><div class="check-box"></div>ElementHelper.java created in utils package</div>
+    <div class="check-item"><div class="check-box"></div>Practice task runs — all 5 tasks produce correct output</div>
+  </div>
+  <h3>Resources</h3>
+  <ul class="resource-list">
+    <li><span>&#128214;</span><strong>Selenium Docs:&nbsp;</strong><a href="https://www.selenium.dev/documentation/webdriver/elements/interactions/" target="_blank">Selenium — Element Interactions</a> &nbsp;<span style="color:var(--muted);font-size:12px">Official docs for all WebElement methods.</span></li>
+    <li><span>&#127947;</span><strong>Practice:&nbsp;</strong><a href="https://demoqa.com/elements" target="_blank">DemoQA — Elements</a> &nbsp;<span style="color:var(--muted);font-size:12px">Checkboxes, radio, input, file upload — all on one site.</span></li>
+  </ul>
+  <div class="callout tip">
+    <span class="callout-icon">&#128640;</span>
+    <div class="callout-body">
+      <div class="callout-title">Day 18 Preview — Handling Dropdowns &amp; Date Pickers</div>
+      <p>Tomorrow: deep dive into <strong>dropdown handling patterns</strong> on real apps — OrangeHRM's custom dropdowns, date pickers, time pickers, and auto-complete fields. Plus handling elements that appear dynamically after user interaction.</p>
+    </div>
+  </div>
+</div>
+
+</div>
+<div class="footer">
+  <span>Day 17 of 65</span> &nbsp;&middot;&nbsp; Selenium + Java Automation Roadmap &nbsp;&middot;&nbsp; Phase 2 &mdash; Core Selenium &nbsp;&middot;&nbsp; <span>Next: Day 18 &mdash; Dropdowns &amp; Date Pickers</span>
+</div>
+</body>
+</html>

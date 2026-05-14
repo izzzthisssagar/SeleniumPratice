@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 19 — Actions Class</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Sora:wght@400;600;700;800&display=swap');
+:root{--bg:#0d1117;--bg2:#161b22;--bg3:#1e2530;--border:#30363d;--accent:#f0a500;--accent2:#58a6ff;--accent3:#3fb950;--accent4:#ff7b72;--accent5:#d2a8ff;--text:#e6edf3;--muted:#8b949e;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);line-height:1.75;font-size:15px;}
+.hero{background:linear-gradient(135deg,#0d1117,#161b22,#1a0d00);border-bottom:2px solid var(--accent);padding:48px 40px 36px;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:0;right:0;width:400px;height:400px;background:radial-gradient(circle,rgba(240,165,0,0.07),transparent 70%);pointer-events:none;}
+.hero-tag{display:inline-block;background:rgba(240,165,0,0.12);border:1px solid rgba(240,165,0,0.3);color:var(--accent);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;padding:4px 12px;border-radius:20px;margin-bottom:16px;}
+.hero h1{font-size:34px;font-weight:800;line-height:1.2;margin-bottom:10px;}
+.hero h1 span{color:var(--accent);}
+.hero-sub{color:var(--muted);font-size:14px;display:flex;gap:24px;flex-wrap:wrap;margin-top:16px;}
+.hero-sub span{display:flex;align-items:center;gap:6px;}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--accent);display:inline-block;}
+.container{max-width:980px;margin:0 auto;padding:40px 32px 80px;}
+.toc{background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:8px;padding:24px 28px;margin-bottom:48px;}
+.toc-title{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:14px;}
+.toc ol{padding-left:20px;}.toc li{margin-bottom:6px;}
+.toc a{color:var(--muted);text-decoration:none;font-size:14px;}.toc a:hover{color:var(--accent);}
+.section{margin-bottom:56px;}
+.section-header{display:flex;align-items:center;gap:14px;margin-bottom:24px;padding-bottom:14px;border-bottom:1px solid var(--border);}
+.section-num{background:var(--accent);color:#000;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:12px;width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.section h2{font-size:22px;font-weight:700;}
+h3{font-size:16px;font-weight:600;color:var(--accent);margin:28px 0 12px;display:flex;align-items:center;gap:8px;}
+h3::before{content:'▸';color:var(--accent2);font-size:12px;}
+p{color:var(--muted);margin-bottom:14px;line-height:1.8;}strong{color:var(--text);font-weight:600;}
+.code-block{background:#010409;border:1px solid var(--border);border-radius:10px;margin:20px 0;overflow:hidden;}
+.code-header{background:var(--bg2);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
+.code-lang{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent);letter-spacing:1px;text-transform:uppercase;font-weight:600;}
+.code-file{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);}
+pre{font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.85;padding:20px;overflow-x:auto;color:#e6edf3;}
+.kw{color:#ff7b72;font-weight:500;}.ty{color:#ffa657;}.st{color:#a5d6ff;}.cm{color:#6e7681;font-style:italic;}
+.nm{color:#79c0ff;}.nu{color:#79c0ff;}.fn{color:#d2a8ff;}.op{color:#ff7b72;}.bool{color:#3fb950;}
+code{font-family:'JetBrains Mono',monospace;font-size:12.5px;background:rgba(240,165,0,0.1);border:1px solid rgba(240,165,0,0.2);color:var(--accent);padding:1px 7px;border-radius:4px;}
+.callout{border-radius:8px;padding:16px 20px;margin:20px 0;display:flex;gap:14px;align-items:flex-start;}
+.callout-icon{font-size:18px;flex-shrink:0;margin-top:1px;}.callout-body{flex:1;}
+.callout-title{font-weight:700;font-size:13px;margin-bottom:4px;}.callout p{margin-bottom:0;font-size:13.5px;}
+.note{background:rgba(88,166,255,0.07);border-left:3px solid var(--accent2);}.note .callout-title{color:var(--accent2);}
+.tip{background:rgba(63,185,80,0.07);border-left:3px solid var(--accent3);}.tip .callout-title{color:var(--accent3);}
+.warn{background:rgba(240,165,0,0.07);border-left:3px solid var(--accent);}.warn .callout-title{color:var(--accent);}
+.error{background:rgba(255,123,114,0.07);border-left:3px solid var(--accent4);}.error .callout-title{color:var(--accent4);}
+.purple{background:rgba(210,168,255,0.07);border-left:3px solid var(--accent5);}.purple .callout-title{color:var(--accent5);}
+.table-wrap{overflow-x:auto;margin:20px 0;}
+table{width:100%;border-collapse:collapse;font-size:13.5px;}
+thead tr{background:var(--bg2);border-bottom:2px solid var(--accent);}
+th{padding:12px 16px;text-align:left;font-weight:700;font-size:12px;letter-spacing:0.5px;text-transform:uppercase;color:var(--accent);}
+td{padding:11px 16px;border-bottom:1px solid var(--border);color:var(--muted);}
+tr:hover td{background:rgba(255,255,255,0.02);}
+td:first-child{font-family:'JetBrains Mono',monospace;color:var(--accent2);font-size:13px;}
+.diagram-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:28px 24px;margin:24px 0;overflow:hidden;}
+.diagram-title{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:20px;text-align:center;}
+.hour-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(240,165,0,0.1);border:1px solid rgba(240,165,0,0.25);color:var(--accent);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:1px;padding:5px 14px;border-radius:20px;margin-bottom:18px;margin-top:30px;}
+.mistake-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:20px 0;}
+.mistake-card{background:rgba(255,123,114,0.05);border:1px solid rgba(255,123,114,0.2);border-radius:8px;padding:16px;}
+.mistake-card .mt{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent4);font-weight:700;margin-bottom:8px;}
+.mistake-card p{font-size:13px;margin:0;}
+.checklist{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:24px 28px;margin:24px 0;}
+.checklist-title{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent3);letter-spacing:1.5px;text-transform:uppercase;font-weight:700;margin-bottom:16px;}
+.check-item{display:flex;align-items:flex-start;gap:12px;padding:9px 0;border-bottom:1px solid rgba(48,54,61,0.5);font-size:14px;color:var(--muted);}
+.check-item:last-child{border-bottom:none;}
+.check-box{width:18px;height:18px;border:2px solid var(--accent3);border-radius:4px;flex-shrink:0;margin-top:2px;}
+.resource-list{list-style:none;padding:0;margin:12px 0;}
+.resource-list li{padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;margin-bottom:8px;font-size:13.5px;display:flex;gap:10px;align-items:center;}
+.resource-list li a{color:var(--accent2);text-decoration:none;}
+.footer{background:var(--bg2);border-top:1px solid var(--border);padding:24px 40px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);}
+.footer span{color:var(--accent);}
+::-webkit-scrollbar{width:6px;height:6px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+@media(max-width:640px){.hero{padding:32px 20px 24px;}.hero h1{font-size:24px;}.container{padding:24px 16px 60px;}}
+</style>
+</head>
+<body>
+<div class="hero">
+  <div class="hero-tag">Phase 2 &middot; Day 19 of 65</div>
+  <h1>Actions <span>Class</span></h1>
+  <div class="hero-sub">
+    <span><span class="dot"></span>2 Hours</span>
+    <span><span class="dot"></span>Mouse Hover &middot; Right-Click &middot; Double-Click &middot; Drag &amp; Drop &middot; Key Combinations &middot; Tooltips</span>
+  </div>
+</div>
+<div class="container">
+
+<div class="toc">
+  <div class="toc-title">// Table of Contents</div>
+  <ol>
+    <li><a href="#s1">What is the Actions Class?</a></li>
+    <li><a href="#s2">Actions Architecture — Build &amp; Perform</a></li>
+    <li><a href="#s3">Mouse Hover — moveToElement()</a></li>
+    <li><a href="#s4">Right-Click — contextClick()</a></li>
+    <li><a href="#s5">Double-Click — doubleClick()</a></li>
+    <li><a href="#s6">Click and Hold — clickAndHold()</a></li>
+    <li><a href="#s7">Drag and Drop</a></li>
+    <li><a href="#s8">Keyboard Actions — sendKeys, keyDown, keyUp</a></li>
+    <li><a href="#s9">Chaining Multiple Actions</a></li>
+    <li><a href="#s10">Scroll Actions (Selenium 4)</a></li>
+    <li><a href="#s11">Tooltip Verification</a></li>
+    <li><a href="#s12">ActionsHelper Utility</a></li>
+    <li><a href="#s13">Practice Task + Expected Output</a></li>
+    <li><a href="#s14">Common Mistakes</a></li>
+    <li><a href="#s15">End of Day Checklist + Resources</a></li>
+  </ol>
+</div>
+
+<!-- S1 -->
+<div class="section" id="s1">
+  <div class="section-header"><div class="section-num">01</div><h2>What is the Actions Class?</h2></div>
+  <div class="hour-badge">&#9200; Hour 1 — Mouse Actions (60 mins)</div>
+  <p>The <code>Actions</code> class simulates complex user interactions that <code>element.click()</code> can't handle — mouse hover, right-click, double-click, drag-and-drop, and keyboard combinations. It builds a chain of actions and executes them all at once with <code>perform()</code>.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Action</th><th>Method</th><th>Use Case</th></tr></thead>
+      <tbody>
+        <tr><td>Mouse hover</td><td>moveToElement(el)</td><td>Show tooltips, reveal hidden menus, dropdown reveals</td></tr>
+        <tr><td>Right-click</td><td>contextClick(el)</td><td>Open context menu, right-click menus</td></tr>
+        <tr><td>Double-click</td><td>doubleClick(el)</td><td>Select all text in input, open edit mode in tables</td></tr>
+        <tr><td>Click and hold</td><td>clickAndHold(el)</td><td>Drag start, slider controls</td></tr>
+        <tr><td>Drag and drop</td><td>dragAndDrop(src, tgt)</td><td>Sortable lists, Kanban boards, file managers</td></tr>
+        <tr><td>Key + click</td><td>keyDown(Keys.CONTROL) + click</td><td>Multi-select with Ctrl+click</td></tr>
+        <tr><td>Scroll by amount</td><td>scrollByAmount(x, y)</td><td>Scroll page or element by pixels</td></tr>
+        <tr><td>Scroll to element</td><td>scrollToElement(el)</td><td>Bring element into viewport</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- S2 -->
+<div class="section" id="s2">
+  <div class="section-header"><div class="section-num">02</div><h2>Actions Architecture — Build &amp; Perform</h2></div>
+  <div class="diagram-wrap">
+    <div class="diagram-title">// Actions Pattern — Always ends with perform()</div>
+    <svg viewBox="0 0 700 100" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:700px;display:block;margin:0 auto">
+      <defs><marker id="aa" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0L0,6L8,3z" fill="#f0a500"/></marker></defs>
+      <rect x="10" y="20" width="120" height="50" rx="8" fill="#1e2530" stroke="#d2a8ff" stroke-width="1.5"/>
+      <text x="70" y="42" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#d2a8ff" font-weight="700">new Actions</text>
+      <text x="70" y="58" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#6e7681">(driver)</text>
+      <line x1="130" y1="45" x2="155" y2="45" stroke="#f0a500" stroke-width="1.5" marker-end="url(#aa)"/>
+      <rect x="155" y="20" width="130" height="50" rx="8" fill="#1e2530" stroke="#f0a500" stroke-width="1.5"/>
+      <text x="220" y="42" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#f0a500" font-weight="700">.moveToElement</text>
+      <text x="220" y="58" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#6e7681">action 1</text>
+      <line x1="285" y1="45" x2="310" y2="45" stroke="#f0a500" stroke-width="1.5" marker-end="url(#aa)"/>
+      <rect x="310" y="20" width="110" height="50" rx="8" fill="#1e2530" stroke="#f0a500" stroke-width="1.5"/>
+      <text x="365" y="42" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#f0a500" font-weight="700">.click()</text>
+      <text x="365" y="58" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#6e7681">action 2</text>
+      <line x1="420" y1="45" x2="445" y2="45" stroke="#f0a500" stroke-width="1.5" marker-end="url(#aa)"/>
+      <rect x="445" y="20" width="110" height="50" rx="8" fill="#1e2530" stroke="#f0a500" stroke-width="1.5"/>
+      <text x="500" y="42" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#f0a500" font-weight="700">.sendKeys()</text>
+      <text x="500" y="58" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#6e7681">action 3</text>
+      <line x1="555" y1="45" x2="580" y2="45" stroke="#3fb950" stroke-width="1.5" marker-end="url(#aa)"/>
+      <rect x="580" y="20" width="110" height="50" rx="8" fill="#0a1a0d" stroke="#3fb950" stroke-width="2"/>
+      <text x="635" y="42" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#3fb950" font-weight="700">.perform()</text>
+      <text x="635" y="58" text-anchor="middle" font-family="Sora,sans-serif" font-size="9" fill="#3fb950">EXECUTES ALL</text>
+    </svg>
+  </div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">Actions_Setup.java</span></div>
+    <pre><span class="kw">import</span> org.openqa.selenium.interactions.Actions;
+
+<span class="cm">// Create Actions object — needs driver reference</span>
+<span class="nm">Actions</span> <span class="nm">actions</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">Actions</span>(driver);
+
+<span class="cm">// Pattern: chain methods, end with perform()</span>
+actions.<span class="fn">moveToElement</span>(element)
+       .<span class="fn">click</span>()
+       .<span class="fn">perform</span>();  <span class="cm">// ← REQUIRED — nothing happens without this</span>
+
+<span class="cm">// Short syntax for single actions</span>
+<span class="kw">new</span> <span class="fn">Actions</span>(driver).<span class="fn">moveToElement</span>(element).<span class="fn">perform</span>();
+<span class="kw">new</span> <span class="fn">Actions</span>(driver).<span class="fn">doubleClick</span>(element).<span class="fn">perform</span>();
+<span class="kw">new</span> <span class="fn">Actions</span>(driver).<span class="fn">contextClick</span>(element).<span class="fn">perform</span>();</pre>
+  </div>
+</div>
+
+<!-- S3 -->
+<div class="section" id="s3">
+  <div class="section-header"><div class="section-num">03</div><h2>Mouse Hover — moveToElement()</h2></div>
+  <p>Hover reveals hidden elements — dropdown menus, tooltips, sub-menus. Many navigation menus only show sub-items when you hover over the parent.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">MouseHover.java</span></div>
+    <pre><span class="nm">Actions</span> <span class="nm">actions</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">Actions</span>(driver);
+
+<span class="cm">// Basic hover</span>
+WebElement <span class="nm">menuItem</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">cssSelector</span>(<span class="st">".nav-item"</span>));
+actions.<span class="fn">moveToElement</span>(menuItem).<span class="fn">perform</span>();
+Thread.<span class="fn">sleep</span>(<span class="nu">500</span>); <span class="cm">// wait for sub-menu to appear</span>
+
+<span class="cm">// Hover then click sub-menu item</span>
+WebElement <span class="nm">subMenu</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">cssSelector</span>(<span class="st">".sub-menu-item"</span>));
+actions.<span class="fn">moveToElement</span>(menuItem)
+       .<span class="fn">moveToElement</span>(subMenu)
+       .<span class="fn">click</span>()
+       .<span class="fn">perform</span>();
+
+<span class="cm">// Hover to reveal tooltip</span>
+WebElement <span class="nm">icon</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">cssSelector</span>(<span class="st">".info-icon"</span>));
+actions.<span class="fn">moveToElement</span>(icon).<span class="fn">perform</span>();
+Thread.<span class="fn">sleep</span>(<span class="nu">500</span>);
+WebElement <span class="nm">tooltip</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">cssSelector</span>(<span class="st">".tooltip"</span>));
+<span class="fn">System.out.println</span>(<span class="st">"Tooltip: "</span> <span class="op">+</span> tooltip.<span class="fn">getText</span>());
+
+<span class="cm">// Hover with offset (hover to specific coordinates within element)</span>
+actions.<span class="fn">moveToElement</span>(menuItem, <span class="nu">10</span>, <span class="nu">5</span>).<span class="fn">perform</span>(); <span class="cm">// offset x=10, y=5 from center</span>
+
+<span class="cm">// OrangeHRM — hover over user dropdown to see options</span>
+WebElement <span class="nm">userMenu</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">cssSelector</span>(<span class="st">".oxd-userdropdown"</span>));
+actions.<span class="fn">moveToElement</span>(userMenu).<span class="fn">perform</span>();
+Thread.<span class="fn">sleep</span>(<span class="nu">300</span>);</pre>
+  </div>
+</div>
+
+<!-- S4 -->
+<div class="section" id="s4">
+  <div class="section-header"><div class="section-num">04</div><h2>Right-Click — contextClick()</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">RightClick.java</span></div>
+    <pre><span class="nm">Actions</span> <span class="nm">actions</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">Actions</span>(driver);
+
+<span class="cm">// Right-click on an element</span>
+WebElement <span class="nm">element</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">id</span>(<span class="st">"myElement"</span>));
+actions.<span class="fn">contextClick</span>(element).<span class="fn">perform</span>();
+Thread.<span class="fn">sleep</span>(<span class="nu">500</span>); <span class="cm">// wait for context menu to appear</span>
+
+<span class="cm">// Click a context menu option</span>
+driver.<span class="fn">findElement</span>(By.<span class="fn">xpath</span>(<span class="st">"//li[text()='Edit']"</span>)).<span class="fn">click</span>();
+<span class="fn">System.out.println</span>(<span class="st">"Clicked Edit from context menu"</span>);
+
+<span class="cm">// Right-click at specific coordinates</span>
+actions.<span class="fn">contextClick</span>().<span class="fn">perform</span>(); <span class="cm">// right-click current mouse position</span>
+
+<span class="cm">// Practice on DemoQA right-click page</span>
+driver.<span class="fn">get</span>(<span class="st">"https://demoqa.com/buttons"</span>);
+WebElement <span class="nm">rightClickBtn</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">id</span>(<span class="st">"rightClickBtn"</span>));
+actions.<span class="fn">contextClick</span>(rightClickBtn).<span class="fn">perform</span>();
+Thread.<span class="fn">sleep</span>(<span class="nu">500</span>);
+<span class="ty">String</span> <span class="nm">msg</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">id</span>(<span class="st">"rightClickMessage"</span>)).<span class="fn">getText</span>();
+<span class="fn">System.out.println</span>(<span class="st">"Right click result: "</span> <span class="op">+</span> msg);</pre>
+  </div>
+</div>
+
+<!-- S5 -->
+<div class="section" id="s5">
+  <div class="section-header"><div class="section-num">05</div><h2>Double-Click — doubleClick()</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">DoubleClick.java</span></div>
+    <pre><span class="nm">Actions</span> <span class="nm">actions</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">Actions</span>(driver);
+
+<span class="cm">// Double-click on element</span>
+WebElement <span class="nm">element</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">id</span>(<span class="st">"editableCell"</span>));
+actions.<span class="fn">doubleClick</span>(element).<span class="fn">perform</span>();
+<span class="fn">System.out.println</span>(<span class="st">"Double-clicked"</span>);
+
+<span class="cm">// Double-click to select all text in an input field</span>
+WebElement <span class="nm">inputField</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">name</span>(<span class="st">"username"</span>));
+inputField.<span class="fn">sendKeys</span>(<span class="st">"SomeText"</span>);
+actions.<span class="fn">doubleClick</span>(inputField).<span class="fn">perform</span>(); <span class="cm">// selects the word</span>
+
+<span class="cm">// Triple-click to select all text in field (alternative)</span>
+actions.<span class="fn">click</span>(inputField)
+       .<span class="fn">keyDown</span>(Keys.CONTROL)
+       .<span class="fn">sendKeys</span>(<span class="st">"a"</span>)
+       .<span class="fn">keyUp</span>(Keys.CONTROL)
+       .<span class="fn">perform</span>(); <span class="cm">// Ctrl+A selects all</span>
+
+<span class="cm">// Practice on DemoQA</span>
+driver.<span class="fn">get</span>(<span class="st">"https://demoqa.com/buttons"</span>);
+WebElement <span class="nm">dblClickBtn</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">id</span>(<span class="st">"doubleClickBtn"</span>));
+actions.<span class="fn">doubleClick</span>(dblClickBtn).<span class="fn">perform</span>();
+Thread.<span class="fn">sleep</span>(<span class="nu">300</span>);
+<span class="ty">String</span> <span class="nm">result</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">id</span>(<span class="st">"doubleClickMessage"</span>)).<span class="fn">getText</span>();
+<span class="fn">System.out.println</span>(<span class="st">"Double-click result: "</span> <span class="op">+</span> result);</pre>
+  </div>
+</div>
+
+<!-- S6 -->
+<div class="section" id="s6">
+  <div class="section-header"><div class="section-num">06</div><h2>Click and Hold — clickAndHold()</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">ClickHold.java</span></div>
+    <pre><span class="nm">Actions</span> <span class="nm">actions</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">Actions</span>(driver);
+
+<span class="cm">// Hold mouse button down on element</span>
+WebElement <span class="nm">element</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">id</span>(<span class="st">"sliderHandle"</span>));
+actions.<span class="fn">clickAndHold</span>(element)
+       .<span class="fn">moveByOffset</span>(<span class="nu">100</span>, <span class="nu">0</span>)  <span class="cm">// move 100px to the right while holding</span>
+       .<span class="fn">release</span>()              <span class="cm">// release the mouse button</span>
+       .<span class="fn">perform</span>();
+
+<span class="cm">// Slider example — move from left to right</span>
+WebElement <span class="nm">slider</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">cssSelector</span>(<span class="st">"input[type='range']"</span>));
+actions.<span class="fn">clickAndHold</span>(slider)
+       .<span class="fn">moveByOffset</span>(<span class="nu">50</span>, <span class="nu">0</span>)
+       .<span class="fn">release</span>()
+       .<span class="fn">perform</span>();
+<span class="fn">System.out.println</span>(<span class="st">"Slider value: "</span> <span class="op">+</span> slider.<span class="fn">getAttribute</span>(<span class="st">"value"</span>));
+
+<span class="cm">// Move to exact coordinates (from top-left of page)</span>
+actions.<span class="fn">moveToLocation</span>(<span class="nu">500</span>, <span class="nu">300</span>).<span class="fn">click</span>().<span class="fn">perform</span>();
+
+<span class="cm">// Move relative to current position</span>
+actions.<span class="fn">moveByOffset</span>(<span class="nu">50</span>, <span class="nu">100</span>).<span class="fn">perform</span>(); <span class="cm">// move 50px right, 100px down</span></pre>
+  </div>
+</div>
+
+<!-- S7 -->
+<div class="section" id="s7">
+  <div class="section-header"><div class="section-num">07</div><h2>Drag and Drop</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">DragDrop.java</span></div>
+    <pre><span class="nm">Actions</span> <span class="nm">actions</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">Actions</span>(driver);
+
+<span class="cm">// Method 1: dragAndDrop(source, target) — simplest</span>
+WebElement <span class="nm">source</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">id</span>(<span class="st">"draggable"</span>));
+WebElement <span class="nm">target</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">id</span>(<span class="st">"droppable"</span>));
+actions.<span class="fn">dragAndDrop</span>(source, target).<span class="fn">perform</span>();
+Thread.<span class="fn">sleep</span>(<span class="nu">500</span>);
+<span class="fn">System.out.println</span>(<span class="st">"Dragged and dropped"</span>);
+
+<span class="cm">// Method 2: dragAndDropBy(source, xOffset, yOffset)</span>
+actions.<span class="fn">dragAndDropBy</span>(source, <span class="nu">200</span>, <span class="nu">0</span>).<span class="fn">perform</span>(); <span class="cm">// drag 200px right</span>
+
+<span class="cm">// Method 3: Manual — clickAndHold + moveToElement + release</span>
+<span class="cm">// More reliable on some modern apps</span>
+actions.<span class="fn">clickAndHold</span>(source)
+       .<span class="fn">moveToElement</span>(target)
+       .<span class="fn">release</span>()
+       .<span class="fn">perform</span>();
+
+<span class="cm">// Practice on DemoQA</span>
+driver.<span class="fn">get</span>(<span class="st">"https://demoqa.com/droppable"</span>);
+WebElement <span class="nm">drag</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">id</span>(<span class="st">"draggable"</span>));
+WebElement <span class="nm">drop</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">id</span>(<span class="st">"droppable"</span>));
+actions.<span class="fn">dragAndDrop</span>(drag, drop).<span class="fn">perform</span>();
+Thread.<span class="fn">sleep</span>(<span class="nu">500</span>);
+<span class="ty">String</span> <span class="nm">dropText</span> <span class="op">=</span> drop.<span class="fn">getText</span>();
+<span class="fn">System.out.println</span>(<span class="st">"Drop zone text: "</span> <span class="op">+</span> dropText); <span class="cm">// "Dropped!"</span>
+
+<span class="cm">// Verify drag-and-drop succeeded</span>
+<span class="ty">boolean</span> <span class="nm">success</span> <span class="op">=</span> dropText.<span class="fn">contains</span>(<span class="st">"Dropped"</span>);
+<span class="fn">System.out.println</span>(success <span class="op">?</span> <span class="st">"✓ Drop successful"</span> <span class="op">:</span> <span class="st">"✗ Drop failed"</span>);</pre>
+  </div>
+</div>
+
+<!-- S8 -->
+<div class="section" id="s8">
+  <div class="section-header"><div class="section-num">08</div><h2>Keyboard Actions — sendKeys, keyDown, keyUp</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">KeyboardActions.java</span></div>
+    <pre><span class="kw">import</span> org.openqa.selenium.Keys;
+
+<span class="nm">Actions</span> <span class="nm">actions</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">Actions</span>(driver);
+
+<span class="cm">// sendKeys via Actions (types into currently focused element)</span>
+actions.<span class="fn">sendKeys</span>(<span class="st">"Hello World"</span>).<span class="fn">perform</span>();
+actions.<span class="fn">sendKeys</span>(Keys.ENTER).<span class="fn">perform</span>();
+actions.<span class="fn">sendKeys</span>(Keys.TAB).<span class="fn">perform</span>();
+
+<span class="cm">// sendKeys on specific element</span>
+WebElement <span class="nm">field</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">name</span>(<span class="st">"username"</span>));
+actions.<span class="fn">click</span>(field).<span class="fn">sendKeys</span>(<span class="st">"Admin"</span>).<span class="fn">perform</span>();
+
+<span class="cm">// Ctrl+A then type (clear + type in one action)</span>
+actions.<span class="fn">click</span>(field)
+       .<span class="fn">keyDown</span>(Keys.CONTROL)
+       .<span class="fn">sendKeys</span>(<span class="st">"a"</span>)
+       .<span class="fn">keyUp</span>(Keys.CONTROL)
+       .<span class="fn">sendKeys</span>(<span class="st">"NewText"</span>)
+       .<span class="fn">perform</span>();
+
+<span class="cm">// Ctrl+Click — multi-select in a list</span>
+WebElement <span class="nm">item1</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">cssSelector</span>(<span class="st">"li:nth-child(1)"</span>));
+WebElement <span class="nm">item3</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">cssSelector</span>(<span class="st">"li:nth-child(3)"</span>));
+actions.<span class="fn">click</span>(item1)
+       .<span class="fn">keyDown</span>(Keys.CONTROL)
+       .<span class="fn">click</span>(item3)
+       .<span class="fn">keyUp</span>(Keys.CONTROL)
+       .<span class="fn">perform</span>();
+
+<span class="cm">// Shift+Click — range select</span>
+actions.<span class="fn">click</span>(item1)
+       .<span class="fn">keyDown</span>(Keys.SHIFT)
+       .<span class="fn">click</span>(item3)
+       .<span class="fn">keyUp</span>(Keys.SHIFT)
+       .<span class="fn">perform</span>();
+
+<span class="cm">// Copy-paste via keyboard</span>
+actions.<span class="fn">keyDown</span>(Keys.CONTROL).<span class="fn">sendKeys</span>(<span class="st">"c"</span>).<span class="fn">keyUp</span>(Keys.CONTROL).<span class="fn">perform</span>(); <span class="cm">// copy</span>
+actions.<span class="fn">keyDown</span>(Keys.CONTROL).<span class="fn">sendKeys</span>(<span class="st">"v"</span>).<span class="fn">keyUp</span>(Keys.CONTROL).<span class="fn">perform</span>(); <span class="cm">// paste</span>
+
+<span class="cm">// keyDown/keyUp — modifier keys that stay pressed</span>
+<span class="cm">// keyDown(Keys.SHIFT) + sendKeys("hello") = "HELLO"</span>
+actions.<span class="fn">keyDown</span>(Keys.SHIFT)
+       .<span class="fn">sendKeys</span>(<span class="st">"hello"</span>)
+       .<span class="fn">keyUp</span>(Keys.SHIFT)
+       .<span class="fn">perform</span>(); <span class="cm">// types "HELLO"</span></pre>
+  </div>
+</div>
+
+<!-- S9 -->
+<div class="section" id="s9">
+  <div class="section-header"><div class="section-num">09</div><h2>Chaining Multiple Actions</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">ChainedActions.java</span></div>
+    <pre><span class="nm">Actions</span> <span class="nm">actions</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">Actions</span>(driver);
+
+<span class="cm">// Chain: hover menu → hover sub-menu → click</span>
+WebElement <span class="nm">topMenu</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">cssSelector</span>(<span class="st">".top-menu"</span>));
+WebElement <span class="nm">subMenu</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">cssSelector</span>(<span class="st">".sub-menu-item"</span>));
+
+actions.<span class="fn">moveToElement</span>(topMenu)      <span class="cm">// hover parent</span>
+       .<span class="fn">pause</span>(<span class="nu">300</span>)                   <span class="cm">// pause 300ms for animation</span>
+       .<span class="fn">moveToElement</span>(subMenu)       <span class="cm">// hover child</span>
+       .<span class="fn">pause</span>(<span class="nu">200</span>)
+       .<span class="fn">click</span>()                      <span class="cm">// click sub-item</span>
+       .<span class="fn">perform</span>();
+
+<span class="cm">// Chain: select all text + type replacement</span>
+WebElement <span class="nm">input</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">name</span>(<span class="st">"username"</span>));
+actions.<span class="fn">click</span>(input)
+       .<span class="fn">keyDown</span>(Keys.CONTROL)
+       .<span class="fn">sendKeys</span>(<span class="st">"a"</span>)
+       .<span class="fn">keyUp</span>(Keys.CONTROL)
+       .<span class="fn">sendKeys</span>(<span class="st">"NewUsername"</span>)
+       .<span class="fn">perform</span>();
+<span class="fn">System.out.println</span>(<span class="st">"Value: "</span> <span class="op">+</span> input.<span class="fn">getAttribute</span>(<span class="st">"value"</span>)); <span class="cm">// NewUsername</span>
+
+<span class="cm">// Chain: right-click + select context option</span>
+WebElement <span class="nm">rightClickTarget</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">id</span>(<span class="st">"tableRow"</span>));
+actions.<span class="fn">contextClick</span>(rightClickTarget).<span class="fn">perform</span>();
+Thread.<span class="fn">sleep</span>(<span class="nu">300</span>);
+driver.<span class="fn">findElement</span>(By.<span class="fn">xpath</span>(<span class="st">"//li[text()='Delete']"</span>)).<span class="fn">click</span>();</pre>
+  </div>
+</div>
+
+<!-- S10 -->
+<div class="section" id="s10">
+  <div class="section-header"><div class="section-num">10</div><h2>Scroll Actions (Selenium 4)</h2></div>
+  <div class="hour-badge">&#9200; Hour 2 — Scroll, Tooltips &amp; Practice (60 mins)</div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">ScrollActions.java</span></div>
+    <pre><span class="nm">Actions</span> <span class="nm">actions</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">Actions</span>(driver);
+
+<span class="cm">// Selenium 4 native scroll — NO JavaScript needed!</span>
+
+<span class="cm">// Scroll down by pixels from current position</span>
+actions.<span class="fn">scrollByAmount</span>(<span class="nu">0</span>, <span class="nu">500</span>).<span class="fn">perform</span>(); <span class="cm">// scroll down 500px</span>
+actions.<span class="fn">scrollByAmount</span>(<span class="nu">0</span>, <span class="op">-</span><span class="nu">300</span>).<span class="fn">perform</span>(); <span class="cm">// scroll up 300px</span>
+actions.<span class="fn">scrollByAmount</span>(<span class="nu">200</span>, <span class="nu">0</span>).<span class="fn">perform</span>(); <span class="cm">// scroll right 200px</span>
+
+<span class="cm">// Scroll until specific element is in view</span>
+WebElement <span class="nm">footer</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">cssSelector</span>(<span class="st">"footer"</span>));
+actions.<span class="fn">scrollToElement</span>(footer).<span class="fn">perform</span>();
+Thread.<span class="fn">sleep</span>(<span class="nu">300</span>);
+<span class="fn">System.out.println</span>(<span class="st">"Scrolled to footer"</span>);
+
+<span class="cm">// Scroll within a scrollable element (not the page)</span>
+WebElement <span class="nm">scrollableDiv</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">cssSelector</span>(<span class="st">".scrollable-list"</span>));
+actions.<span class="fn">scrollFromOrigin</span>(
+    org.openqa.selenium.interactions.WheelInput.ScrollOrigin.<span class="fn">fromElement</span>(scrollableDiv),
+    <span class="nu">0</span>, <span class="nu">100</span>  <span class="cm">// scroll within this element</span>
+).<span class="fn">perform</span>();
+
+<span class="cm">// JS scroll still works too (from Day 12):</span>
+((<span class="nm">JavascriptExecutor</span>) driver).<span class="fn">executeScript</span>(
+    <span class="st">"arguments[0].scrollIntoView(true)"</span>, footer);</pre>
+  </div>
+</div>
+
+<!-- S11 -->
+<div class="section" id="s11">
+  <div class="section-header"><div class="section-num">11</div><h2>Tooltip Verification</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">TooltipVerify.java</span></div>
+    <pre><span class="nm">Actions</span> <span class="nm">actions</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">Actions</span>(driver);
+
+<span class="cm">// METHOD 1: title attribute tooltip (easiest)</span>
+<span class="cm">// HTML: &lt;button title="Save your changes"&gt;Save&lt;/button&gt;</span>
+WebElement <span class="nm">saveBtn</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">id</span>(<span class="st">"saveBtn"</span>));
+<span class="ty">String</span> <span class="nm">titleTooltip</span> <span class="op">=</span> saveBtn.<span class="fn">getAttribute</span>(<span class="st">"title"</span>);
+<span class="fn">System.out.println</span>(<span class="st">"Tooltip (title): "</span> <span class="op">+</span> titleTooltip);
+<span class="ty">boolean</span> <span class="nm">passed</span> <span class="op">=</span> titleTooltip.<span class="fn">equals</span>(<span class="st">"Save your changes"</span>);
+<span class="fn">System.out.println</span>(passed <span class="op">?</span> <span class="st">"✓ PASS"</span> <span class="op">:</span> <span class="st">"✗ FAIL"</span>);
+
+<span class="cm">// METHOD 2: CSS tooltip — appears on hover as div</span>
+<span class="cm">// HTML: &lt;span class="info-icon"&gt;?&lt;/span&gt;</span>
+<span class="cm">//       &lt;div class="tooltip" hidden&gt;More info here&lt;/div&gt;</span>
+WebElement <span class="nm">infoIcon</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">cssSelector</span>(<span class="st">".info-icon"</span>));
+actions.<span class="fn">moveToElement</span>(infoIcon).<span class="fn">perform</span>();
+Thread.<span class="fn">sleep</span>(<span class="nu">500</span>); <span class="cm">// wait for tooltip to render</span>
+WebElement <span class="nm">tooltip</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">cssSelector</span>(<span class="st">".tooltip"</span>));
+<span class="fn">System.out.println</span>(<span class="st">"Tooltip visible: "</span> <span class="op">+</span> tooltip.<span class="fn">isDisplayed</span>());
+<span class="fn">System.out.println</span>(<span class="st">"Tooltip text   : "</span> <span class="op">+</span> tooltip.<span class="fn">getText</span>());
+
+<span class="cm">// METHOD 3: aria-label attribute</span>
+<span class="cm">// HTML: &lt;button aria-label="Delete this record"&gt;&lt;/button&gt;</span>
+<span class="ty">String</span> <span class="nm">ariaLabel</span> <span class="op">=</span> saveBtn.<span class="fn">getAttribute</span>(<span class="st">"aria-label"</span>);
+<span class="fn">System.out.println</span>(<span class="st">"Aria label: "</span> <span class="op">+</span> ariaLabel);</pre>
+  </div>
+</div>
+
+<!-- S12 -->
+<div class="section" id="s12">
+  <div class="section-header"><div class="section-num">12</div><h2>ActionsHelper Utility</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">ActionsHelper.java — utils/ActionsHelper.java</span></div>
+    <pre><span class="kw">package</span> com.qaautomation.utils;
+
+<span class="kw">import</span> org.openqa.selenium.*;
+<span class="kw">import</span> org.openqa.selenium.interactions.Actions;
+
+<span class="kw">public class</span> <span class="nm">ActionsHelper</span> {
+
+    <span class="kw">public static void</span> <span class="fn">hover</span>(WebDriver <span class="nm">driver</span>, WebElement <span class="nm">el</span>) {
+        <span class="kw">new</span> <span class="fn">Actions</span>(driver).<span class="fn">moveToElement</span>(el).<span class="fn">perform</span>();
+    }
+
+    <span class="kw">public static void</span> <span class="fn">rightClick</span>(WebDriver <span class="nm">driver</span>, WebElement <span class="nm">el</span>) {
+        <span class="kw">new</span> <span class="fn">Actions</span>(driver).<span class="fn">contextClick</span>(el).<span class="fn">perform</span>();
+    }
+
+    <span class="kw">public static void</span> <span class="fn">doubleClick</span>(WebDriver <span class="nm">driver</span>, WebElement <span class="nm">el</span>) {
+        <span class="kw">new</span> <span class="fn">Actions</span>(driver).<span class="fn">doubleClick</span>(el).<span class="fn">perform</span>();
+    }
+
+    <span class="kw">public static void</span> <span class="fn">dragAndDrop</span>(WebDriver <span class="nm">driver</span>,
+            WebElement <span class="nm">source</span>, WebElement <span class="nm">target</span>) {
+        <span class="kw">new</span> <span class="fn">Actions</span>(driver).<span class="fn">dragAndDrop</span>(source, target).<span class="fn">perform</span>();
+    }
+
+    <span class="kw">public static void</span> <span class="fn">scrollDown</span>(WebDriver <span class="nm">driver</span>, <span class="ty">int</span> <span class="nm">pixels</span>) {
+        <span class="kw">new</span> <span class="fn">Actions</span>(driver).<span class="fn">scrollByAmount</span>(<span class="nu">0</span>, pixels).<span class="fn">perform</span>();
+    }
+
+    <span class="kw">public static void</span> <span class="fn">scrollToElement</span>(WebDriver <span class="nm">driver</span>, WebElement <span class="nm">el</span>) {
+        <span class="kw">new</span> <span class="fn">Actions</span>(driver).<span class="fn">scrollToElement</span>(el).<span class="fn">perform</span>();
+    }
+
+    <span class="kw">public static void</span> <span class="fn">hoverAndClick</span>(WebDriver <span class="nm">driver</span>,
+            WebElement <span class="nm">hoverEl</span>, WebElement <span class="nm">clickEl</span>) {
+        <span class="kw">new</span> <span class="fn">Actions</span>(driver)
+            .<span class="fn">moveToElement</span>(hoverEl)
+            .<span class="fn">pause</span>(<span class="nu">300</span>)
+            .<span class="fn">moveToElement</span>(clickEl)
+            .<span class="fn">click</span>()
+            .<span class="fn">perform</span>();
+    }
+
+    <span class="kw">public static</span> <span class="ty">String</span> <span class="fn">getTooltip</span>(WebElement <span class="nm">el</span>) {
+        <span class="ty">String</span> <span class="nm">title</span>     <span class="op">=</span> el.<span class="fn">getAttribute</span>(<span class="st">"title"</span>);
+        <span class="ty">String</span> <span class="nm">ariaLabel</span> <span class="op">=</span> el.<span class="fn">getAttribute</span>(<span class="st">"aria-label"</span>);
+        <span class="kw">if</span> (title <span class="op">!=</span> <span class="kw">null</span> <span class="op">&amp;&amp;</span> !title.<span class="fn">isEmpty</span>())     <span class="kw">return</span> title;
+        <span class="kw">if</span> (ariaLabel <span class="op">!=</span> <span class="kw">null</span> <span class="op">&amp;&amp;</span> !ariaLabel.<span class="fn">isEmpty</span>()) <span class="kw">return</span> ariaLabel;
+        <span class="kw">return</span> <span class="st">""</span>;
+    }
+}</pre>
+  </div>
+</div>
+
+<!-- S13 -->
+<div class="section" id="s13">
+  <div class="section-header"><div class="section-num">13</div><h2>Practice Task + Expected Output</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">Day19Practice.java</span></div>
+    <pre><span class="kw">package</span> com.qaautomation.tests;
+
+<span class="kw">import</span> com.qaautomation.utils.*;
+<span class="kw">import</span> org.openqa.selenium.*;
+<span class="kw">import</span> org.openqa.selenium.interactions.Actions;
+<span class="kw">import</span> java.util.List;
+
+<span class="kw">public class</span> <span class="nm">Day19Practice</span> {
+
+    <span class="kw">public static void</span> <span class="fn">main</span>(<span class="ty">String</span>[] args) <span class="kw">throws</span> InterruptedException {
+        WebDriver <span class="nm">driver</span> <span class="op">=</span> DriverFactory.<span class="fn">getDriver</span>(<span class="st">"chrome"</span>);
+        <span class="nm">Actions</span> <span class="nm">actions</span> <span class="op">=</span> <span class="kw">new</span> <span class="fn">Actions</span>(driver);
+
+        <span class="kw">try</span> {
+            <span class="cm">// Task 1: DemoQA — Right-click, Double-click, Single click</span>
+            <span class="fn">System.out.println</span>(<span class="st">"====== TASK 1: DemoQA Buttons ======"</span>);
+            driver.<span class="fn">get</span>(<span class="st">"https://demoqa.com/buttons"</span>);
+
+            <span class="ty">String</span> <span class="nm">title</span> <span class="op">=</span> driver.<span class="fn">getTitle</span>();
+            <span class="fn">System.out.println</span>(<span class="st">"  Page: "</span> <span class="op">+</span> title);
+
+            <span class="cm">// Double-click button</span>
+            WebElement <span class="nm">dblBtn</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">id</span>(<span class="st">"doubleClickBtn"</span>));
+            actions.<span class="fn">doubleClick</span>(dblBtn).<span class="fn">perform</span>();
+            Thread.<span class="fn">sleep</span>(<span class="nu">300</span>);
+            <span class="ty">String</span> <span class="nm">dblMsg</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">id</span>(<span class="st">"doubleClickMessage"</span>)).<span class="fn">getText</span>();
+            <span class="fn">System.out.println</span>(<span class="st">"  Double-click: "</span> <span class="op">+</span> dblMsg);
+
+            <span class="cm">// Right-click button</span>
+            WebElement <span class="nm">rtBtn</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">id</span>(<span class="st">"rightClickBtn"</span>));
+            actions.<span class="fn">contextClick</span>(rtBtn).<span class="fn">perform</span>();
+            Thread.<span class="fn">sleep</span>(<span class="nu">300</span>);
+            <span class="ty">String</span> <span class="nm">rtMsg</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">id</span>(<span class="st">"rightClickMessage"</span>)).<span class="fn">getText</span>();
+            <span class="fn">System.out.println</span>(<span class="st">"  Right-click : "</span> <span class="op">+</span> rtMsg);
+            <span class="fn">System.out.println</span>(<span class="st">"  ✓ PASS"</span>);
+
+            <span class="cm">// Task 2: Drag and Drop</span>
+            <span class="fn">System.out.println</span>(<span class="st">"\n====== TASK 2: Drag and Drop ======"</span>);
+            driver.<span class="fn">get</span>(<span class="st">"https://demoqa.com/droppable"</span>);
+            WebElement <span class="nm">drag</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">id</span>(<span class="st">"draggable"</span>));
+            WebElement <span class="nm">drop</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">id</span>(<span class="st">"droppable"</span>));
+            <span class="fn">System.out.println</span>(<span class="st">"  Before drop: "</span> <span class="op">+</span> drop.<span class="fn">getText</span>());
+            actions.<span class="fn">dragAndDrop</span>(drag, drop).<span class="fn">perform</span>();
+            Thread.<span class="fn">sleep</span>(<span class="nu">500</span>);
+            <span class="fn">System.out.println</span>(<span class="st">"  After drop : "</span> <span class="op">+</span> drop.<span class="fn">getText</span>());
+            <span class="fn">System.out.println</span>(drop.<span class="fn">getText</span>().<span class="fn">contains</span>(<span class="st">"Dropped"</span>) <span class="op">?</span> <span class="st">"  ✓ PASS"</span> <span class="op">:</span> <span class="st">"  ✗ FAIL"</span>);
+
+            <span class="cm">// Task 3: Scroll Actions</span>
+            <span class="fn">System.out.println</span>(<span class="st">"\n====== TASK 3: Scroll Actions ======"</span>);
+            driver.<span class="fn">get</span>(<span class="st">"https://demoqa.com"</span>);
+            actions.<span class="fn">scrollByAmount</span>(<span class="nu">0</span>, <span class="nu">500</span>).<span class="fn">perform</span>();
+            Thread.<span class="fn">sleep</span>(<span class="nu">300</span>);
+            <span class="fn">System.out.println</span>(<span class="st">"  Scrolled down 500px"</span>);
+            actions.<span class="fn">scrollByAmount</span>(<span class="nu">0</span>, <span class="op">-</span><span class="nu">500</span>).<span class="fn">perform</span>();
+            Thread.<span class="fn">sleep</span>(<span class="nu">300</span>);
+            <span class="fn">System.out.println</span>(<span class="st">"  Scrolled back to top"</span>);
+            <span class="fn">System.out.println</span>(<span class="st">"  ✓ PASS"</span>);
+
+            <span class="cm">// Task 4: OrangeHRM hover + scroll</span>
+            <span class="fn">System.out.println</span>(<span class="st">"\n====== TASK 4: OrangeHRM Hover ======"</span>);
+            driver.<span class="fn">get</span>(ConfigReader.<span class="fn">getBaseUrl</span>());
+            driver.<span class="fn">findElement</span>(By.<span class="fn">name</span>(<span class="st">"username"</span>)).<span class="fn">sendKeys</span>(ConfigReader.<span class="fn">getUsername</span>());
+            driver.<span class="fn">findElement</span>(By.<span class="fn">name</span>(<span class="st">"password"</span>)).<span class="fn">sendKeys</span>(ConfigReader.<span class="fn">getPassword</span>());
+            driver.<span class="fn">findElement</span>(By.<span class="fn">cssSelector</span>(<span class="st">"button[type='submit']"</span>)).<span class="fn">click</span>();
+            Thread.<span class="fn">sleep</span>(<span class="nu">2000</span>);
+
+            <span class="cm">// Hover over user dropdown</span>
+            WebElement <span class="nm">userDrop</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(
+                By.<span class="fn">cssSelector</span>(<span class="st">".oxd-userdropdown"</span>));
+            actions.<span class="fn">moveToElement</span>(userDrop).<span class="fn">perform</span>();
+            Thread.<span class="fn">sleep</span>(<span class="nu">400</span>);
+            <span class="fn">System.out.println</span>(<span class="st">"  Hovered user dropdown"</span>);
+
+            <span class="cm">// Click it to open</span>
+            userDrop.<span class="fn">click</span>();
+            Thread.<span class="fn">sleep</span>(<span class="nu">400</span>);
+            <span class="ty">boolean</span> <span class="nm">logoutVisible</span> <span class="op">=</span> !driver.<span class="fn">findElements</span>(
+                By.<span class="fn">xpath</span>(<span class="st">"//a[text()='Logout']"</span>)).<span class="fn">isEmpty</span>();
+            <span class="fn">System.out.println</span>(<span class="st">"  Logout visible: "</span> <span class="op">+</span> logoutVisible);
+            <span class="fn">System.out.println</span>(logoutVisible <span class="op">?</span> <span class="st">"  ✓ PASS"</span> <span class="op">:</span> <span class="st">"  ✗ FAIL"</span>);
+
+            <span class="cm">// Scroll down on dashboard</span>
+            actions.<span class="fn">scrollByAmount</span>(<span class="nu">0</span>, <span class="nu">300</span>).<span class="fn">perform</span>();
+            Thread.<span class="fn">sleep</span>(<span class="nu">300</span>);
+            <span class="fn">System.out.println</span>(<span class="st">"  Scrolled dashboard ✓"</span>);
+
+        } <span class="kw">catch</span> (Exception <span class="nm">e</span>) {
+            <span class="fn">System.out.println</span>(<span class="st">"Error: "</span> <span class="op">+</span> e.<span class="fn">getMessage</span>());
+        } <span class="kw">finally</span> {
+            driver.<span class="fn">quit</span>();
+            <span class="fn">System.out.println</span>(<span class="st">"\nBrowser closed ✓"</span>);
+        }
+    }
+}</pre>
+  </div>
+  <h3>Expected Output</h3>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Output</span><span class="code-file">Console</span></div>
+    <pre>====== TASK 1: DemoQA Buttons ======
+  Page: DEMOQA
+  Double-click: You have done a double click
+  Right-click : You have done a right click
+  ✓ PASS
+
+====== TASK 2: Drag and Drop ======
+  Before drop: Drop here
+  After drop : Dropped!
+  ✓ PASS
+
+====== TASK 3: Scroll Actions ======
+  Scrolled down 500px
+  Scrolled back to top
+  ✓ PASS
+
+====== TASK 4: OrangeHRM Hover ======
+  Hovered user dropdown
+  Logout visible: true
+  ✓ PASS
+  Scrolled dashboard ✓
+
+Browser closed ✓</pre>
+  </div>
+</div>
+
+<!-- S14 -->
+<div class="section" id="s14">
+  <div class="section-header"><div class="section-num">14</div><h2>Common Mistakes</h2></div>
+  <div class="mistake-grid">
+    <div class="mistake-card"><div class="mt">&#10060; Forgetting perform()</div><p>Building an Actions chain without calling <code>.perform()</code> at the end — nothing happens. perform() is mandatory. It's the most common Actions mistake.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; Hover without pause</div><p>Hovering and immediately looking for sub-menu items — they haven't appeared yet. Add <code>.pause(300)</code> in the chain or a Thread.sleep(500) after perform().</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; dragAndDrop not working</div><p>Some modern apps ignore the standard drag-and-drop event. Try the manual approach: <code>clickAndHold().moveToElement().pause(500).release()</code>. HTML5 canvas drag may need JS dispatch events.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; keyDown without keyUp</div><p>Calling <code>keyDown(Keys.SHIFT)</code> without <code>keyUp(Keys.SHIFT)</code> leaves the modifier key stuck — all subsequent typing will be in uppercase/shifted. Always pair keyDown with keyUp.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; moveToElement on hidden element</div><p>Hovering an element with visibility:hidden or display:none throws MoveTargetOutOfBoundsException. The element must be visible and in the viewport.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; scrollByAmount vs scrollToElement</div><p><code>scrollByAmount(0, 500)</code> scrolls by pixels from current position. <code>scrollToElement(el)</code> scrolls until element is visible. Use scrollToElement when you need a specific element in view.</p></div>
+  </div>
+</div>
+
+<!-- S15 -->
+<div class="section" id="s15">
+  <div class="section-header"><div class="section-num">15</div><h2>End of Day Checklist + Resources</h2></div>
+  <div class="checklist">
+    <div class="checklist-title">&#10022; End of Day 19 Checklist</div>
+    <div class="check-item"><div class="check-box"></div>I understand Actions pattern: new Actions(driver).action().perform()</div>
+    <div class="check-item"><div class="check-box"></div>I always call perform() — nothing executes without it</div>
+    <div class="check-item"><div class="check-box"></div>I can hover to reveal hidden elements with moveToElement()</div>
+    <div class="check-item"><div class="check-box"></div>I can right-click with contextClick() and interact with context menus</div>
+    <div class="check-item"><div class="check-box"></div>I can double-click with doubleClick()</div>
+    <div class="check-item"><div class="check-box"></div>I can drag and drop with dragAndDrop(source, target)</div>
+    <div class="check-item"><div class="check-box"></div>I can use keyDown/keyUp for Ctrl+click, Shift+click, etc.</div>
+    <div class="check-item"><div class="check-box"></div>I can scroll with scrollByAmount() and scrollToElement() (Selenium 4)</div>
+    <div class="check-item"><div class="check-box"></div>ActionsHelper.java created in utils package</div>
+    <div class="check-item"><div class="check-box"></div>Practice task runs — DemoQA buttons + drag-drop + OrangeHRM hover all PASS</div>
+  </div>
+  <h3>Resources</h3>
+  <ul class="resource-list">
+    <li><span>&#128214;</span><strong>Selenium Docs:&nbsp;</strong><a href="https://www.selenium.dev/documentation/webdriver/actions_api/" target="_blank">Selenium — Actions API</a> &nbsp;<span style="color:var(--muted);font-size:12px">Official Actions class documentation — mouse, keyboard, scroll.</span></li>
+    <li><span>&#127947;</span><strong>Practice:&nbsp;</strong><a href="https://demoqa.com/interactions" target="_blank">DemoQA — Interactions</a> &nbsp;<span style="color:var(--muted);font-size:12px">Drag-drop, resizable, selectable — perfect Actions practice.</span></li>
+    <li><span>&#127947;</span><strong>Practice:&nbsp;</strong><a href="https://demoqa.com/buttons" target="_blank">DemoQA — Buttons</a> &nbsp;<span style="color:var(--muted);font-size:12px">Right-click, double-click, dynamic click practice.</span></li>
+  </ul>
+  <div class="callout purple">
+    <span class="callout-icon">&#127881;</span>
+    <div class="callout-body">
+      <div class="callout-title">Day 20 Preview — Explicit Waits (WebDriverWait)</div>
+      <p>Tomorrow is one of the most important days of the entire roadmap. <strong>Explicit Waits</strong> replace every <code>Thread.sleep()</code> in your codebase. Your tests become faster, more reliable, and professional. <code>new WebDriverWait(driver, Duration.ofSeconds(10)).until(ExpectedConditions.visibilityOfElementLocated(locator))</code> — one line that changes everything.</p>
+    </div>
+  </div>
+</div>
+
+</div>
+<div class="footer">
+  <span>Day 19 of 65</span> &nbsp;&middot;&nbsp; Selenium + Java Automation Roadmap &nbsp;&middot;&nbsp; Phase 2 &mdash; Core Selenium &nbsp;&middot;&nbsp; <span>Next: Day 20 &mdash; Explicit Waits (WebDriverWait) &#127881;</span>
+</div>
+</body>
+</html>

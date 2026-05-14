@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 18 — Dropdowns & Date Pickers</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Sora:wght@400;600;700;800&display=swap');
+:root{--bg:#0d1117;--bg2:#161b22;--bg3:#1e2530;--border:#30363d;--accent:#f0a500;--accent2:#58a6ff;--accent3:#3fb950;--accent4:#ff7b72;--accent5:#d2a8ff;--text:#e6edf3;--muted:#8b949e;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);line-height:1.75;font-size:15px;}
+.hero{background:linear-gradient(135deg,#0d1117,#161b22,#0d1522);border-bottom:2px solid var(--accent2);padding:48px 40px 36px;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:0;right:0;width:400px;height:400px;background:radial-gradient(circle,rgba(88,166,255,0.07),transparent 70%);pointer-events:none;}
+.hero-tag{display:inline-block;background:rgba(88,166,255,0.12);border:1px solid rgba(88,166,255,0.3);color:var(--accent2);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;padding:4px 12px;border-radius:20px;margin-bottom:16px;}
+.hero h1{font-size:34px;font-weight:800;line-height:1.2;margin-bottom:10px;}
+.hero h1 span{color:var(--accent2);}
+.hero-sub{color:var(--muted);font-size:14px;display:flex;gap:24px;flex-wrap:wrap;margin-top:16px;}
+.hero-sub span{display:flex;align-items:center;gap:6px;}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--accent2);display:inline-block;}
+.container{max-width:980px;margin:0 auto;padding:40px 32px 80px;}
+.toc{background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--accent2);border-radius:8px;padding:24px 28px;margin-bottom:48px;}
+.toc-title{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--accent2);margin-bottom:14px;}
+.toc ol{padding-left:20px;}.toc li{margin-bottom:6px;}
+.toc a{color:var(--muted);text-decoration:none;font-size:14px;}.toc a:hover{color:var(--accent2);}
+.section{margin-bottom:56px;}
+.section-header{display:flex;align-items:center;gap:14px;margin-bottom:24px;padding-bottom:14px;border-bottom:1px solid var(--border);}
+.section-num{background:var(--accent2);color:#000;font-family:'JetBrains Mono',monospace;font-weight:700;font-size:12px;width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.section h2{font-size:22px;font-weight:700;}
+h3{font-size:16px;font-weight:600;color:var(--accent2);margin:28px 0 12px;display:flex;align-items:center;gap:8px;}
+h3::before{content:'▸';color:var(--accent);font-size:12px;}
+p{color:var(--muted);margin-bottom:14px;line-height:1.8;}strong{color:var(--text);font-weight:600;}
+.code-block{background:#010409;border:1px solid var(--border);border-radius:10px;margin:20px 0;overflow:hidden;}
+.code-header{background:var(--bg2);padding:10px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
+.code-lang{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent2);letter-spacing:1px;text-transform:uppercase;font-weight:600;}
+.code-file{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);}
+pre{font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.85;padding:20px;overflow-x:auto;color:#e6edf3;}
+.kw{color:#ff7b72;font-weight:500;}.ty{color:#ffa657;}.st{color:#a5d6ff;}.cm{color:#6e7681;font-style:italic;}
+.nm{color:#79c0ff;}.nu{color:#79c0ff;}.fn{color:#d2a8ff;}.op{color:#ff7b72;}.bool{color:#3fb950;}
+code{font-family:'JetBrains Mono',monospace;font-size:12.5px;background:rgba(88,166,255,0.1);border:1px solid rgba(88,166,255,0.2);color:var(--accent2);padding:1px 7px;border-radius:4px;}
+.callout{border-radius:8px;padding:16px 20px;margin:20px 0;display:flex;gap:14px;align-items:flex-start;}
+.callout-icon{font-size:18px;flex-shrink:0;margin-top:1px;}.callout-body{flex:1;}
+.callout-title{font-weight:700;font-size:13px;margin-bottom:4px;}.callout p{margin-bottom:0;font-size:13.5px;}
+.note{background:rgba(88,166,255,0.07);border-left:3px solid var(--accent2);}.note .callout-title{color:var(--accent2);}
+.tip{background:rgba(63,185,80,0.07);border-left:3px solid var(--accent3);}.tip .callout-title{color:var(--accent3);}
+.warn{background:rgba(240,165,0,0.07);border-left:3px solid var(--accent);}.warn .callout-title{color:var(--accent);}
+.error{background:rgba(255,123,114,0.07);border-left:3px solid var(--accent4);}.error .callout-title{color:var(--accent4);}
+.purple{background:rgba(210,168,255,0.07);border-left:3px solid var(--accent5);}.purple .callout-title{color:var(--accent5);}
+.table-wrap{overflow-x:auto;margin:20px 0;}
+table{width:100%;border-collapse:collapse;font-size:13.5px;}
+thead tr{background:var(--bg2);border-bottom:2px solid var(--accent2);}
+th{padding:12px 16px;text-align:left;font-weight:700;font-size:12px;letter-spacing:0.5px;text-transform:uppercase;color:var(--accent2);}
+td{padding:11px 16px;border-bottom:1px solid var(--border);color:var(--muted);}
+tr:hover td{background:rgba(255,255,255,0.02);}
+td:first-child{font-family:'JetBrains Mono',monospace;color:var(--accent);font-size:13px;}
+.hour-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(88,166,255,0.1);border:1px solid rgba(88,166,255,0.25);color:var(--accent2);font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;letter-spacing:1px;padding:5px 14px;border-radius:20px;margin-bottom:18px;margin-top:30px;}
+.mistake-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:20px 0;}
+.mistake-card{background:rgba(255,123,114,0.05);border:1px solid rgba(255,123,114,0.2);border-radius:8px;padding:16px;}
+.mistake-card .mt{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent4);font-weight:700;margin-bottom:8px;}
+.mistake-card p{font-size:13px;margin:0;}
+.checklist{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:24px 28px;margin:24px 0;}
+.checklist-title{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent3);letter-spacing:1.5px;text-transform:uppercase;font-weight:700;margin-bottom:16px;}
+.check-item{display:flex;align-items:flex-start;gap:12px;padding:9px 0;border-bottom:1px solid rgba(48,54,61,0.5);font-size:14px;color:var(--muted);}
+.check-item:last-child{border-bottom:none;}
+.check-box{width:18px;height:18px;border:2px solid var(--accent3);border-radius:4px;flex-shrink:0;margin-top:2px;}
+.resource-list{list-style:none;padding:0;margin:12px 0;}
+.resource-list li{padding:10px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;margin-bottom:8px;font-size:13.5px;display:flex;gap:10px;align-items:center;}
+.resource-list li a{color:var(--accent2);text-decoration:none;}
+.footer{background:var(--bg2);border-top:1px solid var(--border);padding:24px 40px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);}
+.footer span{color:var(--accent2);}
+::-webkit-scrollbar{width:6px;height:6px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+@media(max-width:640px){.hero{padding:32px 20px 24px;}.hero h1{font-size:24px;}.container{padding:24px 16px 60px;}}
+</style>
+</head>
+<body>
+<div class="hero">
+  <div class="hero-tag">Phase 2 &middot; Day 18 of 65</div>
+  <h1>Dropdowns <span>&amp; Date Pickers</span></h1>
+  <div class="hero-sub">
+    <span><span class="dot"></span>2 Hours</span>
+    <span><span class="dot"></span>Native Select &middot; Custom Dropdowns &middot; Auto-complete &middot; Date Pickers &middot; Dynamic Elements</span>
+  </div>
+</div>
+<div class="container">
+
+<div class="toc">
+  <div class="toc-title">// Table of Contents</div>
+  <ol>
+    <li><a href="#s1">Dropdown Types — Know Your Enemy</a></li>
+    <li><a href="#s2">Native Select — Select Class Deep Dive</a></li>
+    <li><a href="#s3">OrangeHRM Custom Dropdown Pattern</a></li>
+    <li><a href="#s4">Auto-complete / Typeahead Dropdowns</a></li>
+    <li><a href="#s5">Date Picker — Input Field Type</a></li>
+    <li><a href="#s6">Date Picker — Calendar Widget</a></li>
+    <li><a href="#s7">Date Picker — JavaScript Override</a></li>
+    <li><a href="#s8">Dynamic Elements — Elements That Appear After Action</a></li>
+    <li><a href="#s9">Waiting for Dynamic Elements</a></li>
+    <li><a href="#s10">DropdownHelper Utility</a></li>
+    <li><a href="#s11">Practice Task — OrangeHRM Leave Application</a></li>
+    <li><a href="#s12">Common Mistakes</a></li>
+    <li><a href="#s13">End of Day Checklist + Resources</a></li>
+  </ol>
+</div>
+
+<!-- S1 -->
+<div class="section" id="s1">
+  <div class="section-header"><div class="section-num">01</div><h2>Dropdown Types — Know Your Enemy</h2></div>
+  <div class="hour-badge">&#9200; Hour 1 — Dropdown Strategies (60 mins)</div>
+  <p>Not all dropdowns are equal. The approach changes completely based on the underlying HTML. Inspect first — then decide which strategy to use.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Type</th><th>HTML Structure</th><th>Approach</th><th>Example Apps</th></tr></thead>
+      <tbody>
+        <tr><td>Native Select</td><td><code>&lt;select&gt;&lt;option&gt;</code></td><td>Selenium <code>Select</code> class</td><td>Old HR systems, basic forms</td></tr>
+        <tr><td>Custom Div Dropdown</td><td><code>&lt;div&gt;</code> with click events</td><td>click() trigger + click() option</td><td>OrangeHRM, modern SPAs</td></tr>
+        <tr><td>Auto-complete</td><td><code>&lt;input&gt;</code> + suggestion list</td><td>sendKeys() + wait + click suggestion</td><td>Search boxes, country fields</td></tr>
+        <tr><td>Date Picker — input</td><td><code>&lt;input type="date"&gt;</code></td><td>sendKeys with date string</td><td>Simple HTML5 forms</td></tr>
+        <tr><td>Date Picker — widget</td><td>Calendar popup div</td><td>Navigate month/year, click day</td><td>OrangeHRM, Bootstrap datepicker</td></tr>
+        <tr><td>Date Picker — read-only</td><td>Input disabled, must use calendar</td><td>JS override or calendar navigation</td><td>Strict date pickers</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- S2 -->
+<div class="section" id="s2">
+  <div class="section-header"><div class="section-num">02</div><h2>Native Select — Select Class Deep Dive</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">NativeSelect.java</span></div>
+    <pre><span class="kw">import</span> org.openqa.selenium.support.ui.Select;
+
+<span class="cm">// Always wrap the raw WebElement with Select</span>
+WebElement <span class="nm">raw</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">id</span>(<span class="st">"countryDropdown"</span>));
+<span class="nm">Select</span> <span class="nm">select</span>   <span class="op">=</span> <span class="kw">new</span> <span class="fn">Select</span>(raw);
+
+<span class="cm">// 3 ways to select an option</span>
+select.<span class="fn">selectByVisibleText</span>(<span class="st">"Nepal"</span>);   <span class="cm">// text you see in UI — most readable</span>
+select.<span class="fn">selectByValue</span>(<span class="st">"np"</span>);           <span class="cm">// value= attribute — reliable</span>
+select.<span class="fn">selectByIndex</span>(<span class="nu">2</span>);             <span class="cm">// zero-based index</span>
+
+<span class="cm">// Read current selection</span>
+WebElement <span class="nm">picked</span> <span class="op">=</span> select.<span class="fn">getFirstSelectedOption</span>();
+<span class="fn">System.out.println</span>(<span class="st">"Picked: "</span> <span class="op">+</span> picked.<span class="fn">getText</span>());
+<span class="fn">System.out.println</span>(<span class="st">"Value : "</span> <span class="op">+</span> picked.<span class="fn">getAttribute</span>(<span class="st">"value"</span>));
+
+<span class="cm">// Validate a specific option exists</span>
+<span class="ty">boolean</span> <span class="nm">hasNepal</span> <span class="op">=</span> select.<span class="fn">getOptions</span>().<span class="fn">stream</span>()
+    .<span class="fn">anyMatch</span>(<span class="nm">o</span> -> o.<span class="fn">getText</span>().<span class="fn">equals</span>(<span class="st">"Nepal"</span>));
+<span class="fn">System.out.println</span>(<span class="st">"Has Nepal: "</span> <span class="op">+</span> hasNepal);
+
+<span class="cm">// Print all options</span>
+<span class="fn">System.out.println</span>(<span class="st">"All options:"</span>);
+<span class="kw">for</span> (WebElement <span class="nm">opt</span> : select.<span class="fn">getOptions</span>()) {
+    <span class="ty">String</span> <span class="nm">marker</span> <span class="op">=</span> opt.<span class="fn">isSelected</span>() <span class="op">?</span> <span class="st">" ← selected"</span> : <span class="st">""</span>;
+    <span class="fn">System.out.println</span>(<span class="st">"  "</span> <span class="op">+</span> opt.<span class="fn">getText</span>() <span class="op">+</span> marker);
+}
+
+<span class="cm">// Verify dropdown has expected number of options</span>
+<span class="ty">int</span> <span class="nm">optCount</span> <span class="op">=</span> select.<span class="fn">getOptions</span>().<span class="fn">size</span>();
+<span class="fn">System.out.println</span>(<span class="st">"Total options: "</span> <span class="op">+</span> optCount);</pre>
+  </div>
+</div>
+
+<!-- S3 -->
+<div class="section" id="s3">
+  <div class="section-header"><div class="section-num">03</div><h2>OrangeHRM Custom Dropdown Pattern</h2></div>
+  <p>OrangeHRM uses Vue.js custom dropdowns — they look like dropdowns but use <code>&lt;div&gt;</code> elements, not <code>&lt;select&gt;</code>. The Select class won't work. Here's the full pattern.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">OrangeHRM_CustomDropdown.java</span></div>
+    <pre><span class="cm">// OrangeHRM dropdown HTML structure:</span>
+<span class="cm">// &lt;div class="oxd-select-wrapper"&gt;</span>
+<span class="cm">//   &lt;div class="oxd-select-text-input"&gt;-- Select --&lt;/div&gt;</span>
+<span class="cm">//   &lt;div class="oxd-select-dropdown"&gt; (hidden until clicked)</span>
+<span class="cm">//     &lt;span class="oxd-select-option"&gt;&lt;span&gt;Admin&lt;/span&gt;&lt;/span&gt;</span>
+<span class="cm">//     &lt;span class="oxd-select-option"&gt;&lt;span&gt;ESS&lt;/span&gt;&lt;/span&gt;</span>
+<span class="cm">//   &lt;/div&gt;</span>
+<span class="cm">// &lt;/div&gt;</span>
+
+<span class="cm">// STEP 1: Click the dropdown trigger to open it</span>
+WebElement <span class="nm">dropdown</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(
+    By.<span class="fn">xpath</span>(<span class="st">"//label[text()='User Role']/following::div[@class='oxd-select-text-input'][1]"</span>));
+dropdown.<span class="fn">click</span>();
+Thread.<span class="fn">sleep</span>(<span class="nu">500</span>); <span class="cm">// wait for options to appear</span>
+
+<span class="cm">// STEP 2: Click the specific option</span>
+driver.<span class="fn">findElement</span>(
+    By.<span class="fn">xpath</span>(<span class="st">"//div[@class='oxd-select-dropdown']//span[text()='Admin']"</span>)).<span class="fn">click</span>();
+<span class="fn">System.out.println</span>(<span class="st">"Selected: Admin"</span>);
+
+<span class="cm">// Alternative: by option index</span>
+dropdown.<span class="fn">click</span>();
+Thread.<span class="fn">sleep</span>(<span class="nu">500</span>);
+List&lt;WebElement&gt; <span class="nm">options</span> <span class="op">=</span> driver.<span class="fn">findElements</span>(
+    By.<span class="fn">cssSelector</span>(<span class="st">".oxd-select-option span"</span>));
+<span class="fn">System.out.println</span>(<span class="st">"Options found: "</span> <span class="op">+</span> options.<span class="fn">size</span>());
+<span class="kw">for</span> (WebElement <span class="nm">opt</span> : options) {
+    <span class="fn">System.out.println</span>(<span class="st">"  "</span> <span class="op">+</span> opt.<span class="fn">getText</span>());
+}
+<span class="cm">// Click first option</span>
+options.<span class="fn">get</span>(<span class="nu">0</span>).<span class="fn">click</span>();
+
+<span class="cm">// VERIFY selection shows in dropdown text</span>
+<span class="ty">String</span> <span class="nm">selectedText</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(
+    By.<span class="fn">cssSelector</span>(<span class="st">".oxd-select-text-input"</span>)).<span class="fn">getText</span>();
+<span class="fn">System.out.println</span>(<span class="st">"Now shows: "</span> <span class="op">+</span> selectedText);</pre>
+  </div>
+</div>
+
+<!-- S4 -->
+<div class="section" id="s4">
+  <div class="section-header"><div class="section-num">04</div><h2>Auto-complete / Typeahead Dropdowns</h2></div>
+  <p>Auto-complete fields show suggestions as you type. Type the text, wait for suggestions to appear, then click the right suggestion.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">AutoComplete.java</span></div>
+    <pre><span class="cm">// PATTERN: type → wait for suggestions → click one</span>
+
+<span class="cm">// Step 1: Find and type in the search field</span>
+WebElement <span class="nm">searchField</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(
+    By.<span class="fn">cssSelector</span>(<span class="st">".oxd-autocomplete-text-input input"</span>));
+searchField.<span class="fn">clear</span>();
+searchField.<span class="fn">sendKeys</span>(<span class="st">"Adam"</span>);
+
+<span class="cm">// Step 2: Wait for suggestions dropdown to appear</span>
+Thread.<span class="fn">sleep</span>(<span class="nu">1000</span>); <span class="cm">// temporary — use explicit wait on Day 20</span>
+
+<span class="cm">// Step 3: Get all suggestions</span>
+List&lt;WebElement&gt; <span class="nm">suggestions</span> <span class="op">=</span> driver.<span class="fn">findElements</span>(
+    By.<span class="fn">cssSelector</span>(<span class="st">".oxd-autocomplete-dropdown .oxd-autocomplete-option"</span>));
+<span class="fn">System.out.println</span>(<span class="st">"Suggestions: "</span> <span class="op">+</span> suggestions.<span class="fn">size</span>());
+
+<span class="cm">// Step 4: Click matching suggestion</span>
+<span class="kw">for</span> (WebElement <span class="nm">sug</span> : suggestions) {
+    <span class="fn">System.out.println</span>(<span class="st">"  Option: "</span> <span class="op">+</span> sug.<span class="fn">getText</span>());
+    <span class="kw">if</span> (sug.<span class="fn">getText</span>().<span class="fn">contains</span>(<span class="st">"Adam"</span>)) {
+        sug.<span class="fn">click</span>();
+        <span class="fn">System.out.println</span>(<span class="st">"  Selected: "</span> <span class="op">+</span> sug.<span class="fn">getText</span>());
+        <span class="kw">break</span>;
+    }
+}
+
+<span class="cm">// Verify selection in field</span>
+<span class="ty">String</span> <span class="nm">selectedVal</span> <span class="op">=</span> searchField.<span class="fn">getAttribute</span>(<span class="st">"value"</span>);
+<span class="fn">System.out.println</span>(<span class="st">"Field value: "</span> <span class="op">+</span> selectedVal);</pre>
+  </div>
+</div>
+
+<!-- S5 -->
+<div class="section" id="s5">
+  <div class="section-header"><div class="section-num">05</div><h2>Date Picker — Input Field Type</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">DateInput.java</span></div>
+    <pre><span class="cm">// HTML5 date input: &lt;input type="date" id="dob"&gt;</span>
+<span class="cm">// Format: YYYY-MM-DD (always ISO format for sendKeys)</span>
+
+WebElement <span class="nm">dateField</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">id</span>(<span class="st">"dob"</span>));
+dateField.<span class="fn">sendKeys</span>(<span class="st">"1995-05-15"</span>); <span class="cm">// May 15, 1995</span>
+
+<span class="cm">// Read the date back</span>
+<span class="ty">String</span> <span class="nm">dateValue</span> <span class="op">=</span> dateField.<span class="fn">getAttribute</span>(<span class="st">"value"</span>);
+<span class="fn">System.out.println</span>(<span class="st">"Date set: "</span> <span class="op">+</span> dateValue); <span class="cm">// 1995-05-15</span>
+
+<span class="cm">// Clear and re-enter date</span>
+dateField.<span class="fn">clear</span>();
+dateField.<span class="fn">sendKeys</span>(<span class="st">"2024-01-20"</span>);
+
+<span class="cm">// Use LocalDate for dynamic dates</span>
+<span class="kw">import</span> java.time.LocalDate;
+<span class="kw">import</span> java.time.format.DateTimeFormatter;
+
+LocalDate <span class="nm">today</span>     <span class="op">=</span> LocalDate.<span class="fn">now</span>();
+LocalDate <span class="nm">tomorrow</span>  <span class="op">=</span> today.<span class="fn">plusDays</span>(<span class="nu">1</span>);
+LocalDate <span class="nm">nextMonth</span> <span class="op">=</span> today.<span class="fn">plusMonths</span>(<span class="nu">1</span>);
+LocalDate <span class="nm">lastYear</span>  <span class="op">=</span> today.<span class="fn">minusYears</span>(<span class="nu">1</span>);
+
+DateTimeFormatter <span class="nm">fmt</span> <span class="op">=</span> DateTimeFormatter.<span class="fn">ofPattern</span>(<span class="st">"yyyy-MM-dd"</span>);
+dateField.<span class="fn">sendKeys</span>(tomorrow.<span class="fn">format</span>(fmt));
+<span class="fn">System.out.println</span>(<span class="st">"Tomorrow: "</span> <span class="op">+</span> tomorrow.<span class="fn">format</span>(fmt));</pre>
+  </div>
+</div>
+
+<!-- S6 -->
+<div class="section" id="s6">
+  <div class="section-header"><div class="section-num">06</div><h2>Date Picker — Calendar Widget</h2></div>
+  <p>OrangeHRM's date pickers open a calendar popup. You navigate to the right month/year and click the day. This requires more steps but follows a clear pattern.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">CalendarWidget.java</span></div>
+    <pre><span class="cm">// OrangeHRM calendar structure:</span>
+<span class="cm">// &lt;div class="oxd-date-input"&gt;</span>
+<span class="cm">//   &lt;input type="text" readonly&gt; ← display field</span>
+<span class="cm">//   [calendar popup appears when clicked]</span>
+<span class="cm">// &lt;/div&gt;</span>
+
+<span class="cm">// STEP 1: Click the date field to open calendar</span>
+WebElement <span class="nm">dateInput</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(
+    By.<span class="fn">cssSelector</span>(<span class="st">".oxd-date-input input"</span>));
+dateInput.<span class="fn">click</span>();
+Thread.<span class="fn">sleep</span>(<span class="nu">500</span>);
+
+<span class="cm">// STEP 2: Read current month/year shown</span>
+<span class="ty">String</span> <span class="nm">currentMonth</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(
+    By.<span class="fn">cssSelector</span>(<span class="st">".oxd-calendar-selector-month-selected"</span>)).<span class="fn">getText</span>();
+<span class="fn">System.out.println</span>(<span class="st">"Calendar showing: "</span> <span class="op">+</span> currentMonth);
+
+<span class="cm">// STEP 3: Navigate months (click prev/next arrows)</span>
+WebElement <span class="nm">prevBtn</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(
+    By.<span class="fn">cssSelector</span>(<span class="st">".oxd-calendar-selector-left button"</span>));
+WebElement <span class="nm">nextBtn</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(
+    By.<span class="fn">cssSelector</span>(<span class="st">".oxd-calendar-selector-right button"</span>));
+
+<span class="cm">// Navigate back 2 months</span>
+prevBtn.<span class="fn">click</span>(); Thread.<span class="fn">sleep</span>(<span class="nu">300</span>);
+prevBtn.<span class="fn">click</span>(); Thread.<span class="fn">sleep</span>(<span class="nu">300</span>);
+
+<span class="cm">// STEP 4: Click specific day</span>
+List&lt;WebElement&gt; <span class="nm">days</span> <span class="op">=</span> driver.<span class="fn">findElements</span>(
+    By.<span class="fn">cssSelector</span>(<span class="st">".oxd-calendar-date:not(.oxd-calendar-date--disabled)"</span>));
+<span class="kw">for</span> (WebElement <span class="nm">day</span> : days) {
+    <span class="kw">if</span> (day.<span class="fn">getText</span>().<span class="fn">equals</span>(<span class="st">"15"</span>)) {
+        day.<span class="fn">click</span>();
+        <span class="fn">System.out.println</span>(<span class="st">"Clicked day 15"</span>);
+        <span class="kw">break</span>;
+    }
+}
+
+<span class="cm">// STEP 5: Verify date was set</span>
+<span class="ty">String</span> <span class="nm">setDate</span> <span class="op">=</span> dateInput.<span class="fn">getAttribute</span>(<span class="st">"value"</span>);
+<span class="fn">System.out.println</span>(<span class="st">"Date set to: "</span> <span class="op">+</span> setDate);</pre>
+  </div>
+</div>
+
+<!-- S7 -->
+<div class="section" id="s7">
+  <div class="section-header"><div class="section-num">07</div><h2>Date Picker — JavaScript Override</h2></div>
+  <p>When a date input is readonly and the calendar is complex to navigate, use JavaScript to set the value directly. Faster but bypasses UI validation — use cautiously.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">DatePickerJS.java</span></div>
+    <pre><span class="nm">JavascriptExecutor</span> <span class="nm">js</span> <span class="op">=</span> (<span class="nm">JavascriptExecutor</span>) driver;
+WebElement <span class="nm">dateInput</span> <span class="op">=</span> driver.<span class="fn">findElement</span>(By.<span class="fn">cssSelector</span>(<span class="st">".oxd-date-input input"</span>));
+
+<span class="cm">// Method 1: Set value via JS (bypasses readonly)</span>
+js.<span class="fn">executeScript</span>(<span class="st">"arguments[0].value = arguments[1]"</span>, dateInput, <span class="st">"2024-03-15"</span>);
+
+<span class="cm">// Method 2: Remove readonly attribute, then sendKeys</span>
+js.<span class="fn">executeScript</span>(<span class="st">"arguments[0].removeAttribute('readonly')"</span>, dateInput);
+dateInput.<span class="fn">clear</span>();
+dateInput.<span class="fn">sendKeys</span>(<span class="st">"03/15/2024"</span>);
+
+<span class="cm">// Method 3: Set via value property + trigger change event</span>
+js.<span class="fn">executeScript</span>(
+    <span class="st">"arguments[0].value = '2024-03-15'; "</span>
+    <span class="op">+</span> <span class="st">"arguments[0].dispatchEvent(new Event('change'))"</span>,
+    dateInput);
+
+<span class="cm">// Verify</span>
+<span class="ty">String</span> <span class="nm">val</span> <span class="op">=</span> dateInput.<span class="fn">getAttribute</span>(<span class="st">"value"</span>);
+<span class="fn">System.out.println</span>(<span class="st">"Date value: "</span> <span class="op">+</span> val);
+
+<span class="cm">// For OrangeHRM specifically — sendKeys works after clearing:</span>
+dateInput.<span class="fn">sendKeys</span>(Keys.CONTROL, <span class="st">"a"</span>);
+dateInput.<span class="fn">sendKeys</span>(<span class="st">"03/15/2024"</span>); <span class="cm">// MM/DD/YYYY format for OrangeHRM</span></pre>
+  </div>
+  <div class="callout warn">
+    <span class="callout-icon">&#9889;</span>
+    <div class="callout-body">
+      <div class="callout-title">OrangeHRM date format is MM/DD/YYYY</div>
+      <p>OrangeHRM's date fields expect <strong>MM/DD/YYYY</strong> format, not ISO (YYYY-MM-DD). Always check the placeholder text in DevTools to confirm the expected format before typing a date.</p>
+    </div>
+  </div>
+</div>
+
+<!-- S8 -->
+<div class="section" id="s8">
+  <div class="section-header"><div class="section-num">08</div><h2>Dynamic Elements — Elements That Appear After Action</h2></div>
+  <p>Modern apps load content dynamically. After clicking a dropdown or button, new elements appear in the DOM. You must wait for them before interacting.</p>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">DynamicElements.java</span></div>
+    <pre><span class="cm">// PROBLEM: Element not in DOM yet — findElement throws NoSuchElementException</span>
+
+<span class="cm">// Scenario 1: Options appear after clicking dropdown</span>
+driver.<span class="fn">findElement</span>(By.<span class="fn">cssSelector</span>(<span class="st">".dropdown-trigger"</span>)).<span class="fn">click</span>();
+<span class="cm">// If you immediately find options → NoSuchElementException</span>
+<span class="cm">// Solution: small pause (temporary until Day 20 explicit waits)</span>
+Thread.<span class="fn">sleep</span>(<span class="nu">500</span>);
+driver.<span class="fn">findElement</span>(By.<span class="fn">cssSelector</span>(<span class="st">".dropdown-option"</span>)).<span class="fn">click</span>();
+
+<span class="cm">// Scenario 2: Error message appears after clicking submit</span>
+driver.<span class="fn">findElement</span>(By.<span class="fn">cssSelector</span>(<span class="st">"button[type='submit']"</span>)).<span class="fn">click</span>();
+Thread.<span class="fn">sleep</span>(<span class="nu">1000</span>);
+<span class="ty">boolean</span> <span class="nm">hasError</span> <span class="op">=</span> !driver.<span class="fn">findElements</span>(
+    By.<span class="fn">cssSelector</span>(<span class="st">".error-message"</span>)).<span class="fn">isEmpty</span>();
+
+<span class="cm">// Scenario 3: Table reloads after search filter</span>
+driver.<span class="fn">findElement</span>(By.<span class="fn">cssSelector</span>(<span class="st">".search-btn"</span>)).<span class="fn">click</span>();
+Thread.<span class="fn">sleep</span>(<span class="nu">1500</span>); <span class="cm">// table refresh takes time</span>
+List&lt;WebElement&gt; <span class="nm">results</span> <span class="op">=</span> driver.<span class="fn">findElements</span>(
+    By.<span class="fn">cssSelector</span>(<span class="st">"tbody tr"</span>));
+<span class="fn">System.out.println</span>(<span class="st">"Results: "</span> <span class="op">+</span> results.<span class="fn">size</span>());
+
+<span class="cm">// Scenario 4: Page-level loading spinner</span>
+<span class="cm">// Wait for spinner to DISAPPEAR before interacting</span>
+<span class="cm">// Day 20 will cover this with WebDriverWait properly</span>
+<span class="cm">// For now: wait a fixed time after triggering action</span></pre>
+  </div>
+</div>
+
+<!-- S9 -->
+<div class="section" id="s9">
+  <div class="section-header"><div class="section-num">09</div><h2>Waiting for Dynamic Elements</h2></div>
+  <div class="hour-badge">&#9200; Hour 2 — Dynamic Handling &amp; Utilities (60 mins)</div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">WaitForElement.java</span></div>
+    <pre><span class="cm">// TEMPORARY approach (Days 9-19): polling loop</span>
+<span class="cm">// This is a manual explicit wait — replaced by WebDriverWait on Day 20</span>
+
+<span class="kw">public static</span> WebElement <span class="fn">waitForElement</span>(
+        WebDriver <span class="nm">driver</span>, By <span class="nm">locator</span>, <span class="ty">int</span> <span class="nm">maxSeconds</span>) {
+    <span class="ty">int</span> <span class="nm">waited</span> <span class="op">=</span> <span class="nu">0</span>;
+    <span class="kw">while</span> (waited <span class="op">&lt;</span> maxSeconds <span class="op">*</span> <span class="nu">1000</span>) {
+        List&lt;WebElement&gt; <span class="nm">els</span> <span class="op">=</span> driver.<span class="fn">findElements</span>(locator);
+        <span class="kw">if</span> (!els.<span class="fn">isEmpty</span>() <span class="op">&amp;&amp;</span> els.<span class="fn">get</span>(<span class="nu">0</span>).<span class="fn">isDisplayed</span>()) {
+            <span class="kw">return</span> els.<span class="fn">get</span>(<span class="nu">0</span>);
+        }
+        <span class="kw">try</span> { Thread.<span class="fn">sleep</span>(<span class="nu">500</span>); } <span class="kw">catch</span> (InterruptedException <span class="nm">e</span>) { <span class="kw">break</span>; }
+        waited <span class="op">+=</span> <span class="nu">500</span>;
+    }
+    <span class="kw">throw</span> <span class="kw">new</span> <span class="fn">RuntimeException</span>(<span class="st">"Element not found after "</span> <span class="op">+</span> maxSeconds <span class="op">+</span> <span class="st">"s: "</span> <span class="op">+</span> locator);
+}
+
+<span class="cm">// Wait for dropdown options to appear</span>
+<span class="kw">public static</span> List&lt;WebElement&gt; <span class="fn">waitForOptions</span>(
+        WebDriver <span class="nm">driver</span>, By <span class="nm">optionLocator</span>, <span class="ty">int</span> <span class="nm">maxSeconds</span>) {
+    <span class="ty">int</span> <span class="nm">waited</span> <span class="op">=</span> <span class="nu">0</span>;
+    <span class="kw">while</span> (waited <span class="op">&lt;</span> maxSeconds <span class="op">*</span> <span class="nu">1000</span>) {
+        List&lt;WebElement&gt; <span class="nm">opts</span> <span class="op">=</span> driver.<span class="fn">findElements</span>(optionLocator);
+        <span class="kw">if</span> (!opts.<span class="fn">isEmpty</span>()) <span class="kw">return</span> opts;
+        <span class="kw">try</span> { Thread.<span class="fn">sleep</span>(<span class="nu">300</span>); } <span class="kw">catch</span> (InterruptedException <span class="nm">e</span>) { <span class="kw">break</span>; }
+        waited <span class="op">+=</span> <span class="nu">300</span>;
+    }
+    <span class="kw">throw</span> <span class="kw">new</span> <span class="fn">RuntimeException</span>(<span class="st">"Options not found: "</span> <span class="op">+</span> optionLocator);
+}
+
+<span class="cm">// Usage</span>
+driver.<span class="fn">findElement</span>(By.<span class="fn">cssSelector</span>(<span class="st">".dropdown"</span>)).<span class="fn">click</span>();
+List&lt;WebElement&gt; <span class="nm">opts</span> <span class="op">=</span> <span class="fn">waitForOptions</span>(driver,
+    By.<span class="fn">cssSelector</span>(<span class="st">".dropdown-option"</span>), <span class="nu">5</span>);
+<span class="fn">System.out.println</span>(<span class="st">"Options: "</span> <span class="op">+</span> opts.<span class="fn">size</span>());
+opts.<span class="fn">get</span>(<span class="nu">0</span>).<span class="fn">click</span>();</pre>
+  </div>
+  <div class="callout note">
+    <span class="callout-icon">&#128204;</span>
+    <div class="callout-body">
+      <div class="callout-title">Day 20 replaces all of this with WebDriverWait</div>
+      <p>The manual polling loop above is for learning purposes only. On Day 20 you'll replace every Thread.sleep and manual loop with <code>new WebDriverWait(driver, Duration.ofSeconds(10)).until(ExpectedConditions.visibilityOfElementLocated(locator))</code> — one clean line that's faster and more reliable.</p>
+    </div>
+  </div>
+</div>
+
+<!-- S10 -->
+<div class="section" id="s10">
+  <div class="section-header"><div class="section-num">10</div><h2>DropdownHelper Utility</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">DropdownHelper.java — utils/DropdownHelper.java</span></div>
+    <pre><span class="kw">package</span> com.qaautomation.utils;
+
+<span class="kw">import</span> org.openqa.selenium.*;
+<span class="kw">import</span> org.openqa.selenium.support.ui.Select;
+<span class="kw">import</span> java.util.List;
+
+<span class="kw">public class</span> <span class="nm">DropdownHelper</span> {
+
+    <span class="cm">// Native select — by visible text</span>
+    <span class="kw">public static void</span> <span class="fn">selectByText</span>(WebDriver <span class="nm">d</span>, By <span class="nm">loc</span>, <span class="ty">String</span> <span class="nm">text</span>) {
+        <span class="kw">new</span> <span class="fn">Select</span>(d.<span class="fn">findElement</span>(loc)).<span class="fn">selectByVisibleText</span>(text);
+    }
+
+    <span class="cm">// Native select — by value</span>
+    <span class="kw">public static void</span> <span class="fn">selectByValue</span>(WebDriver <span class="nm">d</span>, By <span class="nm">loc</span>, <span class="ty">String</span> <span class="nm">value</span>) {
+        <span class="kw">new</span> <span class="fn">Select</span>(d.<span class="fn">findElement</span>(loc)).<span class="fn">selectByValue</span>(value);
+    }
+
+    <span class="cm">// Get selected option text from native select</span>
+    <span class="kw">public static</span> <span class="ty">String</span> <span class="fn">getSelectedText</span>(WebDriver <span class="nm">d</span>, By <span class="nm">loc</span>) {
+        <span class="kw">return</span> <span class="kw">new</span> <span class="fn">Select</span>(d.<span class="fn">findElement</span>(loc))
+            .<span class="fn">getFirstSelectedOption</span>().<span class="fn">getText</span>();
+    }
+
+    <span class="cm">// Custom dropdown — click trigger then click option by text</span>
+    <span class="kw">public static void</span> <span class="fn">selectCustom</span>(WebDriver <span class="nm">d</span>,
+            By <span class="nm">triggerLoc</span>, By <span class="nm">optionLoc</span>, <span class="ty">String</span> <span class="nm">text</span>) {
+        d.<span class="fn">findElement</span>(triggerLoc).<span class="fn">click</span>();
+        BrowserUtils.<span class="fn">pause</span>(<span class="nu">500</span>);
+        List&lt;WebElement&gt; <span class="nm">opts</span> <span class="op">=</span> d.<span class="fn">findElements</span>(optionLoc);
+        <span class="kw">for</span> (WebElement <span class="nm">opt</span> : opts) {
+            <span class="kw">if</span> (opt.<span class="fn">getText</span>().<span class="fn">trim</span>().<span class="fn">equals</span>(text)) {
+                opt.<span class="fn">click</span>();
+                <span class="kw">return</span>;
+            }
+        }
+        <span class="kw">throw</span> <span class="kw">new</span> <span class="fn">RuntimeException</span>(<span class="st">"Option not found: "</span> <span class="op">+</span> text);
+    }
+
+    <span class="cm">// Auto-complete — type and select suggestion</span>
+    <span class="kw">public static void</span> <span class="fn">selectAutoComplete</span>(WebDriver <span class="nm">d</span>,
+            By <span class="nm">inputLoc</span>, By <span class="nm">sugLoc</span>, <span class="ty">String</span> <span class="nm">typeText</span>, <span class="ty">String</span> <span class="nm">selectText</span>) {
+        WebElement <span class="nm">input</span> <span class="op">=</span> d.<span class="fn">findElement</span>(inputLoc);
+        input.<span class="fn">clear</span>();
+        input.<span class="fn">sendKeys</span>(typeText);
+        BrowserUtils.<span class="fn">pause</span>(<span class="nu">1000</span>);
+        List&lt;WebElement&gt; <span class="nm">sugs</span> <span class="op">=</span> d.<span class="fn">findElements</span>(sugLoc);
+        <span class="kw">for</span> (WebElement <span class="nm">sug</span> : sugs) {
+            <span class="kw">if</span> (sug.<span class="fn">getText</span>().<span class="fn">contains</span>(selectText)) {
+                sug.<span class="fn">click</span>();
+                <span class="kw">return</span>;
+            }
+        }
+        <span class="kw">throw</span> <span class="kw">new</span> <span class="fn">RuntimeException</span>(<span class="st">"Suggestion not found: "</span> <span class="op">+</span> selectText);
+    }
+
+    <span class="cm">// Get all option texts from native select</span>
+    <span class="kw">public static</span> List&lt;String&gt; <span class="fn">getAllOptionTexts</span>(WebDriver <span class="nm">d</span>, By <span class="nm">loc</span>) {
+        List&lt;String&gt; <span class="nm">texts</span> <span class="op">=</span> <span class="kw">new</span> java.util.ArrayList&lt;&gt;();
+        <span class="kw">new</span> <span class="fn">Select</span>(d.<span class="fn">findElement</span>(loc)).<span class="fn">getOptions</span>()
+            .<span class="fn">forEach</span>(<span class="nm">o</span> -> texts.<span class="fn">add</span>(o.<span class="fn">getText</span>()));
+        <span class="kw">return</span> texts;
+    }
+}</pre>
+  </div>
+</div>
+
+<!-- S11 -->
+<div class="section" id="s11">
+  <div class="section-header"><div class="section-num">11</div><h2>Practice Task — OrangeHRM Leave Application</h2></div>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Java</span><span class="code-file">Day18Practice.java</span></div>
+    <pre><span class="kw">package</span> com.qaautomation.tests;
+
+<span class="kw">import</span> com.qaautomation.utils.*;
+<span class="kw">import</span> org.openqa.selenium.*;
+<span class="kw">import</span> org.openqa.selenium.support.ui.Select;
+<span class="kw">import</span> java.util.List;
+
+<span class="kw">public class</span> <span class="nm">Day18Practice</span> {
+
+    <span class="kw">static final</span> By <span class="nm">USERNAME</span>  <span class="op">=</span> By.<span class="fn">name</span>(<span class="st">"username"</span>);
+    <span class="kw">static final</span> By <span class="nm">PASSWORD</span>  <span class="op">=</span> By.<span class="fn">name</span>(<span class="st">"password"</span>);
+    <span class="kw">static final</span> By <span class="nm">LOGIN_BTN</span> <span class="op">=</span> By.<span class="fn">cssSelector</span>(<span class="st">"button[type='submit']"</span>);
+
+    <span class="kw">public static void</span> <span class="fn">main</span>(<span class="ty">String</span>[] args) <span class="kw">throws</span> InterruptedException {
+        WebDriver <span class="nm">driver</span> <span class="op">=</span> DriverFactory.<span class="fn">getDriver</span>(<span class="st">"chrome"</span>);
+
+        <span class="kw">try</span> {
+            <span class="cm">// Login first</span>
+            driver.<span class="fn">get</span>(ConfigReader.<span class="fn">getBaseUrl</span>());
+            driver.<span class="fn">findElement</span>(USERNAME).<span class="fn">sendKeys</span>(ConfigReader.<span class="fn">getUsername</span>());
+            driver.<span class="fn">findElement</span>(PASSWORD).<span class="fn">sendKeys</span>(ConfigReader.<span class="fn">getPassword</span>());
+            driver.<span class="fn">findElement</span>(LOGIN_BTN).<span class="fn">click</span>();
+            Thread.<span class="fn">sleep</span>(<span class="nu">2000</span>);
+
+            <span class="cm">// Task 1: Navigate to Leave module</span>
+            <span class="fn">System.out.println</span>(<span class="st">"====== TASK 1: Navigate to Leave ======"</span>);
+            driver.<span class="fn">findElement</span>(By.<span class="fn">xpath</span>(<span class="st">"//span[text()='Leave']"</span>)).<span class="fn">click</span>();
+            Thread.<span class="fn">sleep</span>(<span class="nu">1500</span>);
+            <span class="fn">System.out.println</span>(<span class="st">"  Page: "</span> <span class="op">+</span> driver.<span class="fn">getTitle</span>());
+            <span class="fn">System.out.println</span>(<span class="st">"  URL : "</span> <span class="op">+</span> driver.<span class="fn">getCurrentUrl</span>());
+
+            <span class="cm">// Task 2: Explore the Leave List page</span>
+            <span class="fn">System.out.println</span>(<span class="st">"\n====== TASK 2: Leave List Elements ======"</span>);
+            <span class="ty">boolean</span> <span class="nm">hasTable</span> <span class="op">=</span> !driver.<span class="fn">findElements</span>(
+                By.<span class="fn">cssSelector</span>(<span class="st">".oxd-table"</span>)).<span class="fn">isEmpty</span>();
+            <span class="fn">System.out.println</span>(<span class="st">"  Has table: "</span> <span class="op">+</span> hasTable);
+
+            <span class="ty">boolean</span> <span class="nm">hasFilter</span> <span class="op">=</span> !driver.<span class="fn">findElements</span>(
+                By.<span class="fn">cssSelector</span>(<span class="st">".oxd-form"</span>)).<span class="fn">isEmpty</span>();
+            <span class="fn">System.out.println</span>(<span class="st">"  Has filter form: "</span> <span class="op">+</span> hasFilter);
+
+            <span class="cm">// Task 3: Check dropdown elements on the page</span>
+            <span class="fn">System.out.println</span>(<span class="st">"\n====== TASK 3: Dropdowns ======"</span>);
+            List&lt;WebElement&gt; <span class="nm">selects</span> <span class="op">=</span> driver.<span class="fn">findElements</span>(
+                By.<span class="fn">cssSelector</span>(<span class="st">".oxd-select-wrapper"</span>));
+            <span class="fn">System.out.println</span>(<span class="st">"  Custom dropdowns on page: "</span> <span class="op">+</span> selects.<span class="fn">size</span>());
+
+            List&lt;WebElement&gt; <span class="nm">inputs</span> <span class="op">=</span> driver.<span class="fn">findElements</span>(
+                By.<span class="fn">cssSelector</span>(<span class="st">".oxd-date-input input"</span>));
+            <span class="fn">System.out.println</span>(<span class="st">"  Date fields on page: "</span> <span class="op">+</span> inputs.<span class="fn">size</span>());
+
+            <span class="cm">// Task 4: Set date fields if present</span>
+            <span class="fn">System.out.println</span>(<span class="st">"\n====== TASK 4: Date Fields ======"</span>);
+            <span class="kw">if</span> (!inputs.<span class="fn">isEmpty</span>()) {
+                WebElement <span class="nm">firstDate</span> <span class="op">=</span> inputs.<span class="fn">get</span>(<span class="nu">0</span>);
+                <span class="fn">System.out.println</span>(<span class="st">"  1st date field visible: "</span> <span class="op">+</span> firstDate.<span class="fn">isDisplayed</span>());
+                <span class="fn">System.out.println</span>(<span class="st">"  Placeholder: "</span> <span class="op">+</span> firstDate.<span class="fn">getAttribute</span>(<span class="st">"placeholder"</span>));
+                firstDate.<span class="fn">clear</span>();
+                firstDate.<span class="fn">sendKeys</span>(<span class="st">"01/01/2024"</span>);
+                Thread.<span class="fn">sleep</span>(<span class="nu">300</span>);
+                <span class="fn">System.out.println</span>(<span class="st">"  Date typed: 01/01/2024"</span>);
+            } <span class="kw">else</span> {
+                <span class="fn">System.out.println</span>(<span class="st">"  No date fields visible (might need to open Leave form)"</span>);
+            }
+
+            <span class="cm">// Task 5: Search button state</span>
+            <span class="fn">System.out.println</span>(<span class="st">"\n====== TASK 5: Buttons ======"</span>);
+            List&lt;WebElement&gt; <span class="nm">buttons</span> <span class="op">=</span> driver.<span class="fn">findElements</span>(
+                By.<span class="fn">cssSelector</span>(<span class="st">"button.oxd-button"</span>));
+            <span class="fn">System.out.println</span>(<span class="st">"  Buttons on page: "</span> <span class="op">+</span> buttons.<span class="fn">size</span>());
+            <span class="kw">for</span> (WebElement <span class="nm">b</span> : buttons) {
+                <span class="fn">System.out.println</span>(<span class="st">"  → '"</span> <span class="op">+</span> b.<span class="fn">getText</span>() <span class="op">+</span> <span class="st">"' enabled="</span> <span class="op">+</span> b.<span class="fn">isEnabled</span>());
+            }
+            <span class="fn">System.out.println</span>(<span class="st">"  ✓ PASS"</span>);
+
+        } <span class="kw">catch</span> (Exception <span class="nm">e</span>) {
+            <span class="fn">System.out.println</span>(<span class="st">"Error: "</span> <span class="op">+</span> e.<span class="fn">getMessage</span>());
+        } <span class="kw">finally</span> {
+            driver.<span class="fn">quit</span>();
+            <span class="fn">System.out.println</span>(<span class="st">"\nBrowser closed ✓"</span>);
+        }
+    }
+}</pre>
+  </div>
+  <h3>Expected Output</h3>
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Output</span><span class="code-file">Console</span></div>
+    <pre>====== TASK 1: Navigate to Leave ======
+  Page: OrangeHRM
+  URL : https://opensource-demo.orangehrmlive.com/web/index.php/leave/viewLeaveList
+
+====== TASK 2: Leave List Elements ======
+  Has table: true
+  Has filter form: true
+
+====== TASK 3: Dropdowns ======
+  Custom dropdowns on page: 3
+  Date fields on page: 2
+
+====== TASK 4: Date Fields ======
+  1st date field visible: true
+  Placeholder: yyyy-dd-mm
+  Date typed: 01/01/2024
+
+====== TASK 5: Buttons ======
+  Buttons on page: 2
+  → 'Search' enabled=true
+  → 'Reset' enabled=true
+  ✓ PASS
+
+Browser closed ✓</pre>
+  </div>
+</div>
+
+<!-- S12 -->
+<div class="section" id="s12">
+  <div class="section-header"><div class="section-num">12</div><h2>Common Mistakes</h2></div>
+  <div class="mistake-grid">
+    <div class="mistake-card"><div class="mt">&#10060; Using Select on custom dropdown</div><p>If the HTML is <code>&lt;div&gt;</code> not <code>&lt;select&gt;</code>, <code>new Select(element)</code> throws UnexpectedTagNameException. Always inspect the HTML tag before choosing your strategy.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; Not waiting after dropdown click</div><p>Clicking the dropdown trigger and immediately finding options — the options haven't rendered yet. Add Thread.sleep(500) or Day 20's explicit wait.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; Wrong date format</div><p>OrangeHRM uses MM/DD/YYYY. HTML5 date inputs use YYYY-MM-DD. Bootstrap datepickers may use DD/MM/YYYY. Always check the placeholder in DevTools.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; Typing in read-only date field</div><p>sendKeys on a readonly input silently fails. Use JS to remove readonly first, or use the calendar widget to navigate and click the day.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; Auto-complete not waiting for suggestions</div><p>Type text, then immediately look for suggestions — they haven't loaded. The search hits an API. Wait 1+ seconds after sendKeys before finding suggestion elements.</p></div>
+    <div class="mistake-card"><div class="mt">&#10060; Clicking disabled option</div><p>Some dropdown options are disabled (grayed out). Clicking them silently does nothing. Check <code>isEnabled()</code> or look for disabled CSS classes before clicking.</p></div>
+  </div>
+</div>
+
+<!-- S13 -->
+<div class="section" id="s13">
+  <div class="section-header"><div class="section-num">13</div><h2>End of Day Checklist + Resources</h2></div>
+  <div class="checklist">
+    <div class="checklist-title">&#10022; End of Day 18 Checklist</div>
+    <div class="check-item"><div class="check-box"></div>I can identify the 6 dropdown types by inspecting HTML</div>
+    <div class="check-item"><div class="check-box"></div>I use Select class for native &lt;select&gt; elements — selectByVisibleText, selectByValue, selectByIndex</div>
+    <div class="check-item"><div class="check-box"></div>I handle custom div dropdowns: click trigger → wait → click option</div>
+    <div class="check-item"><div class="check-box"></div>I handle auto-complete: sendKeys → wait → click suggestion</div>
+    <div class="check-item"><div class="check-box"></div>I can set HTML5 date inputs with sendKeys using correct format</div>
+    <div class="check-item"><div class="check-box"></div>I know how to navigate calendar widgets (prev/next + click day)</div>
+    <div class="check-item"><div class="check-box"></div>I use JS to set date values when field is readonly</div>
+    <div class="check-item"><div class="check-box"></div>DropdownHelper.java created in utils package</div>
+    <div class="check-item"><div class="check-box"></div>Practice task runs — all 5 tasks produce correct output</div>
+  </div>
+  <h3>Resources</h3>
+  <ul class="resource-list">
+    <li><span>&#128214;</span><strong>Selenium Docs:&nbsp;</strong><a href="https://www.selenium.dev/documentation/webdriver/support_features/select_lists/" target="_blank">Selenium — Select Lists</a> &nbsp;<span style="color:var(--muted);font-size:12px">Official Select class documentation.</span></li>
+    <li><span>&#127947;</span><strong>Practice:&nbsp;</strong><a href="https://demoqa.com/select-menu" target="_blank">DemoQA — Select Menu</a> &nbsp;<span style="color:var(--muted);font-size:12px">Multiple dropdown types to practice on one page.</span></li>
+    <li><span>&#127947;</span><strong>Practice:&nbsp;</strong><a href="https://demoqa.com/date-picker" target="_blank">DemoQA — Date Picker</a> &nbsp;<span style="color:var(--muted);font-size:12px">Date and datetime pickers for hands-on practice.</span></li>
+  </ul>
+  <div class="callout tip">
+    <span class="callout-icon">&#128640;</span>
+    <div class="callout-body">
+      <div class="callout-title">Day 19 Preview — Actions Class</div>
+      <p>Tomorrow: <strong>Actions class</strong> — mouse hover, right-click, double-click, drag and drop, and keyboard combinations. After Day 19, you can automate any mouse and keyboard interaction. Then Day 20 brings the biggest improvement: <strong>Explicit Waits</strong> — removing all Thread.sleep calls forever.</p>
+    </div>
+  </div>
+</div>
+
+</div>
+<div class="footer">
+  <span>Day 18 of 65</span> &nbsp;&middot;&nbsp; Selenium + Java Automation Roadmap &nbsp;&middot;&nbsp; Phase 2 &mdash; Core Selenium &nbsp;&middot;&nbsp; <span>Next: Day 19 &mdash; Actions Class</span>
+</div>
+</body>
+</html>
